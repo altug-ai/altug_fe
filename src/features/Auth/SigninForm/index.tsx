@@ -154,7 +154,7 @@ const SigninForm = (props: Props) => {
             </div>
 
 
-            <div className='flex flex-col space-y-2 mb-10 w-full max-w-[388px]'>
+            <div className='flex flex-col space-y   -2 mb-10 w-full max-w-[388px]'>
                 <h1 className='font-bold text-[36px] leading-[45.36px] text-[#F5F7F8]'>{t("Title")}</h1>
                 <h1 className='font-normal text-[20px] leading-[20px] tracking-[1px] text-[#F5F7F8]  '>{t("SubTitle")}</h1>
             </div>
