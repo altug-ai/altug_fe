@@ -1,0 +1,18 @@
+{
+  "id": "1",
+  "name": "Altug AI",
+  "short_name": "Altug",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "188x36",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#FFFFFF",
+  "background_color": "#FFFFFF",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
+}
