@@ -240,7 +240,7 @@ const CoachChat = (props: Props) => {
     }
 
 
-
+    console.log("here", data?.attributes?.prompts)
 
 
     return (
@@ -281,11 +281,16 @@ const CoachChat = (props: Props) => {
                         {
                             data?.attributes?.prompts?.map((prompt: any) => (
                                 <div onClick={() => {
-                                    setInput(prompt)
+                                    if (prompt?.prompt) {
+                                        setInput(prompt?.prompt)
+                                    } else {
+                                        setInput(prompt)
+                                    }
+
                                 }} key={prompt} className='rounded-[44px] cursor-pointer mb-[16px] px-5 py-2  w-[335px] gap-[12px] min-h-[44px] bg-[#3B424F]   flex flex-col justify-center items-center'>
                                     <div className='flex space-x-[10px] items-center text-[12px] font-medium leading-[24px] text-white'>
                                         <Image src={"/profile/flash.png"} width={500} height={500} alt='flash' className='object-cover h-[24px] w-[24px]' />
-                                        <h1>{prompt}</h1>
+                                        <h1>{prompt?.prompt ?? prompt}</h1>
                                     </div>
                                 </div>
                             ))
