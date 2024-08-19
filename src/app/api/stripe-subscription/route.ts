@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   const customers = await stripe.customers.list({ email: customerEmail });
   if (customers.data.length > 0) {
     customer = customers.data[0];
-  } else {
+  } else {  
     customer = await stripe.customers.create({
       email: customerEmail,
     });

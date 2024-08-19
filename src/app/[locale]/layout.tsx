@@ -7,6 +7,10 @@ import { NextAuthProvider } from "@/features/Auth/NextAuthProvider";
 import { ReactNode } from "react";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
+import { authOptions } from '@/lib/auth';
+import { getServerSession } from "next-auth";
+import { redirect } from 'next/navigation';
+import { fetcher } from "@/lib/functions";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const plus = Plus_Jakarta_Sans({
@@ -36,6 +40,8 @@ export default async function RootLayout(props: Props) {
   const { children, params: { locale } } = props;
 
   const messages = await getMessages();
+
+
   return (
     <html lang={locale}>
 
