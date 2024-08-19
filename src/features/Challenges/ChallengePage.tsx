@@ -35,7 +35,7 @@ const ChallengePage = (props: Props) => {
     const { loading, profileId, jwt } = useContext(AuthContext)
     const params = useParams();
     const { slug }: any = params;
-    const { handleStartCaptureClick, route, setRoute, setVideoUrl, setVideoBlob, point, challengeLoader, setChallengeLoader, } = useContext(ChallengeContext)
+    const { handleStartCaptureClick, route, setRoute, setVideoUrl, setVideoBlob, point, challengeLoader, setChallengeLoader, chal, setChal } = useContext(ChallengeContext)
     const [profiles, setProfiles] = useState(new Set());
     const [profiless, setProfiless] = useState(new Set());
     const t = useTranslations('Home.ChallengePage');
@@ -69,6 +69,9 @@ const ChallengePage = (props: Props) => {
         if (data?.attributes?.submitted_challenges?.data?.length > 0) {
             const updatedSet = new Set(profiles);
             data?.attributes?.submitted_challenges?.data?.map(async (dat: any) => {
+                if (dat?.attributes?.client_profile?.data?.id === profileId) {
+                    setChal(dat)
+                }
                 updatedSet?.add(dat?.attributes?.client_profile?.data?.id);
             });
             setProfiles(updatedSet);
@@ -167,11 +170,13 @@ const ChallengePage = (props: Props) => {
         }
     }
 
+
+    console.log("teh chal", chal)
+
     return (
         <div className='py-[20px] px-[20px] h-full  flex flex-col items-center '>
 
             <Header title={data?.attributes?.title} route={route} setRoute={setRoute} />
-
 
             {/* <VideoRecorder /> */}
             {/* the loader */}
@@ -240,6 +245,25 @@ const ChallengePage = (props: Props) => {
                                                     <div className='rounded-[35px]  cursor-pointer mt-3 w-full gap-[12px] h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
                                                         {t("Submit")}
                                                     </div>
+                                                    {
+                                                        chal?.attributes?.points === 0 && (
+                                                            <div className='w-full max-w-[388px] fixed bottom-[20%] '>
+                                                                <Input
+                                                                    id='video'
+                                                                    type="file"
+                                                                    accept="video/*"
+                                                                    style={{ display: 'none' }}
+                                                                    onChange={handleVideoChange}
+                                                                />
+                                                                <Label htmlFor="video" >
+                                                                    <div className='rounded-[35px]  cursor-pointer mt-3 w-full gap-[12px] h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
+                                                                        Redo challenge
+                                                                    </div>
+                                                                </Label>
+                                                            </div>
+                                                        )
+
+                                                    }
                                                 </div>
                                             ) : (<div className='w-full max-w-[388px] fixed bottom-[10%] '>
                                                 <div onClick={
@@ -266,8 +290,6 @@ const ChallengePage = (props: Props) => {
 
 
                         </div >
-
-
                     </div >
                 )
             }

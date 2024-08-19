@@ -218,6 +218,8 @@ export type ChallengeProps = {
   recording: boolean;
   setRecording: Dispatch<SetStateAction<boolean>>;
   videoBlob: any;
+  setChal: Dispatch<any>;
+  chal: any;
   setVideoBlob: Dispatch<SetStateAction<any>>;
   videoUrl: string;
   setVideoUrl: Dispatch<SetStateAction<string>>;

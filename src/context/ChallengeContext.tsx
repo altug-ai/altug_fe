@@ -46,6 +46,7 @@ function ChallengeContextProvider(props: any) {
     const [descriptionn, setDescriptionn] = useState<string>("");
     const [response, setResponse] = useState<any[]>([]);
     const [elapsedTime, setElapsedTime] = useState(0);
+    const [chal, setChal] = useState<any>()
     const t = useTranslations('Home.ChallengePage');
     const maxDuration = 2 * 60 * 1000; // 2 minutes in milliseconds
 
@@ -162,24 +163,49 @@ function ChallengeContextProvider(props: any) {
                 }
             );
 
-            const profile = await axios.post(
-                `${process.env.NEXT_PUBLIC_STRAPI_URL}/submitted-challenges`,
-                {
-                    data: {
-                        client_profile: profileId,
-                        challenge: slug,
-                        video: response.data[0].id,
-                        stat: stat,
-                        points: point === "" ? 0 : point === null ? 0 : point ? parseInt(point) : 0
+            let profile: any;
+
+            if (chal?.id) {
+                profile = await axios.put(
+                    `${process.env.NEXT_PUBLIC_STRAPI_URL}/submitted-challenges/${chal?.id}`,
+                    {
+                        data: {
+                            client_profile: profileId,
+                            challenge: slug,
+                            video: response.data[0].id,
+                            stat: stat,
+                            points: point === "" ? 0 : point === null ? 0 : point ? parseInt(point) : 0
+                        },
                     },
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${jwt}`,
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${jwt}`,
+                        },
+                    }
+                );
+
+            } else {
+                profile = await axios.post(
+                    `${process.env.NEXT_PUBLIC_STRAPI_URL}/submitted-challenges`,
+                    {
+                        data: {
+                            client_profile: profileId,
+                            challenge: slug,
+                            video: response.data[0].id,
+                            stat: stat,
+                            points: point === "" ? 0 : point === null ? 0 : point ? parseInt(point) : 0
+                        },
                     },
-                }
-            );
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${jwt}`,
+                        },
+                    }
+                );
+            }
+
 
             if (profile?.data?.data?.id) {
                 // update the stats and total_point in the client profile
@@ -216,7 +242,7 @@ function ChallengeContextProvider(props: any) {
                     const timeout = setTimeout(() => {
                         setChallengeLoader((prev) => !prev);
                     }, 2000);
-
+                    setChal(null)
                     setProgress(100)
                     setRefetch(!refetch)
                     setUserPoint(point === "" ? "0" : point === null ? "0" : point ? point : "0")
@@ -494,6 +520,8 @@ You have been provided with a sequence of frame descriptions, where each frame (
                 challengeLoader,
                 setChallengeLoader,
                 recording,
+                chal,
+                setChal,
                 setRecording,
                 videoBlob,
                 setVideoBlob,

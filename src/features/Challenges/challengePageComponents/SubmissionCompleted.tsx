@@ -12,6 +12,7 @@ import RatingsBar from '@/features/Profile/components/RatingsBar'
 import { useGetSubmittedChallenges } from '@/hooks/useGetSubmittedChallenges'
 import { Stat } from '@/context/types'
 import { useRouter } from 'next/navigation'
+import { useParams } from "next/navigation";
 import { ChallengeContext } from '@/context/ChallengeContext'
 import { AuthContext } from '@/context/AuthContext'
 import { useTranslations } from "next-intl";
@@ -29,6 +30,8 @@ const SubmissionCompleted = ({ setRoute, point, stat }: Props) => {
     const { totalPoint } = useContext(AuthContext)
     const { userPoint } = useContext(ChallengeContext)
     const t = useTranslations('Home.ChallengePage');
+    const params = useParams();
+    const { slug }: any = params;
     // let statss: Stat = stats
 
     // useEffect(() => {
@@ -84,6 +87,16 @@ const SubmissionCompleted = ({ setRoute, point, stat }: Props) => {
                 <RatingsBar number={stats?.passing} stat={t("Passing")} />
                 <div className='h-[224.85px] w-[1px] bg-[#BBBBBB]' />
             </div>
+
+            {
+                userPoint === "0" || userPoint === "" && (
+                    <div onClick={() => {
+                        router.push(`/challenge/${slug}`)
+                    }} className='rounded-[35px]  cursor-pointer mt-3 w-full gap-[12px] h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
+                        Redo Challenge
+                    </div>
+                )
+            }
 
 
             <div className='w-full max-w-[388px] fixed bottom-[10%] '>
