@@ -38,7 +38,7 @@ export function useGetSubmittedChallenges(day = 7) {
 
             try {
                 const personal = await fetcher(
-                    `${process.env.NEXT_PUBLIC_STRAPI_URL}/submitted-challenges/?filters[client_profile][id][$eq]=${profileId}&filters[createdAt][$gte]=${isoDaysAgo}&filters[createdAt][$lte]=${isoCurrentDate}`,
+                    `${process.env.NEXT_PUBLIC_STRAPI_URL}/submitted-challenges/?filters[client_profile][id][$eq]=${profileId}&filters[updatedAt][$gte]=${isoDaysAgo}&filters[updatedAt][$lte]=${isoCurrentDate}`,
                     {
                         headers: {
                             "Content-Type": "application/json",
@@ -49,8 +49,6 @@ export function useGetSubmittedChallenges(day = 7) {
 
                 if (isMounted && personal?.data) {
                     setData(personal?.data);
-
-                    // console.log("the data", personal?.data)
 
                     // Calculate new stats based on fetched data
                     const newStats = personal.data.reduce((acc: any, data: any) => {

@@ -7,6 +7,8 @@ import { AuthProps, Coaches, Players, PreferenceSettings, Profile, Tier, UserDat
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { sendNo } from "@/features/CoachChat/functions/functions";
+import { useRouter } from "next/navigation";
+import { usePathname } from 'next/navigation'
 
 
 // @ts-ignore
@@ -22,6 +24,7 @@ function AuthContextProvider({ children }: Props) {
     const [reload, setReload] = useState<boolean>(false)
     const [profileId, setProfileId] = useState<number>();
     const [profileEmail, setProfileEmail] = useState<string>("");
+    const router = useRouter()
     const [profilepic, setProfilePic] = useState<string>();
     const [userId, setUserId] = useState<number>();
     const [profile, setProfile] = useState<Profile>();
@@ -53,6 +56,7 @@ function AuthContextProvider({ children }: Props) {
         passing: 0,
         accuracy: 0
     })
+    const pathname = usePathname()
     // get the client profile
 
     // const { profile, prof, agency, user } = useContext(AuthContext)
@@ -117,7 +121,7 @@ function AuthContextProvider({ children }: Props) {
                     } else {
                         setMessagesLeft(data?.data[0]?.attributes?.messagesLeft)
                     }
-                   
+
                     insertStats(data?.data[0]?.attributes)
                     getPosition(data?.data[0]?.attributes?.preference?.data?.attributes?.position)
                     setPublished(data?.data[0]?.attributes?.createdAt)
@@ -153,6 +157,9 @@ function AuthContextProvider({ children }: Props) {
                         updatedSett?.add(dat?.attributes?.player?.data?.id);
                     });
                     setPlayerIds(updatedSett);
+                    if (!data?.data[0]?.attributes?.user_role?.data?.id && pathname !== "/details") {
+                        router.push("/details")
+                    }
                     setLoading(false);
                 })
                 .catch((error) => {
@@ -183,6 +190,13 @@ function AuthContextProvider({ children }: Props) {
         }
 
     }, [session, reload]);
+
+
+    // useEffect(() => {
+    //     if (!roleId && pathname !== "/details") {
+    //         router.push("/details")
+    //     }
+    // }, [router])
 
 
 

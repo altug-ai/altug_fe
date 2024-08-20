@@ -18,7 +18,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const response = await openai.beta.threads.messages.list(threadId);
+    const response = await openai.beta.threads.messages.list(threadId, {
+      limit: 100,
+    });
     return new Response(JSON.stringify(response), { status: 200 });
   } catch (error) {
     console.error('Error fetching messages:', error);
