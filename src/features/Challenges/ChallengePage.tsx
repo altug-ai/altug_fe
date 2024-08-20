@@ -170,9 +170,6 @@ const ChallengePage = (props: Props) => {
         }
     }
 
-
-    console.log("teh chal", chal)
-
     return (
         <div className='py-[20px] px-[20px] h-full  flex flex-col items-center '>
 
