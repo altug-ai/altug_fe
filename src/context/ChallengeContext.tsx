@@ -108,7 +108,7 @@ function ChallengeContextProvider(props: any) {
                 setRoute(1)
             }
         }, maxDuration);
-    }, [facingMode]);
+    }, [facingMode]);               
 
 
     // to pause the recording

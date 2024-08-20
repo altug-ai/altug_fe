@@ -89,9 +89,10 @@ const SubmissionCompleted = ({ setRoute, point, stat }: Props) => {
             </div>
 
             {
-                userPoint === "0" || userPoint === "" && (
+                (userPoint === "0" || userPoint === "") && (
                     <div onClick={() => {
-                        router.push(`/challenge/${slug}`)
+                        window.location.reload();
+                        setRoute(0)
                     }} className='rounded-[35px]  cursor-pointer mt-3 w-full gap-[12px] h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
                         Redo Challenge
                     </div>

@@ -34,6 +34,8 @@ const Questions = (props: Props) => {
         }
     }, [session])
 
+    console.log("the form and formINdex", form, formIndex)
+
 
     // console.log("thnsis the curent", current)
 
@@ -130,7 +132,7 @@ const Questions = (props: Props) => {
                                             {
                                                 current?.attributes?.options?.map((option: any) => (
                                                     <div key={option?.id} onClick={() => {
-                                                        if (form[formIndex]?.includes(option?.option)) {
+                                                        if (form && form[formIndex]?.includes(option?.option)) {
                                                             // Remove the option from the form state
                                                             setForm(prevForm => {
                                                                 const updatedForm: any = { ...prevForm };
