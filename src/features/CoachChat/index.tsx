@@ -24,9 +24,8 @@ const CoachChat = (props: Props) => {
     const router = useRouter()
     const params = useParams();
     const { slug }: any = params;
-
+    const [voices, setVoices] = useState<Array<SpeechSynthesisVoice>>();
     const { jwt, loading: loader, profileId, handleSubscribe, coaches, setCoaches, coachIds, setCoachIds } = useContext(AuthContext)
-
     const [data, setData] = useState<any>({})
     const [prompt, setPrompt] = useState<string>("")
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -43,6 +42,21 @@ const CoachChat = (props: Props) => {
     const [paid, setPaid] = useState<boolean>(false)
     const [previousLoad, setPreviousLoad] = useState<boolean>(false)
     let [isOpen, setIsOpen] = useState(false)
+
+
+    useEffect(() => {
+        const voices = window.speechSynthesis.getVoices();
+        if (Array.isArray(voices) && voices.length > 0) {
+            setVoices(voices);
+            return;
+        }
+        if ('onvoiceschanged' in window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = function () {
+                const voices = window.speechSynthesis.getVoices();
+                setVoices(voices);
+            }
+        }
+    }, []);
 
     // Ref to track whether getCoach has been executed once
     const hasFetchedChat = useRef(false);
@@ -65,6 +79,19 @@ const CoachChat = (props: Props) => {
             // // userThreadId,
         },
     });
+
+
+    useEffect(() => {
+        if (status !== "in_progress" && tier === "premium") {
+            let content = messages[messages?.length - 1]?.content
+            const utterance = new SpeechSynthesisUtterance(content);
+            if (voices?.[6]) {
+                utterance.voice = voices[6];
+            };
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+        }
+    }, [messages, status])
 
 
     useEffect(() => {
@@ -198,7 +225,8 @@ const CoachChat = (props: Props) => {
 
 
 
-    const handleChat = async () => {
+
+    const handleChat = async (message: any) => {
 
 
         if (!(coachIds?.has(parseInt(slug)))) {
@@ -236,11 +264,10 @@ const CoachChat = (props: Props) => {
                 setCoaches(follow?.data?.data?.attributes?.coaches)
             }
         }
+
         return;
     }
 
-
-    console.log("here", data?.attributes?.prompts)
 
 
     return (
@@ -308,10 +335,12 @@ const CoachChat = (props: Props) => {
 
 
                     {
-                        previous?.slice()?.reverse()?.map((info: any) => (
+                        previous?.slice()?.reverse()?.map((info: any, index) => (
                             <Message
+                                voices={voices}
+                                premium={tier === "premium"}
                                 image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url}
-                                key={info.id}
+                                key={`${info.id} - ${index}`}
                                 message={info?.content[0]?.text?.value}
                                 system={info?.role === "assistant" ? true : false}
                                 user={info?.role === "user" ? true : false}
@@ -320,8 +349,8 @@ const CoachChat = (props: Props) => {
                     }
 
                     {
-                        messages?.map((info: any) => (
-                            <Message image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={info.id} message={info?.content} system={info?.role === "assistant" ? true : false} user={info?.role === "user" ? true : false} />
+                        messages?.map((info: any, index) => (
+                            <Message voices={voices} premium={tier === "premium"} image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={`${info.id} - ${index}`} message={info?.content} system={info?.role === "assistant" ? true : false} user={info?.role === "user" ? true : false} />
                         ))
                     }
 
@@ -348,7 +377,7 @@ const CoachChat = (props: Props) => {
                                 return
                             }
                             let response = await submitMessage(e)
-                            handleChat()
+                            handleChat(messages)
                         }} className='relative w-full max-w-[335px]'>
 
                             <Input disabled={status === "in_progress"} onChange={handleInputChange} value={input} required className='rounded-l-[49px] text-[16px] rounded-r-[49px] h-[48px]' placeholder='Ask your questions here' />

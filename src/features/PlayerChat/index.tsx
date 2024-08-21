@@ -21,6 +21,7 @@ const PlayerChat = (props: Props) => {
     const router = useRouter()
     const params = useParams();
     const { slug }: any = params;
+    const [voices, setVoices] = useState<Array<SpeechSynthesisVoice>>();
     const { jwt, loading: loader, profileId, handleSubscribe, players, setPlayers, playerIds, setPlayerIds } = useContext(AuthContext)
     const [data, setData] = useState<any>({})
     const [prompt, setPrompt] = useState<string>("")
@@ -38,6 +39,21 @@ const PlayerChat = (props: Props) => {
     const [previousLoad, setPreviousLoad] = useState<boolean>(false)
     let [isOpen, setIsOpen] = useState(false)
     const hasFetchedChat = useRef(false);
+
+
+    useEffect(() => {
+        const voices = window.speechSynthesis.getVoices();
+        if (Array.isArray(voices) && voices.length > 0) {
+            setVoices(voices);
+            return;
+        }
+        if ('onvoiceschanged' in window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = function () {
+                const voices = window.speechSynthesis.getVoices();
+                setVoices(voices);
+            }
+        }
+    }, []);
 
     const {
         status,
@@ -57,6 +73,19 @@ const PlayerChat = (props: Props) => {
             // // userThreadId,
         },
     });
+
+
+    useEffect(() => {
+        if (status !== "in_progress" && tier === "premium") {
+            let content = messages[messages?.length - 1]?.content
+            const utterance = new SpeechSynthesisUtterance(content);
+            if (voices?.[6]) {
+                utterance.voice = voices[6];
+            };
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+        }
+    }, [messages, status])
 
     useEffect(() => {
         const fetchMessages = async () => {
@@ -298,6 +327,8 @@ const PlayerChat = (props: Props) => {
                     {
                         previous?.slice()?.reverse()?.map((info: any) => (
                             <Message
+                                voices={voices}
+                                premium={tier === "premium"}
                                 image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url}
                                 key={info.id}
                                 message={info?.content[0]?.text?.value}
@@ -311,7 +342,7 @@ const PlayerChat = (props: Props) => {
 
                     {
                         messages?.map((info: any) => (
-                            <Message image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={info.id} message={info?.content} system={info?.role === "assistant" ? true : false} user={info?.role === "user" ? true : false} />
+                            <Message voices={voices} premium={tier === "premium"} image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={info.id} message={info?.content} system={info?.role === "assistant" ? true : false} user={info?.role === "user" ? true : false} />
                         ))
                     }
 
