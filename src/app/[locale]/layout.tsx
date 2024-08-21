@@ -20,9 +20,14 @@ const plus = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Altug AI",
-  description: "This is Altug AI",
-  manifest: "/manifest.json"
+  title: "Pro Legacy",
+  description: "Pro Legacy",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "favicons/favicon.ico",
+    shortcut: "favicons/favicon-32x32.png",
+    apple: "favicons/apple-touch-icon.png",
+  }
 };
 
 export const viewport: Viewport = {
