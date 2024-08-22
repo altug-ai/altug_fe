@@ -29,6 +29,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "countries-list": "^3.1.0",
+    "elevenlabs": "^0.15.0",
     "embla-carousel-react": "^8.1.6",
     "ffmpeg": "^0.0.4",
     "fs": "^0.0.1-security",

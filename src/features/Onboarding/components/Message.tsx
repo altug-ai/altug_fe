@@ -11,20 +11,42 @@ type Props = {
     date?: string;
     image?: string;
     premium?: boolean;
-    voices?: any;
+    voice?: any;
+    audioRef?: any;
 }
 
-const Message = ({ system, user, message, date, image, premium, voices }: Props) => {
+const Message = ({ system, user, message, date, image, premium, voice, audioRef }: Props) => {
+   
+
+
+
+    const getElevenLabsResponse = async (text: string) => {
+        const response = await fetch("/api/speech", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: text,
+                voice: voice
+            })
+        });
+
+        const data = await response.blob();
+        return data;
+    };
 
 
     const theSpeaker = async () => {
-        console.log("here")
-        const utterance = new SpeechSynthesisUtterance(message);
-        if (voices?.[6]) {
-            utterance.voice = voices[6];
+        const botVoiceResponse = await getElevenLabsResponse(message);
+        const reader = new FileReader();
+        reader.readAsDataURL(botVoiceResponse);
+        reader.onload = () => {
+            if (audioRef.current) {
+                audioRef.current.src = reader.result as string;
+                audioRef.current.play();
+            }
         };
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(utterance);
     }
 
 
