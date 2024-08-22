@@ -19,6 +19,7 @@ type Props = {}
 
 const PlayerChat = (props: Props) => {
     const router = useRouter()
+    const audioRef = useRef<HTMLAudioElement>(null);
     const params = useParams();
     const { slug }: any = params;
     const [voices, setVoices] = useState<Array<SpeechSynthesisVoice>>();
@@ -29,6 +30,7 @@ const PlayerChat = (props: Props) => {
     const [aiLoader, setAILoader] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
     const [response, setResponse] = useState("")
+    const [voice, setVoice] = useState<string>("Adam")
     const [message, setMessage] = useState<any[]>([]);
     const [messagesLeft, setMessagesLeft] = useState<number>(3)
     const [tier, setTier] = useState<any>()
@@ -74,16 +76,39 @@ const PlayerChat = (props: Props) => {
         },
     });
 
+    const getElevenLabsResponse = async (text: string) => {
+        const response = await fetch("/api/speech", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: text,
+                voice: voice
+            })
+        });
+
+        const data = await response.blob();
+        return data;
+    };
+
 
     useEffect(() => {
-        if (status !== "in_progress" && tier === "premium") {
+        const playAudio = async () => {
             let content = messages[messages?.length - 1]?.content
-            const utterance = new SpeechSynthesisUtterance(content);
-            if (voices?.[6]) {
-                utterance.voice = voices[6];
+            const botVoiceResponse = await getElevenLabsResponse(content);
+            const reader = new FileReader();
+            reader.readAsDataURL(botVoiceResponse);
+            reader.onload = () => {
+                if (audioRef.current) {
+                    audioRef.current.src = reader.result as string;
+                    audioRef.current.play();
+                }
             };
-            window.speechSynthesis.cancel();
-            window.speechSynthesis.speak(utterance);
+        }
+
+        if (status !== "in_progress" && tier === "premium") {
+            playAudio()
         }
     }, [messages, status])
 
@@ -176,6 +201,7 @@ const PlayerChat = (props: Props) => {
             hasFetchedChat.current = true; // Set the ref to true to prevent future calls
             getCoach(slug);
         }
+        
     }, [slug, jwt, profileId]);
 
     useEffect(() => {
@@ -192,6 +218,7 @@ const PlayerChat = (props: Props) => {
             )
                 .then((data) => {
                     setData(data?.data)
+                    setVoice(data?.data?.attributes?.voice ?? "Adam")
                     if (data?.data?.attributes?.type === "premium") {
                         setTier("premium")
                     } else {
@@ -327,7 +354,8 @@ const PlayerChat = (props: Props) => {
                     {
                         previous?.slice()?.reverse()?.map((info: any) => (
                             <Message
-                                voices={voices}
+                                voice={voice}
+                                audioRef={audioRef}
                                 premium={tier === "premium"}
                                 image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url}
                                 key={info.id}
@@ -342,7 +370,7 @@ const PlayerChat = (props: Props) => {
 
                     {
                         messages?.map((info: any) => (
-                            <Message voices={voices} premium={tier === "premium"} image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={info.id} message={info?.content} system={info?.role === "assistant" ? true : false} user={info?.role === "user" ? true : false} />
+                            <Message voice={voice} audioRef={audioRef} premium={tier === "premium"} image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={info.id} message={info?.content} system={info?.role === "assistant" ? true : false} user={info?.role === "user" ? true : false} />
                         ))
                     }
 
@@ -357,7 +385,7 @@ const PlayerChat = (props: Props) => {
                     <div ref={messagesEndRef} />
                 </ScrollArea>
 
-
+                <audio ref={audioRef} controls className="mb-2 hidden" />
 
                 <div className='  w-full  '>
                     {/* the input */}
