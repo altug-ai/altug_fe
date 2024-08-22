@@ -201,6 +201,7 @@ const PlayerChat = (props: Props) => {
             hasFetchedChat.current = true; // Set the ref to true to prevent future calls
             getCoach(slug);
         }
+        
     }, [slug, jwt, profileId]);
 
     useEffect(() => {
