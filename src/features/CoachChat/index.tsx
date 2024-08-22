@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { experimental_useAssistant as useAssistant } from "ai/react";
 import { addMessageLeft, createChat, existsIdInArray, followCoach, UpdateChat } from './functions/functions';
 import { useToast } from "@/components/ui/use-toast";
-
+import { ElevenLabsClient, ElevenLabs } from "elevenlabs";
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 
 
@@ -33,6 +33,7 @@ const CoachChat = (props: Props) => {
     const [loading, setLoading] = useState<boolean>(false)
     const [response, setResponse] = useState("")
     const [message, setMessage] = useState<any[]>([]);
+    const [voice, setVoice] = useState<string>("Adam")
     const { toast } = useToast();
     const [messagesLeft, setMessagesLeft] = useState<number>(3)
     const [tier, setTier] = useState<any>()
@@ -41,22 +42,11 @@ const CoachChat = (props: Props) => {
     const [threadIdd, setThreadId] = useState("")
     const [paid, setPaid] = useState<boolean>(false)
     const [previousLoad, setPreviousLoad] = useState<boolean>(false)
+    const audioRef = useRef<HTMLAudioElement>(null);
     let [isOpen, setIsOpen] = useState(false)
 
 
-    useEffect(() => {
-        const voices = window.speechSynthesis.getVoices();
-        if (Array.isArray(voices) && voices.length > 0) {
-            setVoices(voices);
-            return;
-        }
-        if ('onvoiceschanged' in window.speechSynthesis) {
-            window.speechSynthesis.onvoiceschanged = function () {
-                const voices = window.speechSynthesis.getVoices();
-                setVoices(voices);
-            }
-        }
-    }, []);
+
 
     // Ref to track whether getCoach has been executed once
     const hasFetchedChat = useRef(false);
@@ -81,15 +71,39 @@ const CoachChat = (props: Props) => {
     });
 
 
+    const getElevenLabsResponse = async (text: string) => {
+        const response = await fetch("/api/speech", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: text,
+                voice: voice
+            })
+        });
+
+        const data = await response.blob();
+        return data;
+    };
+
+
     useEffect(() => {
-        if (status !== "in_progress" && tier === "premium") {
+        const playAudio = async () => {
             let content = messages[messages?.length - 1]?.content
-            const utterance = new SpeechSynthesisUtterance(content);
-            if (voices?.[6]) {
-                utterance.voice = voices[6];
+            const botVoiceResponse = await getElevenLabsResponse(content);
+            const reader = new FileReader();
+            reader.readAsDataURL(botVoiceResponse);
+            reader.onload = () => {
+                if (audioRef.current) {
+                    audioRef.current.src = reader.result as string;
+                    audioRef.current.play();
+                }
             };
-            window.speechSynthesis.cancel();
-            window.speechSynthesis.speak(utterance);
+        }
+
+        if (status !== "in_progress" && tier === "premium") {
+            playAudio()
         }
     }, [messages, status])
 
@@ -104,7 +118,6 @@ const CoachChat = (props: Props) => {
                 },
                 body: JSON.stringify({ threadId: threadIdd }),
             });
-            console.log("this is teh response", response)
             if (response?.data && response?.data?.length > 0) {
                 setPrevious(response?.data)
             }
@@ -168,10 +181,6 @@ const CoachChat = (props: Props) => {
         setIsOpen(false)
     }
 
-
-
-
-
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -206,6 +215,7 @@ const CoachChat = (props: Props) => {
             )
                 .then((data) => {
                     setData(data?.data)
+                    setVoice(data?.data?.attributes?.voice ?? "Adam")
                     if (data?.data?.attributes?.type === "premium") {
                         setTier("premium")
                     } else {
@@ -222,6 +232,9 @@ const CoachChat = (props: Props) => {
             getCoach(slug);
         }
     }, [slug, jwt]);
+
+
+
 
 
 
@@ -322,7 +335,6 @@ const CoachChat = (props: Props) => {
                                 </div>
                             ))
                         }
-
                     </div>
 
                     {
@@ -337,7 +349,8 @@ const CoachChat = (props: Props) => {
                     {
                         previous?.slice()?.reverse()?.map((info: any, index) => (
                             <Message
-                                voices={voices}
+                                voice={voice}
+                                audioRef={audioRef}
                                 premium={tier === "premium"}
                                 image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url}
                                 key={`${info.id} - ${index}`}
@@ -350,7 +363,7 @@ const CoachChat = (props: Props) => {
 
                     {
                         messages?.map((info: any, index) => (
-                            <Message voices={voices} premium={tier === "premium"} image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={`${info.id} - ${index}`} message={info?.content} system={info?.role === "assistant" ? true : false} user={info?.role === "user" ? true : false} />
+                            <Message audioRef={audioRef} voice={voice} premium={tier === "premium"} image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={`${info.id} - ${index}`} message={info?.content} system={info?.role === "assistant" ? true : false} user={info?.role === "user" ? true : false} />
                         ))
                     }
 
@@ -396,7 +409,7 @@ const CoachChat = (props: Props) => {
             </div>
 
             <TabBar page='explore' />
-
+            <audio ref={audioRef} controls className="mb-2 hidden" />
 
             {/* the dialog */}
             <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close}>
