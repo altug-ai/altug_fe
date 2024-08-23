@@ -51,10 +51,14 @@ const CoachChat = (props: Props) => {
     const [paid, setPaid] = useState<boolean>(false)
     const [previousLoad, setPreviousLoad] = useState<boolean>(false)
     const [fileId, setFileId] = useState();
+
     const audioRef = useRef<HTMLAudioElement>(null);
     let [isOpen, setIsOpen] = useState(false)
     const [imagesrc, setImagesrc] = useState<string>();
     const [filesrc, setFilesrc] = useState<any>()
+
+
+
 
 
 
@@ -295,6 +299,7 @@ const CoachChat = (props: Props) => {
 
 
 
+
     const uploadFileToOpenai = async (src: any) => {
         try {
             const file: any = await openai.files.create({
@@ -331,7 +336,6 @@ const CoachChat = (props: Props) => {
     }
 
 
-    console.log("these are the messages", messages)
 
     return (
         <div className='py-[20px] px-[20px] h-full flex flex-col items-center '>
@@ -414,6 +418,7 @@ const CoachChat = (props: Props) => {
 
                     {
                         messages?.map((info: any, index) => (
+
                             <Message audioRef={audioRef}
                                 voice={voice}
                                 premium={tier === "premium"}
@@ -422,6 +427,7 @@ const CoachChat = (props: Props) => {
                                 user={(info?.role === "user" || info?.role === "tool") ? true : false}
                                 role={info?.role}
                             />
+
                         ))
                     }
 
@@ -449,6 +455,7 @@ const CoachChat = (props: Props) => {
                             }
                             let response = await submitMessage(e)
                             handleChat(messages)
+
                         }} className='relative w-full max-w-[335px] rounded-[49px]  h-12 bg-white'>
 
                             <Input disabled={status === "in_progress"} onChange={handleInputChange} value={input} required className='rounded-l-[49px] w-[80%] text-[16px] border-none focus-visible:ring-0  h-[48px]' placeholder='Ask your questions here' />
@@ -470,6 +477,7 @@ const CoachChat = (props: Props) => {
                                     <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className={`h-[48px] ${status === "in_progress" && "animate-pulse"} w-[48px] cursor-pointer `} />
                                 </button>
                             </div>
+
                         </form>
                     </div>
 
@@ -481,11 +489,13 @@ const CoachChat = (props: Props) => {
 
             <TabBar page='explore' />
 
+
             <audio ref={audioRef}>
                 <source type="audio/mp3" />
             </audio>
             {/* 
             <audio ref={audioRef} controls className="mb-2 hidden" /> */}
+
 
             {/* the dialog */}
             <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close}>

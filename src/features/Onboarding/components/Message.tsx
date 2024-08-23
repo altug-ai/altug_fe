@@ -21,6 +21,7 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
 
 
 
+
     const getElevenLabsResponse = async (text: string) => {
         const response = await fetch("/api/speech", {
             method: "POST",
