@@ -16,9 +16,17 @@ import { addMessageLeft, createChat, existsIdInArray, followCoach, UpdateChat } 
 import { useToast } from "@/components/ui/use-toast";
 import { ElevenLabsClient, ElevenLabs } from "elevenlabs";
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
-
+import { MdOutlineAttachment } from "react-icons/md";
+import OpenAI from 'openai';
+import { Label } from '@/components/ui/label';
 
 type Props = {}
+
+const openai = new OpenAI({
+    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || "",
+    dangerouslyAllowBrowser: true,
+});
+
 
 const CoachChat = (props: Props) => {
     const router = useRouter()
@@ -42,8 +50,11 @@ const CoachChat = (props: Props) => {
     const [threadIdd, setThreadId] = useState("")
     const [paid, setPaid] = useState<boolean>(false)
     const [previousLoad, setPreviousLoad] = useState<boolean>(false)
+    const [fileId, setFileId] = useState();
     const audioRef = useRef<HTMLAudioElement>(null);
     let [isOpen, setIsOpen] = useState(false)
+    const [imagesrc, setImagesrc] = useState<string>();
+    const [filesrc, setFilesrc] = useState<any>()
 
 
 
@@ -60,12 +71,13 @@ const CoachChat = (props: Props) => {
         setInput,
         error,
         threadId,
+        setMessages
     } = useAssistant({
         api: "/api/coach-assistant",
         body: {
             assistantId: data?.attributes?.assistantId,
             userThreadId: threadIdd,
-            // fileId: fileId,
+            fileId: fileId,
             // // userThreadId,
         },
     });
@@ -283,6 +295,44 @@ const CoachChat = (props: Props) => {
 
 
 
+    const uploadFileToOpenai = async (src: any) => {
+        try {
+            const file: any = await openai.files.create({
+                file: src,
+                purpose: "assistants",
+            });
+
+            await setFileId(file?.id);
+
+            if (file?.id) {
+                submitMessage()
+            }
+
+        } catch (error) {
+            console.log("error ", error);
+        }
+    };
+
+
+    const handleFileChange = (e: any) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event: any) => {
+                setImagesrc(event.target.result as string);
+                let result: any = event.target.result as string
+                setMessages([...messages, { id: "id", content: result, role: "tool" }])
+            };
+
+
+            reader.readAsDataURL(file);
+            uploadFileToOpenai(file)
+        }
+    }
+
+
+    console.log("these are the messages", messages)
+
     return (
         <div className='py-[20px] px-[20px] h-full flex flex-col items-center '>
             <div onClick={() => { router.push("/explore") }} className='w-full max-w-[388px] flex space-x-3 items-center mb-[30px]'>
@@ -356,14 +406,22 @@ const CoachChat = (props: Props) => {
                                 key={`${info.id} - ${index}`}
                                 message={info?.content[0]?.text?.value}
                                 system={info?.role === "assistant" ? true : false}
-                                user={info?.role === "user" ? true : false}
+                                user={(info?.role === "user" || info?.role === "tool") ? true : false}
+                                role={info?.role}
                             />
                         ))
                     }
 
                     {
                         messages?.map((info: any, index) => (
-                            <Message audioRef={audioRef} voice={voice} premium={tier === "premium"} image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={`${info.id} - ${index}`} message={info?.content} system={info?.role === "assistant" ? true : false} user={info?.role === "user" ? true : false} />
+                            <Message audioRef={audioRef}
+                                voice={voice}
+                                premium={tier === "premium"}
+                                image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={`${info.id} - ${index}`}
+                                message={info?.content} system={info?.role === "assistant" ? true : false}
+                                user={(info?.role === "user" || info?.role === "tool") ? true : false}
+                                role={info?.role}
+                            />
                         ))
                     }
 
@@ -391,14 +449,27 @@ const CoachChat = (props: Props) => {
                             }
                             let response = await submitMessage(e)
                             handleChat(messages)
-                        }} className='relative w-full max-w-[335px]'>
+                        }} className='relative w-full max-w-[335px] rounded-[49px]  h-12 bg-white'>
 
-                            <Input disabled={status === "in_progress"} onChange={handleInputChange} value={input} required className='rounded-l-[49px] text-[16px] rounded-r-[49px] h-[48px]' placeholder='Ask your questions here' />
+                            <Input disabled={status === "in_progress"} onChange={handleInputChange} value={input} required className='rounded-l-[49px] w-[80%] text-[16px] border-none focus-visible:ring-0  h-[48px]' placeholder='Ask your questions here' />
 
-                            <button disabled={status === "in_progress"} type='submit'>
-                                <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className={`h-[48px] ${status === "in_progress" && "animate-pulse"} w-[48px] cursor-pointer absolute right-0 top-0`} />
-                            </button>
-
+                            <div className='flex space-x-2 items-center absolute right-0 top-0'>
+                                <Label htmlFor="picture">
+                                    <MdOutlineAttachment className='text-[#357EF8] text-lg cursor-pointer' />
+                                </Label>
+                                <Input
+                                    id='picture'
+                                    type='file'
+                                    name='files'
+                                    className='h-20 w-52'
+                                    accept='image/*'
+                                    onChange={handleFileChange}
+                                    style={{ display: 'none' }}
+                                />
+                                <button disabled={status === "in_progress"} type='submit'>
+                                    <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className={`h-[48px] ${status === "in_progress" && "animate-pulse"} w-[48px] cursor-pointer `} />
+                                </button>
+                            </div>
                         </form>
                     </div>
 
@@ -409,7 +480,12 @@ const CoachChat = (props: Props) => {
             </div>
 
             <TabBar page='explore' />
-            <audio ref={audioRef} controls className="mb-2 hidden" />
+
+            <audio ref={audioRef}>
+                <source type="audio/mp3" />
+            </audio>
+            {/* 
+            <audio ref={audioRef} controls className="mb-2 hidden" /> */}
 
             {/* the dialog */}
             <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close}>
