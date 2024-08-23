@@ -13,10 +13,12 @@ type Props = {
     premium?: boolean;
     voice?: any;
     audioRef?: any;
+    role?: any
 }
 
-const Message = ({ system, user, message, date, image, premium, voice, audioRef }: Props) => {
-   
+const Message = ({ system, user, message, date, image, premium, voice, audioRef, role }: Props) => {
+
+
 
 
 
@@ -76,6 +78,7 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef 
 
                                 )
                             }
+
                             <h1 className='text-[14px] leading-[18px] font-medium text-[#181928]'>{message}</h1>
                             <h1 className='text-[#706A6A] text-[13px] leading-[16px] font-normal '>{date ? date : "10:54am"}</h1>
                         </div>
@@ -83,15 +86,21 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef 
                 ) : (
                     <div className=''>
                         <div className='bg-[#357EF8] px-[20px] py-[10px] flex flex-col space-y-2 rounded-l-[12px] rounded-tr-[12px]'>
-                            <h1 className='text-[14px] leading-[18px] font-medium text-[#F5F7F8]'>{message}</h1>
+                            {
+                                role === "tool" ? (
+                                    <Image src={message} width={600} height={600} alt='Message image' className='max-w-[200px] max-h-[200px] object-cover rounded-md' />
+                                ) : (
+                                    <h1 className='text-[14px] leading-[18px] font-medium text-[#F5F7F8]'>{message}</h1>
+                                )
+                            }
                             <h1 className='text-[##E6E6E6] text-[13px] text-end leading-[16px] font-normal '>{date ? date : "10:54am"}</h1>
                         </div>
                     </div>
                 )
             }
 
-        </div>
+        </div >
     )
 }
 
-export default Message
+export default Message     

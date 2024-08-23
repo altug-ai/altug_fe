@@ -20,11 +20,28 @@ export async function POST(req: NextRequest) {
     ? input?.userThreadId
     : input.threadId ?? (await openai.beta.threads.create({})).id;
 
-  // Add a message to the thread
-  const createdMessage = await openai.beta.threads.messages.create(threadId, {
+  let data: any = {
     role: 'user',
     content: input.message,
-  });
+  };
+
+  if (input.fileId) {
+    data = {
+      role: 'user',
+      content: input.message,
+      attachments: [
+        {
+          file_id: input.fileId,
+          tools: [{ type: 'code_interpreter' }],
+        },
+      ],
+    };
+  }
+  // Add a message to the thread
+  const createdMessage = await openai.beta.threads.messages.create(
+    threadId,
+    data
+  );
 
   return experimental_AssistantResponse(
     { threadId, messageId: createdMessage.id },
