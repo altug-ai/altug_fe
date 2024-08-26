@@ -223,11 +223,15 @@ export type ChallengeProps = {
   setVideoBlob: Dispatch<SetStateAction<any>>;
   videoUrl: string;
   setVideoUrl: Dispatch<SetStateAction<string>>;
+  urlVideo: string;
+  setUrlVideo: Dispatch<SetStateAction<string>>;
   videoRef: MutableRefObject<any>;
   mediaRecorderRef: MutableRefObject<any>;
   handleStartCaptureClick: () => void;
   handleStopCaptureClick: () => void;
   pauseRecording: () => void;
+  setGoal: Dispatch<SetStateAction<string>>;
+  goal: string;
   resumeRecording: () => void;
   userPoint: string;
   paused: boolean;
