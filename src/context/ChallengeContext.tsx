@@ -40,10 +40,12 @@ function ChallengeContextProvider(props: any) {
     const { jwt, profileId, setTotalPoint, totalPoint, stats, setStats } = useContext(AuthContext)
     const [progress, setProgress] = useState(0)
     const [point, setPoint] = useState<string>("");
+    const [urlVideo, setUrlVideo] = useState<string>("");
     const [userPoint, setUserPoint] = useState<string>("")
     const [stat, setStat] = useState<string>("");
     const [header, setHeader] = useState<string>("");
     const [descriptionn, setDescriptionn] = useState<string>("");
+    const [goal, setGoal] = useState("")
     const [response, setResponse] = useState<any[]>([]);
     const [elapsedTime, setElapsedTime] = useState(0);
     const [chal, setChal] = useState<any>()
@@ -108,7 +110,7 @@ function ChallengeContextProvider(props: any) {
                 setRoute(1)
             }
         }, maxDuration);
-    }, [facingMode]);               
+    }, [facingMode]);
 
 
     // to pause the recording
@@ -337,6 +339,29 @@ function ChallengeContextProvider(props: any) {
     const handleDesc = async (description: string) => {
         try {
 
+            var getDuration = async function (url: any) {
+                var _player = new Audio(url);
+                return new Promise((resolve) => {
+                    _player.addEventListener(
+                        'durationchange',
+                        function (e) {
+                            if (this.duration != Infinity) {
+                                const duration = this.duration;
+                                _player.remove();
+                                resolve(duration);
+                            }
+                        },
+                        false
+                    );
+                    _player.load();
+                    _player.currentTime = 24 * 60 * 60; //fake big time
+                    _player.volume = 0;
+                    _player.play();
+                });
+            };
+
+            let duration: any = await getDuration(videoUrl);
+
 
             const completion = await openai.chat.completions.create({
                 model: 'gpt-4o',
@@ -344,10 +369,18 @@ function ChallengeContextProvider(props: any) {
                     {
                         role: 'system',
                         content: `
-                        You are a challenge scorer responsible for evaluating user-uploaded videos based on the goal and header of the challenge. The title of the challenge is "${header}" with the goal: "${descriptionn}". The maximum points for this challenge are ${point}.
+                       You are a challenge scorer responsible for evaluating user-uploaded videos based on the goal and header of the challenge. The title of the challenge is "${header}" with the description: "${descriptionn}" and the goal : "${goal}". The maximum points for this challenge are ${point}.
 
-You have been provided with a sequence of frame descriptions, where each frame (ignoring IDs or frame number) details what happens next in the video, it is just a big continuation, no change in scene , the same person/group of people in the frames. Pay attention to details, for example if the challenge is for dribbling and the user is just juggling, then mark the user low, make sure it aligns with the overall goal of the challenge. Your task is to ensure the user's video aligns with the challenge requirements. Score the user based on how well their uploaded video/frames description matches the challenge header, description, and goal, note:a user might begin the challenge at any time in the frames/video, check for an attempt of the challenge being done through out the frames, as long as therre is an attempt of teh challenge in the frames, no matter even if it comes last .  The maximum score achievable for this challenge is ${point} points.
-                         when returning the score and explanation  just return the score and explanation for the user in a json object, for example if it is 0 return score : 0, if it is 1, return score :1 etc, then give an explanation for the score in the same object , just return it as a pure object, do not add anythinbg like ${"```json"} etc, just a pure object, do not add any thing that will be hard to change to Json REMEMBER return it in json like for example ${"{ \n 'score':3, \n 'explanation' : 'yesss'}"}}`,
+You have been provided with a sequence of frame descriptions, where each frame (ignoring IDs or frame number) details what happens next in the video. The frames are part of a larger video, and they represent a continuous sequence with no change in scene or participants. Your task is to ensure the user's video aligns with the challenge requirements.
+
+Pay attention to details:
+
+For example, if the challenge is for dribbling and the user is just juggling, then mark the user low.
+Check if the actions in the frames align with the overall goal of the challenge. If the goal or description involves counting specific actions (e.g., performing an action 30 times within a minute), the total video duration is ${duration}. Since you cannot track the exact count, focus on ensuring that the required action is being consistently performed throughout the video.
+
+If a response mentions something like "However, there is no clear indication that the person is performing 30 touches within a minute," or similar, ignore this and still score the attempt based on the observed performance. Do not deduct points solely because the exact count isn't confirmed in the descriptions. if they partially meet the requirement you can give them the full score as long as there is a sort of match
+A user might begin the challenge at any point in the video, so check for an attempt to complete the challenge throughout the frames. If there is an attempt to meet the challenge requirements, even if it comes at the end, consider it.
+Score the user based on how well their uploaded video/frames description matches the challenge header, description, and goal. The maximum score achievable for this challenge is ${point} points.when returning the score and explanation  just return the score and explanation for the user in a json object, for example if it is 0 return score : 0, if it is 1, return score :1 etc, then give an explanation for the score in the same object , just return it as a pure object, do not add anythinbg like ${"```json"} etc, just a pure object, do not add any thing that will be hard to change to Json REMEMBER return it in json like for example ${"{ \n 'score':3, \n 'explanation' : 'yesss'}"}}`,
                     },
 
                     {
@@ -450,7 +483,10 @@ You have been provided with a sequence of frame descriptions, where each frame (
             batchMessages.push({
                 role: 'system',
                 content: `You are an AI video transcriber with a keen eye for detail, tasked with accurately describing the content of video frames. You have been given a batch of frames from a larger video submitted for a challenge.
-               Your task is to describe the actions and activities of the person or people in each frame. Ensure your descriptions are clear and detailed. Capture all relevant actions, expressions, just say what the user is doing, do not add context like for example "with great ball control and agility" etc, just say what the user is doing, .`,
+
+Your task is to describe the actions and activities of the person or people in each frame. Ensure your descriptions are clear and detailed. Just state what the user is doing, without adding any context or embellishments like "with great ball control and agility," etc. Simply describe the actions as they occur in the video.
+
+Do not include labels such as "frame 1," "frame 2," etc., in your response. Just provide a continuous description of what the user is doing across the frames`,
             });
 
             // Call OpenAI API to process this batch
@@ -519,6 +555,8 @@ You have been provided with a sequence of frame descriptions, where each frame (
             value={{
                 challengeLoader,
                 setChallengeLoader,
+                goal,
+                setGoal,
                 recording,
                 chal,
                 setChal,
@@ -537,6 +575,8 @@ You have been provided with a sequence of frame descriptions, where each frame (
                 pauseRecording,
                 resumeRecording,
                 descriptionn,
+                setUrlVideo,
+                urlVideo,
                 header,
                 setHeader,
                 setDescriptionn,
