@@ -67,14 +67,19 @@ const ChallengePage = (props: Props) => {
     useEffect(() => {
         setProfiles(new Set());
         if (data?.attributes?.submitted_challenges?.data?.length > 0) {
+            let chal = false
             const updatedSet = new Set(profiles);
             data?.attributes?.submitted_challenges?.data?.map(async (dat: any) => {
                 if (dat?.attributes?.client_profile?.data?.id === profileId) {
+                    chal = true
                     setChal(dat)
                 }
                 updatedSet?.add(dat?.attributes?.client_profile?.data?.id);
             });
             setProfiles(updatedSet);
+            if (!chal) {
+                setChal(null)
+            }
         }
     }, [data?.attributes?.submitted_challenges?.data])
 
@@ -195,10 +200,11 @@ const ChallengePage = (props: Props) => {
                         <div className='w-full max-w-[388px] mt-[20px] mb-[70px] flex flex-col space-y-9'>
                             <div className='flex flex-col space-y-2'>
                                 <h1 className='font-medium text-[24px] leading-[32.47px] text-[#FFFFFF]'>{t("Instructions")}</h1>
-                                <h1 className='text-[#FFFFFF] font-medium leading-[16.24px] text-[12px] '>{data?.attributes?.description}</h1>
+                                <h1 className='text-[#FFFFFF] font-medium leading-[16.24px] text-[12px] '>Description : {data?.attributes?.description}</h1>
+                                <h1 className='text-[#FFFFFF] font-medium leading-[16.24px] text-[12px] '>Goal : {data?.attributes?.goal}</h1>
                             </div>
                             <h1 className='font-medium text-[24px] mt-[10px] leading-[32.47px] text-[#FFFFFF]'>{t("Submitted")}</h1>
-                            <div className='mt-[10px] '>
+                            <div className='mt-[10px] pb-[90px]'>
                                 {
                                     data?.attributes?.submitted_challenges?.data?.map((submit: any) => (
                                         <ChallengeBox image={submit?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} goal={data?.attributes?.goal} key={submit?.id} title={data?.attributes?.title} video={submit?.attributes?.video?.data?.attributes?.url} submission />
