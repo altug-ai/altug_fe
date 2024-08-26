@@ -484,11 +484,9 @@ Score the user based on how well their uploaded video/frames description matches
                 role: 'system',
                 content: `You are an AI video transcriber with a keen eye for detail, tasked with accurately describing the content of video frames. You have been given a batch of frames from a larger video submitted for a challenge.
 
-Your task is to describe the actions and activities of the person or people in each frame. Keep track of repetitive actions (e.g., juggling) without explicitly counting in your description. Just state the action (e.g., "juggled") each time it occurs. Ensure your descriptions are clear and detailed.
+Your task is to describe the actions and activities of the person or people in each frame. Ensure your descriptions are clear and detailed. Just state what the user is doing, without adding any context or embellishments like "with great ball control and agility," etc. Simply describe the actions as they occur in the video.
 
-Do not add any context or embellishments like "with great ball control and agility," etc. Simply describe the actions as they occur in the video.
-
-Do not include labels such as "frame 1," "frame 2,", "id 1", "id 2" etc. Provide a continuous description of what the user is doing across the frames.`,
+Do not include labels such as "frame 1," "frame 2," etc., in your response. Just provide a continuous description of what the user is doing across the frames`,
             });
 
             // Call OpenAI API to process this batch
