@@ -7,7 +7,7 @@ import { ChallengeContext } from '@/context/ChallengeContext';
 
 export function useGetChallenges(id?: string | string[]) {
     const { profileId, jwt } = useContext(AuthContext)
-    const { challengeLoader, refetch, setStat, setPoint, setDescriptionn, setHeader, setGoal, setUrlVideo, urlVideo } = useContext(ChallengeContext);
+    const { challengeLoader, refetch, setStat, setPoint, setDescriptionn, setHeader, setGoal, setUrlVideo, setVideoUrl, setVideoBlob } = useContext(ChallengeContext);
     const [data, setData] = useState<any>([]);
     const [allIds, setAllIds] = useState(new Set());
 
@@ -40,7 +40,9 @@ export function useGetChallenges(id?: string | string[]) {
                     setPoint(personal?.data?.attributes?.points)
                     setHeader(personal?.data?.attributes?.title)
                     setDescriptionn(personal?.data?.attributes?.description)
-                    setUrlVideo(personal?.data?.attributes?.banner?.data?.attributes?.url)
+                    setVideoUrl("")
+                    setVideoBlob(null)
+                    setUrlVideo(personal?.data?.attributes?.video?.data?.attributes?.url)
                     setGoal(personal?.data?.attributes?.goal)
                 }
                 setAllData(personal);

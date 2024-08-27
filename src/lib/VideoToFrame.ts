@@ -47,7 +47,7 @@ export class VideoToFrames {
         let duration: any;
 
         let video = document.createElement('video');
-
+        video.crossOrigin = 'anonymous'; // Allow cross-origin access
         duration = await getDuration(videoUrl); // Await the duration
 
         video.preload = 'auto';

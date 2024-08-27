@@ -10,6 +10,7 @@ import OpenAI from "openai";
 import { VideoToFrames, VideoToFramesMethod } from "@/lib/VideoToFrame";
 import { useTranslations } from "next-intl";
 import { sendLeaderboardNots } from "@/features/Challenges/functions/function";
+import { getChallengeDesc } from "./function";
 
 // @ts-ignore
 export const ChallengeContext = createContext<ChallengeProps>({});
@@ -48,6 +49,7 @@ function ChallengeContextProvider(props: any) {
     const [goal, setGoal] = useState("")
     const [response, setResponse] = useState<any[]>([]);
     const [elapsedTime, setElapsedTime] = useState(0);
+    const [res, setRes] = useState<any[]>([]);
     const [chal, setChal] = useState<any>()
     const t = useTranslations('Home.ChallengePage');
     const maxDuration = 2 * 60 * 1000; // 2 minutes in milliseconds
@@ -304,7 +306,7 @@ function ChallengeContextProvider(props: any) {
             throw new Error("Invalid point value: Please provide a valid number for point.");
         }
 
-        const percentageThreshold = 0.5; // Threshold for 40%
+        const percentageThreshold = 0.8; // Threshold for 40%
         const minimumScore = point * percentageThreshold;
 
         return score >= minimumScore ? point : 0;
@@ -335,8 +337,11 @@ function ChallengeContextProvider(props: any) {
 
 
 
+    // get the score for the submitted challenge
+    const handleDesc = async (description: string, desc?: any) => {
 
-    const handleDesc = async (description: string) => {
+
+        // console.log("here", description)
         try {
 
             var getDuration = async function (url: any) {
@@ -372,14 +377,11 @@ function ChallengeContextProvider(props: any) {
                        You are a challenge scorer responsible for evaluating user-uploaded videos based on the goal and header of the challenge. The title of the challenge is "${header}" with the description: "${descriptionn}" and the goal : "${goal}". The maximum points for this challenge are ${point}.
 
 You have been provided with a sequence of frame descriptions, where each frame (ignoring IDs or frame number) details what happens next in the video. The frames are part of a larger video, and they represent a continuous sequence with no change in scene or participants. Your task is to ensure the user's video aligns with the challenge requirements.
-
+if the goal/desciption involves counting then look at the "which will count" phrase in the provided frames description to count. 
 Pay attention to details:
 
 For example, if the challenge is for dribbling and the user is just juggling, then mark the user low.
-Check if the actions in the frames align with the overall goal of the challenge. If the goal or description involves counting specific actions (e.g., performing an action 30 times within a minute), the total video duration is ${duration}. Since you cannot track the exact count, focus on ensuring that the required action is being consistently performed throughout the video.
-
-If a response mentions something like "However, there is no clear indication that the person is performing 30 touches within a minute," or similar, ignore this and still score the attempt based on the observed performance. Do not deduct points solely because the exact count isn't confirmed in the descriptions. if they partially meet the requirement you can give them the full score as long as there is a sort of match
-A user might begin the challenge at any point in the video, so check for an attempt to complete the challenge throughout the frames. If there is an attempt to meet the challenge requirements, even if it comes at the end, consider it.
+Check if the actions  align with the overall goal/description of the challenge. 
 Score the user based on how well their uploaded video/frames description matches the challenge header, description, and goal. The maximum score achievable for this challenge is ${point} points.when returning the score and explanation  just return the score and explanation for the user in a json object, for example if it is 0 return score : 0, if it is 1, return score :1 etc, then give an explanation for the score in the same object , just return it as a pure object, do not add anythinbg like ${"```json"} etc, just a pure object, do not add any thing that will be hard to change to Json REMEMBER return it in json like for example ${"{ \n 'score':3, \n 'explanation' : 'yesss'}"}}`,
                     },
 
@@ -394,6 +396,7 @@ Score the user based on how well their uploaded video/frames description matches
             });
 
             if (completion?.choices?.length > 0) {
+                // console.log("the result", completion?.choices[0]?.message?.content)
                 handleRetriveData(completion?.choices[0]?.message?.content)
             }
         } catch (error) {
@@ -402,6 +405,7 @@ Score the user based on how well their uploaded video/frames description matches
     }
 
 
+    // get the challenge video description
     const handleChat = async () => {
         setError(false);
         const batchSize = 10; // Number of frames to process per batch
@@ -412,6 +416,7 @@ Score the user based on how well their uploaded video/frames description matches
         setProgress(5)
         let frame = 0.5
 
+        // const getFirstDesc = await getChallengeDesc(urlVideo, openai, setRes, res, concatenateDescriptions)
 
         var getDuration = async function (url: any) {
             var _player = new Audio(url);
@@ -482,11 +487,9 @@ Score the user based on how well their uploaded video/frames description matches
             // Add system message for the batch
             batchMessages.push({
                 role: 'system',
-                content: `You are an AI video transcriber with a keen eye for detail, tasked with accurately describing the content of video frames. You have been given a batch of frames from a larger video submitted for a challenge.
+                content: `In this video frame, describe the actions performed by the user, considering the following challenge description: "${descriptionn}" and goal : ${goal}. If the challenge involves counting, indicate the action and specify the count, e.g., "The user just did a juggle, which will count"etc, after EVERY successful action that relates to the goal and description say "which will count"..
 
-Your task is to describe the actions and activities of the person or people in each frame. Ensure your descriptions are clear and detailed. Just state what the user is doing, without adding any context or embellishments like "with great ball control and agility," etc. Simply describe the actions as they occur in the video.
-
-Do not include labels such as "frame 1," "frame 2," etc., in your response. Just provide a continuous description of what the user is doing across the frames`,
+Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1" etc., in your response`,
             });
 
             // Call OpenAI API to process this batch
@@ -506,18 +509,15 @@ Do not include labels such as "frame 1," "frame 2," etc., in your response. Just
                         (done * 60) / frameBatches?.length
                     );
                     setProgress(percentCompleted)
-                    console.log("here", description)
                     setResponse(prevResponse => {
                         let array = [
                             ...prevResponse,
                             {
-                                id: index,  // Assuming `index` is defined somewhere in your code
                                 description: description,
                             }
                         ];
                         newDescription = concatenateDescriptions(array); // Assuming `description` is defined
 
-                        console.log("the newDesceiption", newDescription)
                         return array
                     });
                 }
