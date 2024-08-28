@@ -294,7 +294,7 @@ function ChallengeContextProvider(props: any) {
 
         // Loop through the sorted array and concatenate descriptions
         dataArray.forEach((item: any) => {
-            concatenatedString += `id ${item.id}: ${item.description}\n\n`; // Adjust format as needed
+            concatenatedString += ` ${item.description}\n\n`; // Adjust format as needed
         });
 
         return concatenatedString;
@@ -306,7 +306,7 @@ function ChallengeContextProvider(props: any) {
             throw new Error("Invalid point value: Please provide a valid number for point.");
         }
 
-        const percentageThreshold = 0.8; // Threshold for 40%
+        const percentageThreshold = 0.6; 
         const minimumScore = point * percentageThreshold;
 
         return score >= minimumScore ? point : 0;
@@ -377,11 +377,12 @@ function ChallengeContextProvider(props: any) {
                        You are a challenge scorer responsible for evaluating user-uploaded videos based on the goal and header of the challenge. The title of the challenge is "${header}" with the description: "${descriptionn}" and the goal : "${goal}". The maximum points for this challenge are ${point}.
 
 You have been provided with a sequence of frame descriptions, where each frame (ignoring IDs or frame number) details what happens next in the video. The frames are part of a larger video, and they represent a continuous sequence with no change in scene or participants. Your task is to ensure the user's video aligns with the challenge requirements.
-if the goal/desciption involves counting then look at the "which will count" phrase in the provided frames description to count. 
+if the goal/desciption involves counting then look at the number of times the action is performed in the provided frames description to count. 
 Pay attention to details:
 
 For example, if the challenge is for dribbling and the user is just juggling, then mark the user low.
 Check if the actions  align with the overall goal/description of the challenge. 
+Also note that the user can start or do the challenge at any part of the video, just look through and check for the user doing the actual challenge, ignore any activities done that does not include the challenge, any activities that does not involve the challenge should be ignored, just make sure the user eventually does the challenge
 Score the user based on how well their uploaded video/frames description matches the challenge header, description, and goal. The maximum score achievable for this challenge is ${point} points.when returning the score and explanation  just return the score and explanation for the user in a json object, for example if it is 0 return score : 0, if it is 1, return score :1 etc, then give an explanation for the score in the same object , just return it as a pure object, do not add anythinbg like ${"```json"} etc, just a pure object, do not add any thing that will be hard to change to Json REMEMBER return it in json like for example ${"{ \n 'score':3, \n 'explanation' : 'yesss'}"}}`,
                     },
 
@@ -444,11 +445,11 @@ Score the user based on how well their uploaded video/frames description matches
             frame = 6
         }
         else if (duration > 10 && duration < 16) {
-            frame = 4
+            frame = 6
         } else if (duration > 15 && duration < 31) {
-            frame = 1
+            frame = 3
         } else if (duration > 30 && duration < 80) {
-            frame = 0.8
+            frame = 3
         }
 
         try {
@@ -487,9 +488,9 @@ Score the user based on how well their uploaded video/frames description matches
             // Add system message for the batch
             batchMessages.push({
                 role: 'system',
-                content: `In this video frame, describe the actions performed by the user, considering the following challenge description: "${descriptionn}" and goal : ${goal}. If the challenge involves counting, indicate the action and specify the count, e.g., "The user just did a juggle, which will count"etc, after EVERY successful action that relates to the goal and description say "which will count"..
-
-Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1" etc., in your response`,
+                content: `In this video frame, describe the actions performed by the user., if an action is performed by the user, say all that is being done, no summary, all. 
+also this is the description and goal of the challenge ${descriptionn}, ${goal}, do not allow the description and goal of the challenge cloud your descriptions, for example if the user is just tapping the ball and not juggling, say they are tapping the ball eteec, do not say things like "in an attempt to juggle" or things in that nature, just say the actions exactly as it is.
+Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1", first image", secong image" etc., in your response`,
             });
 
             // Call OpenAI API to process this batch

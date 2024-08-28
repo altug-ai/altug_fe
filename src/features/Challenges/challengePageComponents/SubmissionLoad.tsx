@@ -25,7 +25,7 @@ const SubmissionLoad = ({ setRoute, description, goal, accepted, title, image }:
             throw new Error("Invalid point value: Please provide a valid number for point.");
         }
 
-        const percentageThreshold = 0.8; // Threshold for 40%
+        const percentageThreshold = 0.6; 
         const minimumScore = pointt * percentageThreshold;
 
         return scoree >= minimumScore ? t("Pass") : t("Fail");

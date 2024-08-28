@@ -19,6 +19,7 @@ import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { MdOutlineAttachment } from "react-icons/md";
 import OpenAI from 'openai';
 import { Label } from '@/components/ui/label';
+import MediaModal from './components/MediaModal';
 
 type Props = {}
 
@@ -300,40 +301,9 @@ const CoachChat = (props: Props) => {
 
 
 
-    const uploadFileToOpenai = async (src: any) => {
-        try {
-            const file: any = await openai.files.create({
-                file: src,
-                purpose: "assistants",
-            });
-
-            await setFileId(file?.id);
-
-            if (file?.id) {
-                submitMessage()
-            }
-
-        } catch (error) {
-            console.log("error ", error);
-        }
-    };
 
 
-    const handleFileChange = (e: any) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event: any) => {
-                setImagesrc(event.target.result as string);
-                let result: any = event.target.result as string
-                setMessages([...messages, { id: "id", content: result, role: "tool" }])
-            };
 
-
-            reader.readAsDataURL(file);
-            uploadFileToOpenai(file)
-        }
-    }
 
 
 
@@ -461,18 +431,8 @@ const CoachChat = (props: Props) => {
                             <Input disabled={status === "in_progress"} onChange={handleInputChange} value={input} required className='rounded-l-[49px] w-[80%] text-[16px] border-none focus-visible:ring-0  h-[48px]' placeholder='Ask your questions here' />
 
                             <div className='flex space-x-2 items-center absolute right-0 top-0'>
-                                <Label htmlFor="picture">
-                                    <MdOutlineAttachment className='text-[#357EF8] text-lg cursor-pointer' />
-                                </Label>
-                                <Input
-                                    id='picture'
-                                    type='file'
-                                    name='files'
-                                    className='h-20 w-52'
-                                    accept='image/*'
-                                    onChange={handleFileChange}
-                                    style={{ display: 'none' }}
-                                />
+
+                                <MediaModal setMessages={setMessages} setInput={setInput} status={status} fileId={fileId} handleInputChange={handleInputChange} input={input} messages={messages} setFileId={setFileId} submitMessage={submitMessage} />
                                 <button disabled={status === "in_progress"} type='submit'>
                                     <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className={`h-[48px] ${status === "in_progress" && "animate-pulse"} w-[48px] cursor-pointer `} />
                                 </button>
