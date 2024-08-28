@@ -1,25 +1,21 @@
 "use client";
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import Image from 'next/image';
-import TabBar from '../Profile/components/TabBar';
 import { Input } from '@/components/ui/input';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from "@/components/ui/use-toast";
 import { AuthContext } from '@/context/AuthContext';
 import { fetcher } from '@/lib/functions';
+import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { experimental_useAssistant as useAssistant } from "ai/react";
+import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
+import OpenAI from 'openai';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { TbLoader3 } from 'react-icons/tb';
 import Message from '../Onboarding/components/Message';
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { v4 as uuidv4 } from 'uuid';
-import { Skeleton } from '@/components/ui/skeleton';
-import { experimental_useAssistant as useAssistant } from "ai/react";
-import { addMessageLeft, createChat, existsIdInArray, followCoach, UpdateChat } from './functions/functions';
-import { useToast } from "@/components/ui/use-toast";
-import { ElevenLabsClient, ElevenLabs } from "elevenlabs";
-import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
-import { MdOutlineAttachment } from "react-icons/md";
-import OpenAI from 'openai';
-import { Label } from '@/components/ui/label';
+import TabBar from '../Profile/components/TabBar';
 import MediaModal from './components/MediaModal';
+import { addMessageLeft, createChat, existsIdInArray, followCoach, UpdateChat } from './functions/functions';
 
 type Props = {}
 
@@ -46,6 +42,7 @@ const CoachChat = (props: Props) => {
     const { toast } = useToast();
     const [messagesLeft, setMessagesLeft] = useState<number>(3)
     const [tier, setTier] = useState<any>()
+    const [load, setLoad] = useState<boolean>(false);
     const [chatId, setChatId] = useState()
     const [previous, setPrevious] = useState([])
     const [threadIdd, setThreadId] = useState("")
@@ -303,6 +300,13 @@ const CoachChat = (props: Props) => {
 
 
 
+    const removeTextBetweenDelimiters = (text: string): string => {
+        if (!text) {
+            return "";
+        }
+        // This regex matches everything from the start of the string up to and including the last occurrence of $@@
+        return text.replace(/.*?\$@@/, '');
+    };
 
 
 
@@ -428,13 +432,13 @@ const CoachChat = (props: Props) => {
 
                         }} className='relative w-full max-w-[335px] rounded-[49px]  h-12 bg-white'>
 
-                            <Input disabled={status === "in_progress"} onChange={handleInputChange} value={input} required className='rounded-l-[49px] w-[80%] text-[16px] border-none focus-visible:ring-0  h-[48px]' placeholder='Ask your questions here' />
+                            <Input disabled={status === "in_progress" || load} onChange={handleInputChange} value={removeTextBetweenDelimiters(input)} required className='rounded-l-[49px] w-[80%] text-[16px] border-none focus-visible:ring-0  h-[48px]' placeholder='Ask your questions here' />
 
                             <div className='flex space-x-2 items-center absolute right-0 top-0'>
 
-                                <MediaModal setMessages={setMessages} setInput={setInput} status={status} fileId={fileId} handleInputChange={handleInputChange} input={input} messages={messages} setFileId={setFileId} submitMessage={submitMessage} />
-                                <button disabled={status === "in_progress"} type='submit'>
-                                    <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className={`h-[48px] ${status === "in_progress" && "animate-pulse"} w-[48px] cursor-pointer `} />
+                                <MediaModal load={load} setLoad={setLoad} setMessages={setMessages} setInput={setInput} status={status} fileId={fileId} handleInputChange={handleInputChange} input={input} messages={messages} setFileId={setFileId} submitMessage={submitMessage} />
+                                <button disabled={status === "in_progress" || load} type='submit'>
+                                    <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className={`h-[48px] ${(status === "in_progress" || load) && "animate-pulse"} w-[48px] cursor-pointer `} />
                                 </button>
                             </div>
 

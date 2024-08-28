@@ -23,6 +23,50 @@ const concatenateDescriptions = (dataArray: any) => {
   return concatenatedString;
 };
 
+export const getImageDescription = async (
+  setProgress: Dispatch<SetStateAction<number>>,
+  imageurl: any,
+  input: string
+) => {
+  // get the image description then return it
+  setProgress(50);
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      {
+        role: 'system',
+        content: `
+        Describe this image, describe every detail happening too. , , also craft it in regards to this prompt ${input}
+           `,
+      },
+
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'image_url',
+            image_url: {
+              url: `${imageurl}`,
+            },
+          },
+        ],
+      },
+    ],
+    max_tokens: 1000,
+  });
+
+  const systemResponse = completion.choices.find(
+    (choice) => choice.message.role === 'assistant'
+  );
+
+  setProgress(100);
+  if (systemResponse) {
+    return systemResponse.message.content;
+  } else {
+    return '';
+  }
+};
+
 export const getVideoDescription = async (
   setProgress: Dispatch<SetStateAction<number>>,
   setResponse: Dispatch<any>,
@@ -135,7 +179,6 @@ Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1" etc., in you
 
         let percentCompleted = Math.round((done * 100) / frameBatches?.length);
         setProgress(percentCompleted);
-        
 
         setResponse((prevResponse: any) => {
           let array = [
@@ -165,7 +208,7 @@ Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1" etc., in you
     // Now response state should be populated with descriptions
     setTimeout(() => {
       setResponse([]);
-      // console.log('this is the new Description', newDescription);
+      return newDescription;
     }, 2000);
 
     return newDescription;
