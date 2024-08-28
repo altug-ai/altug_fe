@@ -187,6 +187,7 @@ const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputCha
                                         setError("Enter a media");
                                         return
                                     }
+                                    
                                     if (imagesrc !== "") {
                                         setLoad(true)
                                         let description = await getImageDescription(setProgress, imagesrc, prompt)
