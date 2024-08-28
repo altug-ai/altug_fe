@@ -1,25 +1,24 @@
 "use client";
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { MdOutlineAttachment } from "react-icons/md"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useEffect, useState } from "react";
-import OpenAI from 'openai';
-import Image from "next/image";
+    AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import { Message } from "ai";
 import { AssistantStatus } from "ai/react";
-import { Progress } from "@/components/ui/progress";
-import { getVideoDescription } from "../functions/functions";
+import Image from "next/image";
+import OpenAI from 'openai';
+import { useEffect, useState } from "react";
+import { MdOutlineAttachment } from "react-icons/md";
+import { getImageDescription, getVideoDescription } from "../functions/functions";
 
 type Props = {
     submitMessage: (event?: React.FormEvent<HTMLFormElement>, requestOptions?: {
@@ -33,6 +32,8 @@ type Props = {
     status: AssistantStatus;
     setInput: React.Dispatch<React.SetStateAction<string>>;
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+    setLoad: React.Dispatch<React.SetStateAction<boolean>>;
+    load: boolean;
 }
 
 const openai = new OpenAI({
@@ -40,112 +41,90 @@ const openai = new OpenAI({
     dangerouslyAllowBrowser: true,
 });
 
-const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputChange, input, status, setInput, setMessages }: Props) => {
+const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputChange, input, status, setInput, setMessages, setLoad, load }: Props) => {
     const [imagesrc, setImagesrc] = useState<string>("");
     const [videosrc, setVideosrc] = useState<string>("")
     const [filesrc, setFilesrc] = useState<any>()
     const [response, setResponse] = useState<any>([])
     const [progress, setProgress] = useState(0)
-    const [load, setLoad] = useState<boolean>(false);
+
     const [error, setError] = useState<string>("");
-    const [loadn, setLoadn] = useState<boolean>(false)
+    const [prompt, setPrompt] = useState<string>("")
 
     const handleFileChange = (e: any) => {
         const file = e.target.files[0];
         if (file) {
-            setVideosrc("")
-            setImagesrc("")
-            setError("")
+            setVideosrc("");
+            setImagesrc("");
+            setError("");
             const fileType = file.type;
 
             if (fileType.startsWith("image/")) {
+                if (file.size > 5 * 1024 * 1024) {
+                    // File size is greater than 5 MB
+                    setError('Image should not exceed 5 MB.');
+                    return; // Stop further execution if there's an error
+                }
                 // The file is an image
                 const reader = new FileReader();
                 reader.onload = (event: any) => {
                     setImagesrc(event.target.result as string);
-                    let result: any = event.target.result as string
-
                 };
                 reader.readAsDataURL(file);
             } else if (fileType.startsWith("video/")) {
                 // The file is a video
                 const reader = new FileReader();
-                reader.onload = (event: any) => {
+
+                reader.onload = async (event: any) => {
+                    var getDuration = async function (url: any) {
+                        var _player = new Audio(url);
+                        return new Promise((resolve) => {
+                            _player.addEventListener(
+                                'durationchange',
+                                function (e) {
+                                    if (this.duration !== Infinity) {
+                                        const duration = this.duration;
+                                        _player.remove();
+                                        resolve(duration);
+                                    }
+                                },
+                                false
+                            );
+                            _player.load();
+                            _player.currentTime = 24 * 60 * 60; // fake big time
+                            _player.volume = 0;
+                            _player.play();
+                        });
+                    };
+
+                    let duration: any = await getDuration(event.target.result as string);
+                    if (duration > 125) {
+                        setError("Video cannot be more than 2 minutes.");
+                        return; // Stop further execution if the video duration exceeds 125 seconds
+                    }
+
                     setVideosrc(event.target.result as string); // Assuming you have a setVideosrc function
                 };
+
                 reader.readAsDataURL(file);
             } else {
                 // Handle other file types if necessary
+                setError("Unsupported file type")
                 console.log("Unsupported file type");
             }
 
-            setFilesrc(file);
+            setFilesrc(file); // Assuming you have a setFilesrc function
         }
     };
 
-    // function to delete the file uploaded
-    const deleteFile = async () => {
-        try {
-            if (fileId) {
-                const file = await openai.files.del(fileId);
-                setFileId(undefined)
-            }
-        } catch (error) {
-            console.log("error ", error);
-        }
-    }
 
     useEffect(() => {
-        if (fileId) {
+        if (input !== "" && load) {
             document.getElementById('closeDialog')?.click();
-            submitMessage()
+            submitMessage();
+            setLoad(false);
         }
-    }, [fileId])
-
-    // useEffect(() => {
-    //     if (loadn) {
-    //         document.getElementById('closeDialog')?.click();
-    //         submitMessage()
-    //         setLoadn(false)
-    //     }
-    // }, [input])
-
-
-    // useEffect(() => {
-    //     if (fileId) {
-    //         document.getElementById('closeDialog')?.click();
-    //         submitMessage()
-    //     }
-    // }, [input, loadn])
-
-    useEffect(() => {
-        if (status !== "in_progress" && fileId) {
-            // delete the file from the backend 
-            deleteFile()
-            setLoad(false)
-        }
-    }, [status])
-
-
-
-    const uploadFileToOpenai = async () => {
-        setLoad(true)
-        try {
-            console.log("the filesrc", filesrc)
-            const file: any = await openai.files.create({
-                file: filesrc,
-                purpose: "assistants",
-            });
-            console.log("the file id", file?.id)
-            await setFileId(file?.id);
-            setMessages([...messages, { id: "id", content: imagesrc, role: "tool" }])
-
-        } catch (error) {
-            setLoad(false)
-            setError("Please try again")
-            console.log("error ", error);
-        }
-    };
+    }, [input])
 
 
 
@@ -160,7 +139,7 @@ const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputCha
                     <AlertDialogDescription>
                         <div className="grid w-full max-w-sm items-center gap-1.5">
                             <Label htmlFor="picture">Media</Label>
-                            <Input id="picture" type="file" onChange={handleFileChange} />
+                            <Input id="picture" accept="image/*,video/*" type="file" onChange={handleFileChange} />
                         </div>
                         {
                             imagesrc !== "" && (
@@ -176,10 +155,10 @@ const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputCha
                             )
                         }
                         {
-                            (videosrc !== "" && load) && (
+                            (load) && (
                                 <div className='w-full relative max-w-[388px] mt-10 gap-[12px]'>
                                     <Progress value={progress} />
-                                    <h1 className='absolute top-1 right-20 whitespace-nowrap text-[16px] text-white font-medium text-center'>Analyzing Video</h1>
+                                    <h1 className='absolute top-1 right-20 whitespace-nowrap text-[16px] text-white font-medium text-center'>Analyzing</h1>
                                 </div>
                             )
                         }
@@ -193,11 +172,14 @@ const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputCha
                     <div className='w-full flex justify-center'>
                         <div className='relative w-full max-w-[335px] rounded-[49px]  h-12 bg-white border border-slate-600'>
 
-                            <Input disabled={load} onChange={(e) => { setError(""); handleInputChange(e); }} value={input} required className='rounded-l-[49px] w-[80%] h-full text-[16px] focus-visible:ring-0' placeholder='Enter Questions about the media uploaded' />
+                            <Input disabled={load} onChange={(e) => { setError(""); setPrompt(e.target.value); }} value={prompt} required className='rounded-l-[49px] w-[80%] h-full text-[16px] focus-visible:ring-0' placeholder='Enter Questions about the media uploaded' />
 
                             <div className='flex space-x-2 items-center absolute right-0 top-0'>
                                 <button onClick={async () => {
-                                    if (input === "") {
+                                    if (load) {
+                                        return
+                                    }
+                                    if (prompt === "") {
                                         setError("Enter a prompt");
                                         return;
                                     }
@@ -206,21 +188,21 @@ const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputCha
                                         return
                                     }
                                     if (imagesrc !== "") {
-                                        setInput("based on the image uploaded :" + input)
-                                        uploadFileToOpenai()
+                                        setLoad(true)
+                                        let description = await getImageDescription(setProgress, imagesrc, prompt)
+                                        setMessages([...messages, { id: "id", content: imagesrc, role: "tool" }])
+                                        let desc = `this  is the description of the image uploaded : ${description}, do not say based on your description or something along the line and this is the prompt of the user: $@@ ` + prompt
+                                        setInput(desc)
+
                                     }
                                     if (videosrc !== "") {
                                         setLoad(true)
                                         let newDescription = '';
                                         setMessages([...messages, { id: "id", content: videosrc, role: "data" }])
                                         let description = await getVideoDescription(setProgress, setResponse, videosrc, newDescription)
-                                        setInput("yessss" + input)
-                                        setInput(`$@@ this  is the description of the video uploaded : ${newDescription} and this is the prompt of the user: $@@` + input);
-                                        setTimeout(() => {
-                                            document.getElementById('closeDialog')?.click();
-                                            submitMessage()
-                                        }, 3000);
-                                        setLoad(false)
+                                        let desc = `this  is the description of the video uploaded : ${description}, do not say based on your description or something along the line and this is the prompt of the user: $@@` + prompt
+                                        setInput(desc);
+
                                     }
                                 }} type='button'>
                                     <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className={`h-[48px] ${(status === "in_progress" || load) && "animate-pulse"} w-[48px] cursor-pointer `} />

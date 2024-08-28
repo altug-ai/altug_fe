@@ -40,12 +40,23 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
     };
 
 
-    const removeTextBetweenDelimiters = (text: string) => {
+    function removeTextBetweenDelimiters(text: string) {
+
         if (!text) {
             return ""
         }
-        return text?.replace(/\$@@.*?\$@@/g, '');
-    };
+        // Use regex to match the prompt and content
+        const regex = /\$@@(.*)/;
+        const match = text.match(regex);
+
+        // If a match is found, extract the content after the prompt
+        if (match) {
+            return match[1];
+        } else {
+            // If no match is found, return the original string
+            return text;
+        }
+    }
 
 
     const theSpeaker = async () => {
