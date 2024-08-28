@@ -132,10 +132,10 @@ const DetailsForm = (props: Props) => {
 
 
     return (
-        <div>
+        <div >
 
             {
-                (route === 0 && !roleId && !load && profileId) && (
+                (route === 0 && !roleId && !load && profileId) ? (
 
                     <div className='py-[20px] px-[20px] h-full flex flex-col items-center '>
 
@@ -265,6 +265,16 @@ const DetailsForm = (props: Props) => {
 
                     </div>
 
+                ) : (
+                    <div className=" flex flex-col items-center w-full h-screen justify-end" style={{ backgroundImage: 'url("/auth/bg.png")' }}>
+                        <div className='w-full max-w-[388px] mb-[60px] '>
+                            <div onClick={async () => {
+                                await signOut()
+                            }} className='rounded-[35px] cursor-pointer mt-3 w-1/2 gap-[12px] h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
+                                LogOut
+                            </div>
+                        </div>
+                    </div>
                 )}
 
 

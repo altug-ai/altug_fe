@@ -8,7 +8,7 @@ export class VideoToFrames {
    * Extracts frames from the video and returns them as an array of imageData
    * @param videoUrl url to the video file (html5 compatible format) eg: mp4
    * @param amount number of frames per second or total number of frames that you want to extract
-   * @param type [fps, totalFrames] The method of extracting frames: Number of frames per second of video or the total number of frames acros the whole video duration. defaults to fps
+   * @param type [fps, totalFrames] The method of extracting frames: Number of frames per second of video or the total number of frames across the whole video duration. defaults to fps
    */
   public static async getFrames(
     videoUrl: string,
@@ -30,7 +30,7 @@ export class VideoToFrames {
           false
         );
         _player.load();
-        _player.currentTime = 24 * 60 * 60; //fake big time
+        _player.currentTime = 24 * 60 * 60; // fake big time
         _player.volume = 0;
         _player.play();
       });
@@ -53,8 +53,9 @@ export class VideoToFrames {
         video.preload = 'auto';
         let that = this;
         video.addEventListener('loadeddata', async function () {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
+          // Set the canvas resolution to 224x224 pixels
+          canvas.width = 224;
+          canvas.height = 224;
 
           let totalFrames: number = amount;
           if (type === VideoToFramesMethod.fps) {
@@ -96,7 +97,26 @@ export class VideoToFrames {
     canvas: HTMLCanvasElement,
     resolve: (frame: string) => void
   ) {
-    context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-    resolve(canvas.toDataURL());
+    // Draw the video frame onto the canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    let quality = 0.7; // Start with a medium-high quality
+    let dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+    // Adjust the quality until the frame is under 100KB
+    while (this.getBase64Size(dataUrl) > 200 && quality > 0.1) {
+      quality -= 0.1; // Reduce the quality by 0.1
+      dataUrl = canvas.toDataURL('image/jpeg', quality);
+    }
+
+    resolve(dataUrl);
+  }
+
+  private static getBase64Size(base64: string): number {
+    // Calculate the size of the base64 string in kilobytes
+    const sizeInBytes =
+      base64.length * (3 / 4) -
+      (base64.endsWith('==') ? 2 : base64.endsWith('=') ? 1 : 0);
+    return sizeInBytes / 1024;
   }
 }

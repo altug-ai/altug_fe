@@ -40,6 +40,14 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
     };
 
 
+    const removeTextBetweenDelimiters = (text: string) => {
+        if (!text) {
+            return ""
+        }
+        return text?.replace(/\$@@.*?\$@@/g, '');
+    };
+
+
     const theSpeaker = async () => {
         const botVoiceResponse = await getElevenLabsResponse(message);
         const reader = new FileReader();
@@ -80,7 +88,7 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                                 )
                             }
 
-                            <h1 className='text-[14px] leading-[18px] font-medium text-[#181928]'>{message}</h1>
+                            <h1 className='text-[14px] leading-[18px] font-medium text-[#181928]'>{removeTextBetweenDelimiters(message)}</h1>
                             <h1 className='text-[#706A6A] text-[13px] leading-[16px] font-normal '>{date ? date : "10:54am"}</h1>
                         </div>
                     </div>
@@ -90,8 +98,12 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                             {
                                 role === "tool" ? (
                                     <Image src={message} width={600} height={600} alt='Message image' className='max-w-[200px] max-h-[200px] object-cover rounded-md' />
+                                ) : role === "data" ? (
+                                    <video className='h-[192.52px] w-full object-cover rounded-md grid place-items-center my-7' controls preload="none">
+                                        <source src={message} type="video/mp4" />
+                                    </video>
                                 ) : (
-                                    <h1 className='text-[14px] leading-[18px] font-medium text-[#F5F7F8]'>{message}</h1>
+                                    <h1 className='text-[14px] leading-[18px] font-medium text-[#F5F7F8]'>{removeTextBetweenDelimiters(message)}</h1>
                                 )
                             }
                             <h1 className='text-[##E6E6E6] text-[13px] text-end leading-[16px] font-normal '>{date ? date : "10:54am"}</h1>
