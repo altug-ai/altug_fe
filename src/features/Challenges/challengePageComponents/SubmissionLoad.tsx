@@ -61,7 +61,7 @@ const SubmissionLoad = ({ setRoute, description, goal, accepted, title, image }:
 
             {
                 explanation !== "" && (
-                    <div className='mt-[50px]'>
+                    <div className='mt-[50px] pb-[70px]'>
                         <div className='flex flex-col space-y-2 mb-[20px]'>
                             <h1 className='font-medium text-[24px] leading-[32.47px] text-[#FFFFFF]'>{t("This")} {calculateScore()}</h1>
                             <h1 className='font-medium text-[24px] leading-[32.47px] text-[#FFFFFF]'>{t("Explanation")}</h1>
