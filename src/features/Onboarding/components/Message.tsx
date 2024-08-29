@@ -16,8 +16,8 @@ type Props = {
     voice?: any;
     audioRef?: any;
     role?: any
-    audioEnabled: boolean;
-    setAudioEnabled: Dispatch<SetStateAction<boolean>>;
+    audioEnabled?: boolean;
+    setAudioEnabled?: Dispatch<SetStateAction<boolean>>;
 }
 
 
@@ -176,7 +176,10 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                                         if (audioRef?.current) {
                                             audioRef?.current?.play();
                                         }
-                                        setAudioEnabled(true);
+                                        if (setAudioEnabled) {
+                                            setAudioEnabled(true);
+                                        }
+
                                         close();
                                         theSpeaker();
                                     }}
