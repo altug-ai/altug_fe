@@ -503,6 +503,7 @@ Score the user based on how well their uploaded video/frames description matches
                 role: 'system',
                 content: `In this video frame, describe the actions performed by the user., if an action is performed by the user, say all that is being done, no summary, all. 
 also this is the description and goal of the challenge ${descriptionn}, ${goal} given to the user, do not allow the description and goal of the challenge cloud your descriptions, for example if the user is just tapping the ball and not juggling, say they are tapping the ball eteec, do not say things like "in an attempt to juggle" or things in that nature, just say the actions exactly as it is. do not hallucinate result , or say the user is during the goal/description of the challenge when they are not.
+if the challenge involves a count, please state the count, for example do not say something like "the user is repeatedly tapping the ball", say something like, the user just tapped the ball with his foot, they just tapped the ball again, just did again, etec, state all action clearly no matter how small. state what the user is doing and what part of the body the user is using etec. make it extremely detailed
                 Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1", first image", secong image" etc., in your response`,
             });
 
