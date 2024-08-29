@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { experimental_useAssistant as useAssistant } from "ai/react";
 import { addMessageLeft, createChatt, existsIdInArray, followPlayer, UpdateChatt } from '../CoachChat/functions/functions';
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
+import MediaModal from '../CoachChat/components/MediaModal';
 
 type Props = {}
 
@@ -39,6 +40,8 @@ const PlayerChat = (props: Props) => {
     const [threadIdd, setThreadId] = useState("")
     const [paid, setPaid] = useState<boolean>(false)
     const [previousLoad, setPreviousLoad] = useState<boolean>(false)
+    const [load, setLoad] = useState<boolean>(false);
+    const [fileId, setFileId] = useState();
     let [isOpen, setIsOpen] = useState(false)
     const hasFetchedChat = useRef(false);
 
@@ -66,6 +69,7 @@ const PlayerChat = (props: Props) => {
         setInput,
         error,
         threadId,
+        setMessages
     } = useAssistant({
         api: "/api/coach-assistant",
         body: {
@@ -201,7 +205,7 @@ const PlayerChat = (props: Props) => {
             hasFetchedChat.current = true; // Set the ref to true to prevent future calls
             getCoach(slug);
         }
-        
+
     }, [slug, jwt, profileId]);
 
     useEffect(() => {
@@ -283,6 +287,17 @@ const PlayerChat = (props: Props) => {
 
 
     }
+
+
+    const removeTextBetweenDelimiters = (text: string): string => {
+        if (!text) {
+            return "";
+        }
+        // This regex matches everything from the start of the string up to and including the last occurrence of $@@
+        return text.replace(/.*?\$@@/, '');
+    };
+
+
 
 
     return (
@@ -399,10 +414,11 @@ const PlayerChat = (props: Props) => {
                             let response = await submitMessage(e)
                             handleChat()
                         }} className='relative w-full max-w-[335px]'>
-                            <Input disabled={status === "in_progress"} onChange={handleInputChange} value={input} required className='rounded-l-[49px] text-[16px] rounded-r-[49px] h-[48px]' placeholder='Ask your questions here' />
+                            <Input disabled={status === "in_progress" || load} onChange={handleInputChange} value={input} required className='rounded-l-[49px] text-[16px] rounded-r-[49px] h-[48px]' placeholder='Ask your questions here' />
 
-                            <button disabled={status === "in_progress"} type='submit'>
-                                <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className='h-[48px] w-[48px] cursor-pointer absolute right-0 top-0' />
+                            <MediaModal load={load} setLoad={setLoad} setMessages={setMessages} setInput={setInput} status={status} fileId={fileId} handleInputChange={handleInputChange} input={input} messages={messages} setFileId={setFileId} submitMessage={submitMessage} />
+                            <button disabled={status === "in_progress" || load} type='submit'>
+                                <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className={`h-[48px] ${(status === "in_progress" || load) && "animate-pulse"} w-[48px] cursor-pointer `} />
                             </button>
 
                         </form>
