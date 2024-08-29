@@ -367,16 +367,17 @@ const PlayerChat = (props: Props) => {
                     }
 
                     {
-                        previous?.slice()?.reverse()?.map((info: any) => (
+                        previous?.slice()?.reverse()?.map((info: any, index) => (
                             <Message
                                 voice={voice}
                                 audioRef={audioRef}
                                 premium={tier === "premium"}
                                 image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url}
-                                key={info.id}
+                                key={`${info.id} - ${index}`}
                                 message={info?.content[0]?.text?.value}
                                 system={info?.role === "assistant" ? true : false}
-                                user={info?.role === "user" ? true : false}
+                                user={(info?.role === "user" || info?.role === "tool") ? true : false}
+                                role={info?.role}
                             />
                         ))
                     }
@@ -384,8 +385,16 @@ const PlayerChat = (props: Props) => {
                     {/* this is where the chats will show */}
 
                     {
-                        messages?.map((info: any) => (
-                            <Message voice={voice} audioRef={audioRef} premium={tier === "premium"} image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={info.id} message={info?.content} system={info?.role === "assistant" ? true : false} user={info?.role === "user" ? true : false} />
+                        messages?.map((info: any, index) => (
+
+                            <Message audioRef={audioRef}
+                                voice={voice}
+                                premium={tier === "premium"}
+                                image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={`${info.id} - ${index}`}
+                                message={info?.content} system={info?.role === "assistant" ? true : false}
+                                user={(info?.role === "user" || info?.role === "tool") ? true : false}
+                                role={info?.role}
+                            />
                         ))
                     }
 
@@ -413,16 +422,23 @@ const PlayerChat = (props: Props) => {
                             }
                             let response = await submitMessage(e)
                             handleChat()
-                        }} className='relative w-full max-w-[335px]'>
-                            <Input disabled={status === "in_progress" || load} onChange={handleInputChange} value={input} required className='rounded-l-[49px] text-[16px] rounded-r-[49px] h-[48px]' placeholder='Ask your questions here' />
 
-                            <MediaModal load={load} setLoad={setLoad} setMessages={setMessages} setInput={setInput} status={status} fileId={fileId} handleInputChange={handleInputChange} input={input} messages={messages} setFileId={setFileId} submitMessage={submitMessage} />
-                            <button disabled={status === "in_progress" || load} type='submit'>
-                                <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className={`h-[48px] ${(status === "in_progress" || load) && "animate-pulse"} w-[48px] cursor-pointer `} />
-                            </button>
+                        }} className='relative w-full max-w-[335px] rounded-[49px]  h-12 bg-white'>
+
+                            <Input disabled={status === "in_progress" || load} onChange={handleInputChange} value={removeTextBetweenDelimiters(input)} required className='rounded-l-[49px] w-[80%] text-[16px] border-none focus-visible:ring-0  h-[48px]' placeholder='Ask your questions here' />
+
+                            <div className='flex space-x-2 items-center absolute right-0 top-0'>
+
+                                <MediaModal load={load} setLoad={setLoad} setMessages={setMessages} setInput={setInput} status={status} fileId={fileId} handleInputChange={handleInputChange} input={input} messages={messages} setFileId={setFileId} submitMessage={submitMessage} />
+                                <button disabled={status === "in_progress" || load} type='submit'>
+                                    <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className={`h-[48px] ${(status === "in_progress" || load) && "animate-pulse"} w-[48px] cursor-pointer `} />
+                                </button>
+                            </div>
 
                         </form>
                     </div>
+
+
                 </div>
 
 
@@ -455,7 +471,7 @@ const PlayerChat = (props: Props) => {
                                     className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
                                     onClick={() => { handleSubscribe(`/chat/player/${slug}`, chatId) }}
                                 >
-                                    
+
                                     Upgrade
                                 </Button>
                             </div>
