@@ -35,7 +35,14 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
             })
         });
 
+        if (response?.statusText === "Unauthorized") {
+            const utterance = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+        }
+
         const data = await response.blob();
+
         return data;
     };
 

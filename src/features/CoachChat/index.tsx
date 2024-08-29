@@ -52,9 +52,6 @@ const CoachChat = (props: Props) => {
 
     const audioRef = useRef<HTMLAudioElement>(null);
     let [isOpen, setIsOpen] = useState(false)
-    const [imagesrc, setImagesrc] = useState<string>();
-    const [filesrc, setFilesrc] = useState<any>()
-
 
 
 
@@ -96,7 +93,11 @@ const CoachChat = (props: Props) => {
                 voice: voice
             })
         });
-
+        if (response?.statusText === "Unauthorized") {
+            const utterance = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+        }
         const data = await response.blob();
         return data;
     };
