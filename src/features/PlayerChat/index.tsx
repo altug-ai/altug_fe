@@ -447,7 +447,7 @@ const PlayerChat = (props: Props) => {
                     <div className="flex min-h-full items-center justify-center p-4">
                         <DialogPanel
                             transition
-                            className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-3xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-3"
+                            className="w-full max-w-md rounded-xl bg-[#262629] bg-opacity-95 backdrop-blur-md p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-3"
                         >
                             <DialogTitle as="h3" className="text-base/7 font-medium text-white">
                                 Maximum messages reached
