@@ -16,6 +16,7 @@ import Message from '../Onboarding/components/Message';
 import TabBar from '../Profile/components/TabBar';
 import MediaModal from './components/MediaModal';
 import { addMessageLeft, createChat, existsIdInArray, followCoach, UpdateChat } from './functions/functions';
+import { CoachContext } from '@/context/CoachContext';
 
 type Props = {}
 
@@ -49,13 +50,16 @@ const CoachChat = (props: Props) => {
     const [paid, setPaid] = useState<boolean>(false)
     const [previousLoad, setPreviousLoad] = useState<boolean>(false)
     const [fileId, setFileId] = useState();
-
     const audioRef = useRef<HTMLAudioElement>(null);
     let [isOpen, setIsOpen] = useState(false)
+    let [isOpenn, setIsOpenn] = useState(false)
+    const [audioEnabled, setAudioEnabled] = useState<boolean>(false)
 
-
-
-
+    useEffect(() => {
+        if (!audioEnabled) {
+            setIsOpenn(true)
+        }
+    }, [])
 
 
     // Ref to track whether getCoach has been executed once
@@ -194,6 +198,14 @@ const CoachChat = (props: Props) => {
 
     function close() {
         setIsOpen(false)
+    }
+
+    function openn() {
+        setIsOpenn(true)
+    }
+
+    function closee() {
+        setIsOpenn(false)
     }
 
     const scrollToBottom = () => {
@@ -382,6 +394,8 @@ const CoachChat = (props: Props) => {
                                 audioRef={audioRef}
                                 premium={tier === "premium"}
                                 image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url}
+                                audioEnabled={audioEnabled}
+                                setAudioEnabled={setAudioEnabled}
                                 key={`${info.id} - ${index}`}
                                 message={info?.content[0]?.text?.value}
                                 system={info?.role === "assistant" ? true : false}
@@ -398,6 +412,8 @@ const CoachChat = (props: Props) => {
                                 voice={voice}
                                 premium={tier === "premium"}
                                 image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={`${info.id} - ${index}`}
+                                audioEnabled={audioEnabled}
+                                setAudioEnabled={setAudioEnabled}
                                 message={info?.content} system={info?.role === "assistant" ? true : false}
                                 user={(info?.role === "user" || info?.role === "tool") ? true : false}
                                 role={info?.role}
@@ -494,6 +510,48 @@ const CoachChat = (props: Props) => {
                     </div>
                 </div>
             </Dialog>
+
+
+            <Dialog open={isOpenn} as="div" className="relative z-10 focus:outline-none" onClose={closee}>
+                <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                    <div className="flex min-h-full items-center justify-center p-4">
+                        <DialogPanel
+                            transition
+                            className="w-full max-w-md rounded-xl bg-[#262629] bg-opacity-95 backdrop-blur-md p-6  duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-3"
+                        >
+                            <DialogTitle as="h3" className="text-base/7 font-medium text-white">
+                                Permission Required
+                            </DialogTitle>
+                            <p className="mt-2 text-sm/6 text-white">
+                                Enable Audio?
+                            </p>
+                            <div className="mt-4 flex items-center space-x-2">
+                                <Button
+                                    className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                    onClick={closee}
+                                >
+                                    No
+                                </Button>
+                                <Button
+                                    className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                    onClick={() => {
+                                        const utterance = new SpeechSynthesisUtterance("");
+                                        window.speechSynthesis.cancel();
+                                        window.speechSynthesis.speak(utterance);
+                                        if (audioRef?.current) {
+                                            audioRef?.current?.play();
+                                        }
+                                        setAudioEnabled(true);
+                                        closee();
+                                    }}
+                                >
+                                    Yes
+                                </Button>
+                            </div>
+                        </DialogPanel>
+                    </div>
+                </div >
+            </Dialog >
         </div>
     )
 }

@@ -1,6 +1,6 @@
 "use client";
 import Image from 'next/image';
-import React, { useContext, useEffect, useState } from 'react'
+import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
 import { HiMiniSpeakerWave } from "react-icons/hi2";
 import { getTimeData } from '../functions/functions';
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
@@ -16,12 +16,13 @@ type Props = {
     voice?: any;
     audioRef?: any;
     role?: any
+    audioEnabled?: boolean;
+    setAudioEnabled?: Dispatch<SetStateAction<boolean>>;
 }
 
 
-const Message = ({ system, user, message, date, image, premium, voice, audioRef, role }: Props) => {
+const Message = ({ system, user, message, date, image, premium, voice, audioRef, role, audioEnabled, setAudioEnabled }: Props) => {
 
-    const { audioEnabled, setAudioEnabled } = useContext(CoachContext)
     let [isOpen, setIsOpen] = useState(false)
 
 
@@ -69,18 +70,15 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
 
 
     const theSpeaker = async () => {
-        // const botVoiceResponse = await getElevenLabsResponse(message);
-        // const reader = new FileReader();
-        // reader.readAsDataURL(botVoiceResponse);
-        // reader.onload = () => {
-        //     if (audioRef.current) {
-        //         audioRef.current.src = reader.result as string;
-        //         audioRef.current.play();
-        //     }
-        // };
-        const utterance = new SpeechSynthesisUtterance(message);
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(utterance);
+        const botVoiceResponse = await getElevenLabsResponse(message);
+        const reader = new FileReader();
+        reader.readAsDataURL(botVoiceResponse);
+        reader.onload = () => {
+            if (audioRef.current) {
+                audioRef.current.src = reader.result as string;
+                audioRef.current.play();
+            }
+        };
     }
 
 
@@ -172,11 +170,18 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                                 <Button
                                     className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
                                     onClick={() => {
-                                        const utterance = new SpeechSynthesisUtterance("Audio Enabled");
+                                        const utterance = new SpeechSynthesisUtterance("");
                                         window.speechSynthesis.cancel();
                                         window.speechSynthesis.speak(utterance);
-                                        setAudioEnabled(true);
+                                        if (audioRef?.current) {
+                                            audioRef?.current?.play();
+                                        }
+                                        if (setAudioEnabled) {
+                                            setAudioEnabled(true);
+                                        }
+
                                         close();
+                                        theSpeaker();
                                     }}
                                 >
                                     Yes
