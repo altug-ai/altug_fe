@@ -210,6 +210,8 @@ export type Tier = undefined | '' | 'free' | 'premium';
 export type CoachProps = {
   coachLoader: boolean;
   setCoachLoader: Dispatch<SetStateAction<boolean>>;
+  audioEnabled: boolean;
+  setAudioEnabled: Dispatch<SetStateAction<boolean>>;
 };
 
 export type ChallengeProps = {

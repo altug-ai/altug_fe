@@ -1,8 +1,10 @@
 "use client";
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { HiMiniSpeakerWave } from "react-icons/hi2";
 import { getTimeData } from '../functions/functions';
+import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { CoachContext } from '@/context/CoachContext';
 
 type Props = {
     system?: boolean;
@@ -19,8 +21,8 @@ type Props = {
 
 const Message = ({ system, user, message, date, image, premium, voice, audioRef, role }: Props) => {
 
-
-
+    const { audioEnabled, setAudioEnabled } = useContext(CoachContext)
+    let [isOpen, setIsOpen] = useState(false)
 
 
     const getElevenLabsResponse = async (text: string) => {
@@ -79,6 +81,13 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
     }
 
 
+    function open() {
+        setIsOpen(true)
+    }
+
+    function close() {
+        setIsOpen(false)
+    }
 
 
 
@@ -98,7 +107,12 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                             {
                                 premium && (
                                     <div onClick={() => {
-                                        theSpeaker()
+                                        if (!audioEnabled) {
+                                            open()
+                                        } else {
+                                            theSpeaker()
+                                        }
+
                                     }} className='w-full flex justify-end'>
                                         <HiMiniSpeakerWave className='h-4 w-4 text-slate-800 cursor-pointer' />
                                     </div>
@@ -129,6 +143,46 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                     </div>
                 )
             }
+
+
+            {/* if the audio is not enabled */}
+            <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close}>
+                <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                    <div className="flex min-h-full items-center justify-center p-4">
+                        <DialogPanel
+                            transition
+                            className="w-full max-w-md rounded-xl bg-[#262629] bg-opacity-95 backdrop-blur-md p-6  duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-3"
+                        >
+                            <DialogTitle as="h3" className="text-base/7 font-medium text-white">
+                                Permission Required
+                            </DialogTitle>
+                            <p className="mt-2 text-sm/6 text-white">
+                                Enable Audio?
+                            </p>
+                            <div className="mt-4 flex items-center space-x-2">
+                                <Button
+                                    className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                    onClick={close}
+                                >
+                                    No
+                                </Button>
+                                <Button
+                                    className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                    onClick={() => {
+                                        const utterance = new SpeechSynthesisUtterance("Audio Enabled");
+                                        window.speechSynthesis.cancel();
+                                        window.speechSynthesis.speak(utterance);
+                                        setAudioEnabled(true);
+                                        close();
+                                    }}
+                                >
+                                    Yes
+                                </Button>
+                            </div>
+                        </DialogPanel>
+                    </div>
+                </div >
+            </Dialog >
 
         </div >
     )
