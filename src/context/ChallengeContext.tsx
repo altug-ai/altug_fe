@@ -1,22 +1,22 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { ChallengeProps } from "./types";
-import axios from "axios";
-import { AuthContext } from "./AuthContext";
-import { useParams } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
-import OpenAI from "openai";
-import { VideoToFrames, VideoToFramesMethod } from "@/lib/VideoToFrame";
-import { useTranslations } from "next-intl";
 import { sendLeaderboardNots } from "@/features/Challenges/functions/function";
-import { getChallengeDesc } from "./function";
+import { VideoToFrames, VideoToFramesMethod } from "@/lib/VideoToFrame";
+import axios from "axios";
+import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+import OpenAI from "openai";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { AuthContext } from "./AuthContext";
+import { ChallengeProps } from "./types";
+import { usePathname } from 'next/navigation'
 
 // @ts-ignore
 export const ChallengeContext = createContext<ChallengeProps>({});
 
 const openai = new OpenAI({
-    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || "",
+    apiKey: process.env.NEXT_PUBLIC_OPEN_API_KEY || "",
     dangerouslyAllowBrowser: true,
 });
 
@@ -52,7 +52,17 @@ function ChallengeContextProvider(props: any) {
     const [res, setRes] = useState<any[]>([]);
     const [chal, setChal] = useState<any>()
     const t = useTranslations('Home.ChallengePage');
+    const pathname = usePathname()
     const maxDuration = 2 * 60 * 1000; // 2 minutes in milliseconds
+
+    useEffect(() => {
+        setRoute(0)
+        setScore(null)
+        setVideoUrl("")
+        setVideoBlob(null)
+        setExplanation("")
+        setProgress(0)
+    }, [pathname])
 
 
     // handle the data available
@@ -306,7 +316,7 @@ function ChallengeContextProvider(props: any) {
             throw new Error("Invalid point value: Please provide a valid number for point.");
         }
 
-        const percentageThreshold = 0.6; 
+        const percentageThreshold = 0.6;
         const minimumScore = point * percentageThreshold;
 
         return score >= minimumScore ? point : 0;
@@ -326,7 +336,10 @@ function ChallengeContextProvider(props: any) {
             setProgress(70)
             setScore(score)
             setExplanation(explanation);
-            handleUploadChallengeVideo(`${newScore}`)
+
+            if (newScore !== 0) {
+                handleUploadChallengeVideo(`${newScore}`)
+            }
             return { score, explanation };
         } catch (error) {
             setError(true);
@@ -489,8 +502,8 @@ Score the user based on how well their uploaded video/frames description matches
             batchMessages.push({
                 role: 'system',
                 content: `In this video frame, describe the actions performed by the user., if an action is performed by the user, say all that is being done, no summary, all. 
-also this is the description and goal of the challenge ${descriptionn}, ${goal}, do not allow the description and goal of the challenge cloud your descriptions, for example if the user is just tapping the ball and not juggling, say they are tapping the ball eteec, do not say things like "in an attempt to juggle" or things in that nature, just say the actions exactly as it is.
-Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1", first image", secong image" etc., in your response`,
+also this is the description and goal of the challenge ${descriptionn}, ${goal} given to the user, do not allow the description and goal of the challenge cloud your descriptions, for example if the user is just tapping the ball and not juggling, say they are tapping the ball eteec, do not say things like "in an attempt to juggle" or things in that nature, just say the actions exactly as it is. do not hallucinate result , or say the user is during the goal/description of the challenge when they are not.
+                Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1", first image", secong image" etc., in your response`,
             });
 
             // Call OpenAI API to process this batch
@@ -524,8 +537,8 @@ Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1", first image
                 }
             } catch (error) {
                 console.error('Error processing batch with OpenAI:', error);
-                setResponse([])
-                setError(true);
+                // setResponse([])
+                // setError(true);
             }
 
         };
@@ -613,3 +626,4 @@ Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1", first image
 }
 
 export { ChallengeContextProvider };
+

@@ -15,6 +15,7 @@ import { experimental_useAssistant as useAssistant } from "ai/react";
 import { addMessageLeft, createChatt, existsIdInArray, followPlayer, UpdateChatt } from '../CoachChat/functions/functions';
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import MediaModal from '../CoachChat/components/MediaModal';
+import { CoachContext } from '@/context/CoachContext';
 
 type Props = {}
 
@@ -43,14 +44,16 @@ const PlayerChat = (props: Props) => {
     const [load, setLoad] = useState<boolean>(false);
     const [fileId, setFileId] = useState();
     let [isOpen, setIsOpen] = useState(false)
+    let [isOpenn, setIsOpenn] = useState(false)
+    // const { audioEnabled, setAudioEnabled } = useContext(CoachContext)
+    const [audioEnabled, setAudioEnabled] = useState<boolean>(false)
     const hasFetchedChat = useRef(false);
 
-
-
-
-
-
-
+    useEffect(() => {
+        if (!audioEnabled && tier === "premium") {
+            setIsOpenn(true)
+        }
+    }, [tier])
 
     const {
         status,
@@ -71,6 +74,7 @@ const PlayerChat = (props: Props) => {
             // // userThreadId,
         },
     });
+
 
     const getElevenLabsResponse = async (text: string) => {
         const response = await fetch("/api/speech", {
@@ -141,6 +145,14 @@ const PlayerChat = (props: Props) => {
 
     function close() {
         setIsOpen(false)
+    }
+
+    function openn() {
+        setIsOpenn(true)
+    }
+
+    function closee() {
+        setIsOpenn(false)
     }
 
 
@@ -366,6 +378,8 @@ const PlayerChat = (props: Props) => {
                             <Message
                                 voice={voice}
                                 audioRef={audioRef}
+                                audioEnabled={audioEnabled}
+                                setAudioEnabled={setAudioEnabled}
                                 premium={tier === "premium"}
                                 image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url}
                                 key={`${info.id} - ${index}`}
@@ -384,6 +398,8 @@ const PlayerChat = (props: Props) => {
 
                             <Message audioRef={audioRef}
                                 voice={voice}
+                                audioEnabled={audioEnabled}
+                                setAudioEnabled={setAudioEnabled}
                                 premium={tier === "premium"}
                                 image={data?.attributes?.profile?.data?.attributes?.url ?? data?.attributes?.pic_url} key={`${info.id} - ${index}`}
                                 message={info?.content} system={info?.role === "assistant" ? true : false}
@@ -447,7 +463,7 @@ const PlayerChat = (props: Props) => {
                     <div className="flex min-h-full items-center justify-center p-4">
                         <DialogPanel
                             transition
-                            className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-3xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-3"
+                            className="w-full max-w-md rounded-xl bg-[#262629] bg-opacity-95 backdrop-blur-md p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-3"
                         >
                             <DialogTitle as="h3" className="text-base/7 font-medium text-white">
                                 Maximum messages reached
@@ -474,6 +490,48 @@ const PlayerChat = (props: Props) => {
                     </div>
                 </div>
             </Dialog>
+
+
+            <Dialog open={isOpenn} as="div" className="relative z-10 focus:outline-none" onClose={closee}>
+                <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                    <div className="flex min-h-full items-center justify-center p-4">
+                        <DialogPanel
+                            transition
+                            className="w-full max-w-md rounded-xl bg-[#262629] bg-opacity-95 backdrop-blur-md p-6  duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-3"
+                        >
+                            <DialogTitle as="h3" className="text-base/7 font-medium text-white">
+                                Permission Required
+                            </DialogTitle>
+                            <p className="mt-2 text-sm/6 text-white">
+                                Enable Audio?
+                            </p>
+                            <div className="mt-4 flex items-center space-x-2">
+                                <Button
+                                    className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                    onClick={closee}
+                                >
+                                    No
+                                </Button>
+                                <Button
+                                    className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                    onClick={() => {
+                                        const utterance = new SpeechSynthesisUtterance("");
+                                        window.speechSynthesis.cancel();
+                                        window.speechSynthesis.speak(utterance);
+                                        if (audioRef?.current) {
+                                            audioRef?.current?.play();
+                                        }
+                                        setAudioEnabled(true);
+                                        closee();
+                                    }}
+                                >
+                                    Yes
+                                </Button>
+                            </div>
+                        </DialogPanel>
+                    </div>
+                </div >
+            </Dialog >
         </div>
     )
 }

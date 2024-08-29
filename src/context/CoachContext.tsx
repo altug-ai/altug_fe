@@ -9,12 +9,14 @@ export const CoachContext = createContext<CoachProps>({});
 
 function CoachContextProvider(props: any) {
     const [coachLoader, setCoachLoader] = useState<boolean>(false)
-
+    const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
     return (
         <CoachContext.Provider
             value={{
                 coachLoader,
-                setCoachLoader
+                setCoachLoader,
+                audioEnabled,
+                setAudioEnabled
             }}
         >
             {props.children}
