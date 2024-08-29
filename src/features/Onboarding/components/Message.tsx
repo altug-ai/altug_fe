@@ -69,15 +69,18 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
 
 
     const theSpeaker = async () => {
-        const botVoiceResponse = await getElevenLabsResponse(message);
-        const reader = new FileReader();
-        reader.readAsDataURL(botVoiceResponse);
-        reader.onload = () => {
-            if (audioRef.current) {
-                audioRef.current.src = reader.result as string;
-                audioRef.current.play();
-            }
-        };
+        // const botVoiceResponse = await getElevenLabsResponse(message);
+        // const reader = new FileReader();
+        // reader.readAsDataURL(botVoiceResponse);
+        // reader.onload = () => {
+        //     if (audioRef.current) {
+        //         audioRef.current.src = reader.result as string;
+        //         audioRef.current.play();
+        //     }
+        // };
+        const utterance = new SpeechSynthesisUtterance(message);
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
     }
 
 
