@@ -10,7 +10,7 @@ type Props = {
 
 const Header = ({ setRoute, route, title }: Props) => {
     const router = useRouter();
-    const { handleStopCaptureClick, setVideoUrl, handleStartCaptureClick, recording } = useContext(ChallengeContext)
+    const { handleStopCaptureClick, setVideoUrl, handleStartCaptureClick, recording, setExplanation } = useContext(ChallengeContext)
     return (
         <div onClick={() => {
             if (route === 5) {
@@ -26,6 +26,7 @@ const Header = ({ setRoute, route, title }: Props) => {
                 setRoute(5)
             }
             if (route === 2) {
+                setExplanation("")
                 setRoute(1)
             }
             if (route === 0) {
