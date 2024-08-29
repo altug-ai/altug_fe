@@ -46,19 +46,11 @@ const PlayerChat = (props: Props) => {
     const hasFetchedChat = useRef(false);
 
 
-    useEffect(() => {
-        const voices = window.speechSynthesis.getVoices();
-        if (Array.isArray(voices) && voices.length > 0) {
-            setVoices(voices);
-            return;
-        }
-        if ('onvoiceschanged' in window.speechSynthesis) {
-            window.speechSynthesis.onvoiceschanged = function () {
-                const voices = window.speechSynthesis.getVoices();
-                setVoices(voices);
-            }
-        }
-    }, []);
+
+
+
+
+
 
     const {
         status,
@@ -91,6 +83,11 @@ const PlayerChat = (props: Props) => {
                 voice: voice
             })
         });
+        if (response?.statusText === "Unauthorized") {
+            const utterance = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+        }
 
         const data = await response.blob();
         return data;
@@ -244,8 +241,6 @@ const PlayerChat = (props: Props) => {
 
 
     const handleChat = async () => {
-
-
         if (!(playerIds?.has(parseInt(slug)))) {
             let createChat = await createChatt(slug, jwt, profileId)
             const updatedSett = new Set(playerIds);
