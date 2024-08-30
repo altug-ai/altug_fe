@@ -36,7 +36,7 @@ export const getImageDescription = async (
       {
         role: 'system',
         content: `
-        Describe this image, describe every detail happening too. , , also craft it in regards to this prompt ${input}
+        , this is the user prompt ${input}, use it to get a reply for the image uploaded, do not make the reply too long,
            `,
       },
 
@@ -59,7 +59,6 @@ export const getImageDescription = async (
     (choice) => choice.message.role === 'assistant'
   );
 
-  setProgress(100);
   if (systemResponse) {
     return systemResponse.message.content;
   } else {
@@ -177,7 +176,7 @@ Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1" etc., in you
         done = done + 1;
         const description = systemResponse.message.content;
 
-        let percentCompleted = Math.round((done * 100) / frameBatches?.length);
+        let percentCompleted = Math.round((done * 70) / frameBatches?.length);
         setProgress(percentCompleted);
 
         setResponse((prevResponse: any) => {
@@ -506,3 +505,98 @@ export const followPlayer = async (id: any, profileId: any, jwt: any) => {
     console.error(error);
   }
 };
+
+export function compressAndResizeBase64Image(
+  base64Image: any,
+  targetSizeKB = 100,
+  maxIterations = 10
+) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = base64Image;
+
+    img.onload = () => {
+      let quality = 0.9; // Start with high quality
+      let width = img.width;
+      let height = img.height;
+      let iteration = 0;
+
+      function compressAndCheckSize() {
+        const canvas = document.createElement('canvas');
+        const ctx: any = canvas.getContext('2d');
+
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        const fileSizeKB = Math.round(
+          (compressedBase64.length * (3 / 4)) / 1024
+        );
+
+        if (fileSizeKB <= targetSizeKB || iteration >= maxIterations) {
+          resolve(compressedBase64);
+        } else {
+          if (fileSizeKB > targetSizeKB) {
+            // Reduce dimensions slightly for better compression
+            width *= 0.9;
+            height *= 0.9;
+          }
+          quality -= 0.1; // Reduce quality further
+          iteration++;
+          compressAndCheckSize(); // Retry with lower quality and/or smaller dimensions
+        }
+      }
+
+      compressAndCheckSize();
+    };
+
+    img.onerror = (error) => {
+      reject(error);
+    };
+  });
+}
+
+export function compressAndResizeImageFile(
+  file: any,
+  targetSizeKB = 100,
+  maxIterations = 10
+): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = (event: any) => {
+      const base64Image = event.target.result;
+      compressAndResizeBase64Image(base64Image, targetSizeKB, maxIterations)
+        .then((compressedBase64: any) => {
+          // Convert the compressed base64 string back to a File object
+          const compressedFile = base64ToFile(compressedBase64, file.name);
+          resolve(compressedFile);
+        })
+        .catch((error) => reject(error));
+    };
+
+    reader.onerror = (error) => {
+      reject(error);
+    };
+  });
+}
+
+// Helper function to convert base64 to File
+function base64ToFile(base64: string, fileName: string): File {
+  const arr: any = base64.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new File([u8arr], fileName, { type: mime });
+}
