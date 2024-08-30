@@ -103,7 +103,7 @@ const SignupForm = (props: Props) => {
         setLoader(true);
 
         let data = form.getValues();
-        let role : any = await roles?.find((role: any) => role?.attributes?.role === form.getValues().role)
+        let role: any = await roles?.find((role: any) => role?.attributes?.role === form.getValues().role)
         // create the user in strapi
         try {
             const responseData = await fetcher(
@@ -165,7 +165,7 @@ const SignupForm = (props: Props) => {
                     action: <TbLoader3 className="text-[#357EF8] w-7 h-7 animate-spin" />,
                 });
                 let callbackUrl = "/onboarding"
-                if (search) {
+                if (search && search.startsWith("/challenge")) {
                     callbackUrl = `/onboarding?callbackUrl=${search}`
                 }
                 // sign into the app after creating the user
@@ -426,7 +426,7 @@ const SignupForm = (props: Props) => {
                         <div className=' w-full flex justify-center '>
                             <div onClick={async () => {
                                 let callbackUrl = "/details"
-                                if (search) {
+                                if (search && search.startsWith("/challenge")) {
                                     callbackUrl = `/details?callbackUrl=${search}`
                                 }
                                 const ress = await signIn("google", {
