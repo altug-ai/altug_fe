@@ -128,7 +128,7 @@ const ProfilePicture = (props: Props) => {
             </div>
 
             <div className='  h-[110.81px] w-[100.56px] bg-cover flex flex-col items-center justify-center' style={{ backgroundImage: 'url("/profile/Number.png")' }}>
-                <h1 className='font-bold text-[24px] leading-[12.54px]   text-white'>{totalPoint ?? 0}</h1>
+                <h1 className='font-semibold text-[20px] font-clash leading-[12.54px] text-white'>{totalPoint ?? 0}</h1>
             </div>
         </div>
     )
