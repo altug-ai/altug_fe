@@ -1,6 +1,6 @@
 "use client";
 import Image from 'next/image';
-import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
+import React, { Dispatch, SetStateAction, useContext, useEffect, useMemo, useState } from 'react'
 import { HiMiniSpeakerWave } from "react-icons/hi2";
 import { getTimeData } from '../functions/functions';
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
@@ -18,10 +18,11 @@ type Props = {
     role?: any
     audioEnabled?: boolean;
     setAudioEnabled?: Dispatch<SetStateAction<boolean>>;
+    content?: any
 }
 
 
-const Message = ({ system, user, message, date, image, premium, voice, audioRef, role, audioEnabled, setAudioEnabled }: Props) => {
+const Message = ({ system, user, message, date, image, premium, voice, audioRef, role, audioEnabled, setAudioEnabled, content }: Props) => {
 
     let [isOpen, setIsOpen] = useState(false)
 
@@ -90,6 +91,23 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
         setIsOpen(false)
     }
 
+    function extractUrlFromString(input: string): string | false {
+        try {
+            const fixedContent = input.replace(/\n\s*/g, "").trim();
+
+            // Extract the URL using regex instead of JSON parsing
+            const match = fixedContent.match(/url:(https?:\/\/[^\s]+)/);
+
+            if (match) {
+                return match[1];
+            }
+
+            return false;
+        } catch (error) {
+            return false;
+        }
+    }   
+    const extract = useMemo(() => extractUrlFromString(message), [message]);
 
 
     return (
@@ -129,15 +147,41 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                     <div className=''>
                         <div className='bg-[#357EF8] px-[20px] py-[10px] flex flex-col space-y-2 rounded-l-[12px] rounded-tr-[12px]'>
                             {
-                                role === "tool" ? (
+                                content?.image_url ? (
+                                    <div>
+                                        <Image src={content?.image_url?.url} width={600} height={600} alt='Message image' className='max-w-[200px] max-h-[200px] object-cover rounded-md' />
+                                    </div>
+                                ) : role === "tool" ? (
                                     <Image src={message} width={600} height={600} alt='Message image' className='max-w-[200px] max-h-[200px] object-cover rounded-md' />
                                 ) : role === "data" ? (
-                                    <video className='h-[192.52px] w-full object-cover rounded-md grid place-items-center my-7' controls preload="none">
+                                    <video className='h-[192.52px] max-w-[300px] w-full   rounded-md  my-7' controls preload="none">
                                         <source src={message} type="video/mp4" />
                                     </video>
                                 ) : (
-                                    <h1 className='text-[14px] leading-[18px] font-medium text-[#F5F7F8]'>{removeTextBetweenDelimiters(message)}</h1>
+                                    <>
+                                        {
+                                            message?.startsWith("data:image/") ? (
+                                                <Image src={message} width={600} height={600} alt='Message image' className='max-w-[200px] max-h-[200px] object-cover rounded-md' />
+                                            ) : (
+                                                <>
+                                                    {
+                                                        extract ? (
+                                                            <video className='max-h-[200px] min-w-[200px] max-w-[300px]   rounded-md  my-7' controls preload="none">
+                                                                <source src={extract} type="video/mp4" />
+                                                            </video>
+                                                        ) : (
+                                                            <h1 className='text-[14px] leading-[18px] font-medium text-[#F5F7F8]'>{removeTextBetweenDelimiters(message)}</h1>
+                                                        )
+                                                    }
+                                                </>
+
+                                            )
+                                        }
+                                    </>
+
                                 )
+
+
                             }
                             <h1 className='text-[##E6E6E6] text-[13px] text-end leading-[16px] font-normal '>{date ? date : "10:54am"}</h1>
                         </div>
@@ -170,7 +214,7 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                                 <Button
                                     className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
                                     onClick={() => {
-                                        const utterance = new SpeechSynthesisUtterance("");
+                                        const utterance = new SpeechSynthesisUtterance("Audio Enabled");
                                         window.speechSynthesis.cancel();
                                         window.speechSynthesis.speak(utterance);
                                         if (audioRef?.current) {
