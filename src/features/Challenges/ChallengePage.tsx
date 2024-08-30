@@ -1,32 +1,23 @@
 "use client";
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import TabBar from '../Profile/components/TabBar'
-import Header from './challengePageComponents/PageHeader'
-import ChallengeBox from './components/ChallengeBox'
-import Submissionupload from './challengePageComponents/Submissionupload';
-import SubmissionLoad from './challengePageComponents/SubmissionLoad';
-import { useParams } from "next/navigation";
-import SubmissionCompleted from './challengePageComponents/SubmissionCompleted';
-import { useGetChallenges } from '@/hooks/useGetChallenges';
-import { AuthContext } from '@/context/AuthContext';
-import { TbLoader3 } from 'react-icons/tb';
-import Recording from './challengePageComponents/Recording';
-import { ChallengeContext } from '@/context/ChallengeContext';
-import VideoRecorder from './challengePageComponents/VideoRecoder';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
-import { useTranslations } from "next-intl";
+import { Label } from '@/components/ui/label';
 import { useToast } from "@/components/ui/use-toast";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
+import { AuthContext } from '@/context/AuthContext';
+import { ChallengeContext } from '@/context/ChallengeContext';
+import { useGetChallenges } from '@/hooks/useGetChallenges';
+import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { useTranslations } from "next-intl";
+import { useParams, useSearchParams } from "next/navigation";
+import React, { useContext, useEffect, useState } from 'react';
+import { TbLoader3 } from 'react-icons/tb';
+import TabBar from '../Profile/components/TabBar';
+import Header from './challengePageComponents/PageHeader';
+import Recording from './challengePageComponents/Recording';
+import SubmissionCompleted from './challengePageComponents/SubmissionCompleted';
+import SubmissionLoad from './challengePageComponents/SubmissionLoad';
+import Submissionupload from './challengePageComponents/Submissionupload';
+import ChallengeBox from './components/ChallengeBox';
 import { acceptChallenge, sendNotification } from './functions/function';
-import { IoIosMenu } from 'react-icons/io';
-import Widget from '@/components/Widget';
-import { useSearchParams } from 'next/navigation'
 
 type Props = {}
 
