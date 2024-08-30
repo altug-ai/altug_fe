@@ -252,7 +252,7 @@ const SigninForm = (props: Props) => {
             <div className=' w-full flex justify-center '>
                 <div onClick={async () => {
                     let callbackUrl = "/profile"
-                    if (search) {
+                    if (search && search.startsWith("/challenge")) {
                         callbackUrl = search
                     }
                     const ress = await signIn("google", {
