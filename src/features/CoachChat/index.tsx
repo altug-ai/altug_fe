@@ -56,10 +56,10 @@ const CoachChat = (props: Props) => {
     const [audioEnabled, setAudioEnabled] = useState<boolean>(false)
 
     useEffect(() => {
-        if (!audioEnabled) {
+        if (!audioEnabled && tier === "premium") {
             setIsOpenn(true)
         }
-    }, [])
+    }, [tier])
 
 
     // Ref to track whether getCoach has been executed once
@@ -324,6 +324,7 @@ const CoachChat = (props: Props) => {
 
 
 
+
     return (
         <div className='py-[20px] px-[20px] h-full flex flex-col items-center '>
             <div onClick={() => { router.push("/explore") }} className='w-full max-w-[388px] flex space-x-3 items-center mb-[30px]'>
@@ -368,7 +369,7 @@ const CoachChat = (props: Props) => {
                                         setInput(prompt)
                                     }
 
-                                }} key={prompt} className='rounded-[44px] cursor-pointer mb-[16px] px-5 py-2  w-[335px] gap-[12px] min-h-[44px] bg-[#3B424F]   flex flex-col justify-center items-center'>
+                                }} key={prompt} className='rounded-[44px] cursor-pointer mb-[16px] px-5 py-2 w-full  max-w-[335px] gap-[12px] min-h-[44px] bg-[#3B424F]   flex flex-col justify-center items-center'>
                                     <div className='flex space-x-[10px] items-center text-[12px] font-medium leading-[24px] text-white'>
                                         <Image src={"/profile/flash.png"} width={500} height={500} alt='flash' className='object-cover h-[24px] w-[24px]' />
                                         <h1>{prompt?.prompt ?? prompt}</h1>
@@ -398,8 +399,9 @@ const CoachChat = (props: Props) => {
                                 setAudioEnabled={setAudioEnabled}
                                 key={`${info.id} - ${index}`}
                                 message={info?.content[0]?.text?.value}
+                                content={info?.content[0]}
                                 system={info?.role === "assistant" ? true : false}
-                                user={(info?.role === "user" || info?.role === "tool") ? true : false}
+                                user={(info?.role === "user" || info?.role === "tool" || info?.role === "data") ? true : false}
                                 role={info?.role}
                             />
                         ))
@@ -415,7 +417,7 @@ const CoachChat = (props: Props) => {
                                 audioEnabled={audioEnabled}
                                 setAudioEnabled={setAudioEnabled}
                                 message={info?.content} system={info?.role === "assistant" ? true : false}
-                                user={(info?.role === "user" || info?.role === "tool") ? true : false}
+                                user={(info?.role === "user" || info?.role === "tool" || info?.role === "data") ? true : false}
                                 role={info?.role}
                             />
 
@@ -453,7 +455,7 @@ const CoachChat = (props: Props) => {
 
                             <div className='flex space-x-2 items-center absolute right-0 top-0'>
 
-                                <MediaModal load={load} setLoad={setLoad} setMessages={setMessages} setInput={setInput} status={status} fileId={fileId} handleInputChange={handleInputChange} input={input} messages={messages} setFileId={setFileId} submitMessage={submitMessage} />
+                                <MediaModal threadId={threadIdd} load={load} setLoad={setLoad} setMessages={setMessages} setInput={setInput} status={status} fileId={fileId} handleInputChange={handleInputChange} input={input} messages={messages} setFileId={setFileId} submitMessage={submitMessage} />
                                 <button disabled={status === "in_progress" || load} type='submit'>
                                     <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className={`h-[48px] ${(status === "in_progress" || load) && "animate-pulse"} w-[48px] cursor-pointer `} />
                                 </button>

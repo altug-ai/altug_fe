@@ -16,9 +16,11 @@ import { Message } from "ai";
 import { AssistantStatus } from "ai/react";
 import Image from "next/image";
 import OpenAI from 'openai';
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { MdOutlineAttachment } from "react-icons/md";
-import { getImageDescription, getVideoDescription } from "../functions/functions";
+import { compressAndResizeBase64Image, compressAndResizeImageFile, getImageDescription, getVideoDescription } from "../functions/functions";
+import axios from "axios";
+import { AuthContext } from "@/context/AuthContext";
 
 type Props = {
     submitMessage: (event?: React.FormEvent<HTMLFormElement>, requestOptions?: {
@@ -34,6 +36,7 @@ type Props = {
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
     setLoad: React.Dispatch<React.SetStateAction<boolean>>;
     load: boolean;
+    threadId: string
 }
 
 const openai = new OpenAI({
@@ -41,15 +44,16 @@ const openai = new OpenAI({
     dangerouslyAllowBrowser: true,
 });
 
-const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputChange, input, status, setInput, setMessages, setLoad, load }: Props) => {
+const MediaModal = ({ threadId, submitMessage, messages, setFileId, fileId, handleInputChange, input, status, setInput, setMessages, setLoad, load }: Props) => {
     const [imagesrc, setImagesrc] = useState<string>("");
     const [videosrc, setVideosrc] = useState<string>("")
     const [filesrc, setFilesrc] = useState<any>()
     const [response, setResponse] = useState<any>([])
     const [progress, setProgress] = useState(0)
-
+    const { jwt } = useContext(AuthContext)
     const [error, setError] = useState<string>("");
     const [prompt, setPrompt] = useState<string>("")
+
 
     const handleFileChange = (e: any) => {
         const file = e.target.files[0];
@@ -58,11 +62,13 @@ const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputCha
             setImagesrc("");
             setError("");
             const fileType = file.type;
-
-            if (fileType.startsWith("image/")) {
-                if (file.size > 5 * 1024 * 1024) {
+            if (fileType.startsWith("image/png")
+                || fileType.startsWith("image/jpeg")
+                || fileType.startsWith("image/gif")
+                || fileType.startsWith("image/webp")) {
+                if (file.size > 10 * 1024 * 1024) {
                     // File size is greater than 5 MB
-                    setError('Image should not exceed 5 MB.');
+                    setError('Image should not exceed 10MB.');
                     return; // Stop further execution if there's an error
                 }
                 // The file is an image
@@ -73,9 +79,11 @@ const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputCha
                 reader.readAsDataURL(file);
             } else if (fileType.startsWith("video/")) {
                 // The file is a video
+
                 const reader = new FileReader();
 
                 reader.onload = async (event: any) => {
+
                     var getDuration = async function (url: any) {
                         var _player = new Audio(url);
                         return new Promise((resolve) => {
@@ -96,35 +104,116 @@ const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputCha
                             _player.play();
                         });
                     };
-
-                    let duration: any = await getDuration(event.target.result as string);
+                    const videoObjectUrl = URL.createObjectURL(file);
+                    let duration: any = await getDuration(videoObjectUrl);
                     if (duration > 125) {
                         setError("Video cannot be more than 2 minutes.");
                         return; // Stop further execution if the video duration exceeds 125 seconds
                     }
+                    // console.log("the video", event.target.result)
 
-                    setVideosrc(event.target.result as string); // Assuming you have a setVideosrc function
+                    setVideosrc(videoObjectUrl); // Assuming you have a setVideosrc function
                 };
 
                 reader.readAsDataURL(file);
             } else {
                 // Handle other file types if necessary
                 setError("Unsupported file type")
-                console.log("Unsupported file type");
             }
 
             setFilesrc(file); // Assuming you have a setFilesrc function
         }
     };
 
+    const resetAll = () => {
+        document.getElementById('closeDialog')?.click();
+        setProgress(0)
+        setImagesrc("");
+        setVideosrc("");
+        setPrompt("")
+        setLoad(false);
+    }
 
     useEffect(() => {
         if (input !== "" && load) {
-            document.getElementById('closeDialog')?.click();
+            resetAll()
             submitMessage();
-            setLoad(false);
+
         }
     }, [input])
+
+
+
+
+    const uploadMediaToOpenAi = async (data: any) => {
+        const createdMessage = await openai.beta.threads.messages.create(
+            threadId,
+            data
+        );
+        return createdMessage
+    }
+
+    const uploadToStrapi = async () => {
+        const body = new FormData();
+
+        try {
+            // Compress the image and wait for it to complete
+            const compressedImage = await compressAndResizeImageFile(filesrc, 150);
+
+            // Append the compressed image to the FormData
+            body.append("files", compressedImage);
+
+            // Upload to Strapi
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_STRAPI_URL}/upload/`,
+                body,
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                }
+            );
+
+            setProgress(100); // Update progress to 100%
+            return response;  // Return the response from the server
+
+        } catch (error) {
+            setError("Something went wrong, please try again.");
+            setProgress(0);  // Reset progress on error
+            setLoad(false);  // Stop any loading indicators
+            return "Error";
+        }
+    };
+
+
+    const uploadVideoToStrapi = async () => {
+        const body = new FormData();
+
+        try {
+            // Append the compressed image to the FormData
+            body.append("files", filesrc);
+
+            // Upload to Strapi
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_STRAPI_URL}/upload/`,
+                body,
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                }
+            );
+
+            setProgress(100); // Update progress to 100%
+            return response;  // Return the response from the server
+
+        } catch (error) {
+            setError("Something went wrong, please try again.");
+            setProgress(0);  // Reset progress on error
+            setLoad(false);  // Stop any loading indicators
+            return "Error";
+        }
+    };
 
 
 
@@ -139,11 +228,16 @@ const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputCha
                     <AlertDialogDescription>
                         <div className="grid w-full max-w-sm items-center gap-1.5">
                             <Label htmlFor="picture">Media</Label>
-                            <Input id="picture" accept="image/*,video/*" type="file" onChange={handleFileChange} />
+                            <Input
+                                id="picture"
+                                accept="image/png, image/jpeg, image/gif, image/webp, video/*"
+                                type="file"
+                                onChange={handleFileChange}
+                            />
                         </div>
                         {
                             imagesrc !== "" && (
-                                <Image src={imagesrc} alt="the image src" width={900} height={900} className="rounded-md my-10 max-h-[250px] object-cover object-top" />
+                                <Image src={imagesrc} alt="the image src" width={900} height={900} className="rounded-md my-10 max-h-[250px] object-contain" />
                             )
                         }
 
@@ -158,7 +252,7 @@ const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputCha
                             (load) && (
                                 <div className='w-full relative max-w-[388px] mt-10 gap-[12px]'>
                                     <Progress value={progress} />
-                                    <h1 className='absolute top-1 right-20 whitespace-nowrap text-[16px] text-white font-medium text-center'>Analyzing</h1>
+                                    <h1 className='absolute top-1 right-[40%] whitespace-nowrap text-[16px] text-white font-medium text-center'>Analyzing</h1>
                                 </div>
                             )
                         }
@@ -187,22 +281,63 @@ const MediaModal = ({ submitMessage, messages, setFileId, fileId, handleInputCha
                                         setError("Enter a media");
                                         return
                                     }
-                                    
+
                                     if (imagesrc !== "") {
                                         setLoad(true)
-                                        let description = await getImageDescription(setProgress, imagesrc, prompt)
-                                        setMessages([...messages, { id: "id", content: imagesrc, role: "tool" }])
-                                        let desc = `this  is the description of the image uploaded : ${description}, do not say based on your description or something along the line and this is the prompt of the user: $@@ ` + prompt
-                                        setInput(desc)
+
+
+                                        compressAndResizeBase64Image(imagesrc, 100).then(async (compressedImage) => {
+                                            let description: any = await getImageDescription(setProgress, compressedImage, prompt)
+                                            if (typeof description === "string") {
+
+                                            }
+                                            setMessages([...messages, { id: "id", content: imagesrc, role: "tool" }, { id: "id", content: prompt, role: "user" }, { id: "id", content: description, role: "assistant" }])
+
+                                            let res: any = await uploadToStrapi()
+                                            if (res?.data && res?.data?.length > 0) {
+
+                                                let upload = await uploadMediaToOpenAi({
+                                                    role: 'user',
+                                                    content: [
+                                                        {
+                                                            type: 'image_url',
+                                                            image_url: {
+                                                                url: res?.data[0]?.url,
+                                                            },
+                                                        },
+                                                    ],
+                                                },)
+                                                let uploadd = await uploadMediaToOpenAi({
+                                                    role: 'user',
+                                                    content: prompt
+                                                },)
+                                                let uploaddd = await uploadMediaToOpenAi({
+                                                    content: description,
+                                                    role: "assistant"
+                                                },)
+                                                resetAll();
+                                                // let desc = `this  is the description of the image uploaded : ${description}, do not say based on your description or something along the line and this is the prompt of the user: $@@ ` + prompt
+                                                // setInput(desc)
+                                            }
+                                        });
 
                                     }
                                     if (videosrc !== "") {
                                         setLoad(true)
                                         let newDescription = '';
-                                        setMessages([...messages, { id: "id", content: videosrc, role: "data" }])
                                         let description = await getVideoDescription(setProgress, setResponse, videosrc, newDescription)
-                                        let desc = `this  is the description of the video uploaded : ${description}, do not say based on your description or something along the line and this is the prompt of the user: $@@` + prompt
-                                        setInput(desc);
+                                        setMessages([...messages, { id: "id", content: videosrc, role: "data" }])
+                                        let res: any = await uploadVideoToStrapi()
+                                        if (res?.data && res?.data?.length > 0) {
+
+                                            let upload = await uploadMediaToOpenAi({
+                                                role: 'user',
+                                                content: `{type:"video",url:${res?.data[0]?.url}`
+                                            },)
+                                            let desc = `this  is the description of the video uploaded : ${description}, do not say based on your description or something along the line and this is the prompt of the user: $@@` + prompt
+                                            setInput(desc);
+                                        }
+
 
                                     }
                                 }} type='button'>
