@@ -39,6 +39,8 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
             })
         });
 
+        console.log("the response", response)
+
         if (response?.statusText === "Unauthorized") {
             const utterance = new SpeechSynthesisUtterance(text);
             window.speechSynthesis.cancel();
@@ -200,7 +202,7 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                         >
                             <DialogTitle as="h3" className="text-base/7 font-medium text-white">
                                 Permission Required
-                                
+
                             </DialogTitle>
                             <p className="mt-2 text-sm/6 text-white">
                                 Enable Audio?
