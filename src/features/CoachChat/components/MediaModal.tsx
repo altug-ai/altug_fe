@@ -284,42 +284,27 @@ const MediaModal = ({ threadId, submitMessage, messages, setFileId, fileId, hand
 
                                     if (imagesrc !== "") {
                                         setLoad(true)
+                                        setMessages([...messages, { id: "id", content: imagesrc, role: "tool" }])
 
+                                        let res: any = await uploadToStrapi()
+                                        if (res?.data && res?.data?.length > 0) {
 
-                                        compressAndResizeBase64Image(imagesrc, 100).then(async (compressedImage) => {
-                                            let description: any = await getImageDescription(setProgress, compressedImage, prompt)
-                                            if (typeof description === "string") {
-
-                                            }
-                                            setMessages([...messages, { id: "id", content: imagesrc, role: "tool" }, { id: "id", content: prompt, role: "user" }, { id: "id", content: description, role: "assistant" }])
-
-                                            let res: any = await uploadToStrapi()
-                                            if (res?.data && res?.data?.length > 0) {
-
-                                                let upload = await uploadMediaToOpenAi({
-                                                    role: 'user',
-                                                    content: [
-                                                        {
-                                                            type: 'image_url',
-                                                            image_url: {
-                                                                url: res?.data[0]?.url,
-                                                            },
+                                            let upload = await uploadMediaToOpenAi({
+                                                role: 'user',
+                                                content: [
+                                                    {
+                                                        type: 'image_url',
+                                                        image_url: {
+                                                            url: res?.data[0]?.url,
                                                         },
-                                                    ],
-                                                },)
-                                                let uploadd = await uploadMediaToOpenAi({
-                                                    role: 'user',
-                                                    content: prompt
-                                                },)
-                                                let uploaddd = await uploadMediaToOpenAi({
-                                                    content: description,
-                                                    role: "assistant"
-                                                },)
-                                                resetAll();
-                                                // let desc = `this  is the description of the image uploaded : ${description}, do not say based on your description or something along the line and this is the prompt of the user: $@@ ` + prompt
-                                                // setInput(desc)
-                                            }
-                                        });
+                                                    },
+                                                ],
+                                            },)
+                                            setInput(prompt)
+                                            // let desc = `this  is the description of the image uploaded : ${description}, do not say based on your description or something along the line and this is the prompt of the user: $@@ ` + prompt
+                                            // setInput(desc)
+                                        }
+
 
                                     }
                                     if (videosrc !== "") {
