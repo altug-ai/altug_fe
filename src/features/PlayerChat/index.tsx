@@ -100,16 +100,18 @@ const PlayerChat = (props: Props) => {
 
     useEffect(() => {
         const playAudio = async () => {
-            let content = messages[messages?.length - 1]?.content
-            const botVoiceResponse = await getElevenLabsResponse(content);
-            const reader = new FileReader();
-            reader.readAsDataURL(botVoiceResponse);
-            reader.onload = () => {
-                if (audioRef.current) {
-                    audioRef.current.src = reader.result as string;
-                    audioRef.current.play();
-                }
-            };
+            let content: any = messages[messages?.length - 1]?.content
+            if (content?.role === "assistant") {
+                const botVoiceResponse = await getElevenLabsResponse(content);
+                const reader = new FileReader();
+                reader.readAsDataURL(botVoiceResponse);
+                reader.onload = () => {
+                    if (audioRef.current) {
+                        audioRef.current.src = reader.result as string;
+                        audioRef.current.play();
+                    }
+                };
+            }
         }
 
         if (status !== "in_progress" && tier === "premium") {
