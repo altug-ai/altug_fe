@@ -54,7 +54,6 @@ const CoachChat = (props: Props) => {
     let [isOpen, setIsOpen] = useState(false)
     let [isOpenn, setIsOpenn] = useState(false)
     const [audioEnabled, setAudioEnabled] = useState<boolean>(false)
-
     useEffect(() => {
         if (!audioEnabled && tier === "premium") {
             setIsOpenn(true)
@@ -84,6 +83,9 @@ const CoachChat = (props: Props) => {
             // // userThreadId,
         },
     });
+
+
+
 
 
     const getElevenLabsResponse = async (text: string) => {
