@@ -200,6 +200,7 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                         >
                             <DialogTitle as="h3" className="text-base/7 font-medium text-white">
                                 Permission Required
+                                
                             </DialogTitle>
                             <p className="mt-2 text-sm/6 text-white">
                                 Enable Audio?
