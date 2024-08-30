@@ -425,9 +425,9 @@ const SignupForm = (props: Props) => {
                         {/* continue with google */}
                         <div className=' w-full flex justify-center '>
                             <div onClick={async () => {
-                                let callbackUrl = "/onboarding"
+                                let callbackUrl = "/details"
                                 if (search) {
-                                    callbackUrl = `/onboarding?callbackUrl=${search}`
+                                    callbackUrl = `/details?callbackUrl=${search}`
                                 }
                                 const ress = await signIn("google", {
                                     redirect: false,

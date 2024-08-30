@@ -87,7 +87,7 @@ const PlayerChat = (props: Props) => {
                 voice: voice
             })
         });
-        if (response?.statusText === "Unauthorized") {
+        if (response?.status === 401) {
             const utterance = new SpeechSynthesisUtterance(text);
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);

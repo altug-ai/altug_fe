@@ -39,7 +39,7 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
             })
         });
 
-        if (response?.statusText === "Unauthorized") {
+        if (response?.status ===  401) {
             const utterance = new SpeechSynthesisUtterance(text);
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
@@ -200,7 +200,7 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                         >
                             <DialogTitle as="h3" className="text-base/7 font-medium text-white">
                                 Permission Required
-                                
+
                             </DialogTitle>
                             <p className="mt-2 text-sm/6 text-white">
                                 Enable Audio?
@@ -215,7 +215,7 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                                 <Button
                                     className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
                                     onClick={() => {
-                                        const utterance = new SpeechSynthesisUtterance("Audio Enabled");
+                                        const utterance = new SpeechSynthesisUtterance("");
                                         window.speechSynthesis.cancel();
                                         window.speechSynthesis.speak(utterance);
                                         if (audioRef?.current) {
