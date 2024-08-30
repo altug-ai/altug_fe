@@ -1,6 +1,4 @@
 "use client";
-import Image from 'next/image'
-import React, { useContext, useEffect, useState } from 'react'
 import {
     Select,
     SelectContent,
@@ -9,24 +7,23 @@ import {
     SelectLabel,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import TabBar from './components/TabBar'
-import PlayerCard from './components/PlayerCard'
-import RatingsBar from './components/RatingsBar'
-import { AuthContext } from '@/context/AuthContext';
-import { TbLoader3 } from 'react-icons/tb';
-import { signOut, useSession } from 'next-auth/react';
+} from "@/components/ui/select";
 import { useToast } from '@/components/ui/use-toast';
+import { AuthContext } from '@/context/AuthContext';
+import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useContext, useEffect, useState } from 'react';
+import { TbLoader3 } from 'react-icons/tb';
+import PlayerCard from './components/PlayerCard';
+import RatingsBar from './components/RatingsBar';
+import TabBar from './components/TabBar';
 // import { useGetAcceptedChallenges } from '@/hooks/useGetAcceptedChallenges';
-import { useGetSubmittedChallenges } from '@/hooks/useGetSubmittedChallenges';
 import { Stat } from '@/context/types';
+import { useGetSubmittedChallenges } from '@/hooks/useGetSubmittedChallenges';
+import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { useTranslations } from "next-intl";
-import { IoIosMenu } from "react-icons/io";
-import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
-import Widget from '@/components/Widget';
-import Header from './components/Header';
 import Banner from './components/Banner';
+import Header from './components/Header';
 
 type Props = {}
 

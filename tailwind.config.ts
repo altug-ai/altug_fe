@@ -19,6 +19,7 @@ const config = {
     },
     fontFamily: {
       plus: ['var(--font-plus)'],
+      clash: ['var(--font-clash)'],
     },
     extend: {
       colors: {
