@@ -40,7 +40,7 @@ const Header = (props: Props) => {
                 </div>
 
                 <div className='  h-[72.7px] w-[68.94px] bg-cover flex flex-col items-center justify-center' style={{ backgroundImage: 'url("/profile/Number.png")' }}>
-                    <h1 className='font-bold text-[24px] leading-[12.54px]   text-white'>{totalPoint ?? 0}</h1>
+                    <h1 className='font-semibold text-[20px] font-clash leading-[12.54px] text-white'>{totalPoint ?? 0}</h1>
                 </div>
             </div>
         </div>
