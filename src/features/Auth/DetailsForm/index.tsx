@@ -1,13 +1,4 @@
 "use client"
-import { useRouter } from "next/navigation"
-import { PureInput } from '@/components/ui/input'
-import { z } from "zod"
-import Image from 'next/image'
-import React, { useContext, useEffect, useState } from 'react'
-import { signIn, signOut, useSession } from "next-auth/react";
-import type {
-    TCountryCode,
-} from 'countries-list'
 import {
     Form,
     FormControl,
@@ -15,12 +6,7 @@ import {
     FormItem,
     FormMessage,
 } from "@/components/ui/form"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { TbLoader3 } from "react-icons/tb";
-import { useToast } from "@/components/ui/use-toast";
-import { fetcher } from "@/lib/functions"
-import axios from "axios"
+import { PureInput } from '@/components/ui/input'
 import {
     Select,
     SelectContent,
@@ -30,14 +16,21 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { countries } from 'countries-list'
-import PhoneInput from 'react-phone-input-2'
-import "react-phone-input-2/lib/bootstrap.css";
-import VerifyEmail from "../VerifyEmail"
-import { useTranslations } from "next-intl";
-import { useSearchParams } from 'next/navigation'
-import { useGetRoles } from "@/hooks/useGetRoles"
+import { useToast } from "@/components/ui/use-toast"
 import { AuthContext } from "@/context/AuthContext"
+import { useGetRoles } from "@/hooks/useGetRoles"
+import { zodResolver } from "@hookform/resolvers/zod"
+import axios from "axios"
+import { countries } from 'countries-list'
+import { signOut, useSession } from "next-auth/react"
+import { useTranslations } from "next-intl"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useContext, useEffect, useState } from 'react'
+import { useForm } from "react-hook-form"
+import { TbLoader3 } from "react-icons/tb"
+import PhoneInput from 'react-phone-input-2'
+import "react-phone-input-2/lib/bootstrap.css"
+import { z } from "zod"
 
 type Props = {}
 
@@ -99,8 +92,12 @@ const DetailsForm = (props: Props) => {
 
 
             if (profile?.data?.data?.id) {
-                setReload(!reload)
-                window.location.href = "/onboarding"; // This will force a full reload
+                // setReload(!reload)
+                let callbackUrl = "/onboarding"
+                if (search) {
+                    callbackUrl = `/onboarding?callbackUrl=${search}`
+                }
+                window.location.href = callbackUrl; // This will force a full reload
                 toast({
                     description: t("Acc"),
                     action: <TbLoader3 className="text-[#357EF8] w-7 h-7 animate-spin" />,
@@ -125,7 +122,11 @@ const DetailsForm = (props: Props) => {
 
     useEffect(() => {
         if (roleId) {
-            router.push("/onboarding")
+            let callbackUrl = "/onboarding"
+            if (search) {
+                callbackUrl = `/onboarding?callbackUrl=${search}`
+            }
+            router.push(callbackUrl)
         }
     }, [roleId])
 
@@ -265,7 +266,7 @@ const DetailsForm = (props: Props) => {
 
                     </div>
 
-                ) : (
+                ) : (jwt && !load) && (
                     <div className=" flex flex-col items-center w-full h-screen justify-end" style={{ backgroundImage: 'url("/auth/bg.png")' }}>
                         <div className='w-full max-w-[388px] mb-[60px] '>
                             <div onClick={async () => {

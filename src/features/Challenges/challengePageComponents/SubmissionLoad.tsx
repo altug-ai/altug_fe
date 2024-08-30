@@ -98,7 +98,7 @@ const SubmissionLoad = ({ setRoute, description, goal, accepted, title, image }:
                     // <div className='rounded-[35px]  cursor-pointer mt-3 w-full gap-[12px] h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
                     //     Analyzing your submission
                     // </div>
-                    <div className='w-full relative max-w-[388px] mt-10 gap-[12px]'>
+                    <div className='w-full relative max-w-[388px] mt-10 gap-[12px] pb-[70px]'>
                         <Progress value={progress} />
 
                         <h1 className='absolute top-1 right-20 whitespace-nowrap text-[16px] text-white font-medium text-center'>{t("Analyze")}</h1>

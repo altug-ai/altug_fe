@@ -82,7 +82,7 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                     <Image src={"/profile/Video.png"} width={600} height={600} alt='video icon' className='w-[74.29px] h-[75.4px] cursor-pointer' />
                 </div> */}
 
-                <video className='h-[192.52px] w-full object-cover rounded-md grid place-items-center' controls preload="none" poster={image}>
+                <video className='h-[192.52px] w-full  rounded-md grid place-items-center' controls preload="none" poster={image}>
                     <source src={video} type="video/mp4" />
                     {t("Tag")}
                 </video>
