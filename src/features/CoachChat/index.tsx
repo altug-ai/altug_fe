@@ -79,8 +79,7 @@ const CoachChat = (props: Props) => {
         body: {
             assistantId: data?.attributes?.assistantId,
             userThreadId: threadIdd,
-            fileId: fileId,
-            // // userThreadId,
+            fileId: fileId
         },
     });
 
