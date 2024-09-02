@@ -59,6 +59,7 @@ export function useGetAcceptedChallenges() {
     }, [profileId, challengeLoader, jwt, pageSize]);
 
     useEffect(() => {
+
         if (jwt && profileId && hasMore) {
             getChallenge(page);
         }
