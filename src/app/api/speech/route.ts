@@ -1,4 +1,6 @@
 import { ElevenLabsClient } from 'elevenlabs';
+export const maxDuration = 60;
+
 
 export async function POST(req: Request) {
   const { message, voice } = await req.json();

@@ -11,7 +11,7 @@ export function useGetChallenges(id?: string | string[]) {
     const [data, setData] = useState<any>([]);
     const [allIds, setAllIds] = useState(new Set());
     const [page, setPage] = useState(1);
-    const [pageSize] = useState(5);  // Adjust the page size as needed
+    const [pageSize] = useState(25);  // Adjust the page size as needed
     const [hasMore, setHasMore] = useState(true);
     const [allData, setAllData] = useState<any>();
     const [loading, setLoading] = useState<boolean>(false);
