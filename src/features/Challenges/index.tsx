@@ -79,7 +79,7 @@ const Challenges = (props: Props) => {
                 tab === 0 && (
                     <div className='mt-[30px] mb-[50px]'>
                         <InfiniteScroll
-                            dataLength={data.length}
+                            dataLength={accepted.length}
                             next={acceptedLoadMore}
                             hasMore={acceptedHasMore}
                             loader={
