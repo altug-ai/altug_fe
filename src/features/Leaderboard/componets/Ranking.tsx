@@ -14,6 +14,7 @@ import { useGetLeaderboard } from '@/hooks/useGetLeaderboard';
 import { TbLoader3 } from 'react-icons/tb';
 import { AuthContext } from '@/context/AuthContext';
 import { useTranslations } from "next-intl";
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 type Propss = {
     user?: boolean;
@@ -51,7 +52,7 @@ const Row = ({ user, gold, silver, bronze, points, username, image, rk }: Propss
 type Props = {}
 
 const Ranking = (props: Props) => {
-    const { data, loading: loader } = useGetLeaderboard()
+    const { data, loading: loader, hasMore, loadMore, setData } = useGetLeaderboard()
     const { profileId, loading, leagues } = useContext(AuthContext)
     const t = useTranslations('Home.Leaderboard');
     return (
@@ -64,23 +65,35 @@ const Ranking = (props: Props) => {
                     </div>
                 )
             }
+            <InfiniteScroll
+                dataLength={data.length}
+                next={loadMore}
+                hasMore={hasMore}
+                loader={
+                    <div className='max-w-[388px] w-full my-[30px] flex justify-center'>
+                        <TbLoader3 className="text-white w-10 h-10 animate-spin" />
+                    </div>
+                }
+                endMessage={<p className='text-center my-2 text-slate-400'>End of leaderboard</p>}
+            >
+                <Table className=''>
+                    <TableHeader className='h-[65px] bg-[#181928]'>
+                        <TableRow className=' h-[65px] my-1  cursor-pointer'>
+                            <TableHead className='text-[12px]  leading-[18px] font-semibold text-white '>RK</TableHead>
+                            <TableHead className='text-[12px] leading-[18px] font-semibold text-white'>{t("Username")}</TableHead>
+                            <TableHead className='text-[12px] leading-[18px] font-semibold text-white text-center'>{t("Total")}</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody className=''>
 
-            <Table className=''>
-                <TableHeader className='h-[65px] bg-[#181928]'>
-                    <TableRow className=' h-[65px] my-1  cursor-pointer'>
-                        <TableHead className='text-[12px]  leading-[18px] font-semibold text-white '>RK</TableHead>
-                        <TableHead className='text-[12px] leading-[18px] font-semibold text-white'>{t("Username")}</TableHead>
-                        <TableHead className='text-[12px] leading-[18px] font-semibold text-white text-center'>{t("Total")}</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody className=''>
-                    {
-                        data?.map((dat: any, index: any) => (
-                            <Row rk={index} key={dat?.id} image={dat?.attributes?.profile_pic?.data?.attributes?.url} user={dat?.id === profileId} gold={index === 0} silver={index === 1} bronze={index === 2} username={dat?.attributes?.username} points={dat?.attributes?.total_point} />
-                        ))
-                    }
-                </TableBody>
-            </Table>
+                        {
+                            data?.map((dat: any, index: any) => (
+                                <Row rk={index} key={dat?.id} image={dat?.attributes?.profile_pic?.data?.attributes?.url} user={dat?.id === profileId} gold={index === 0} silver={index === 1} bronze={index === 2} username={dat?.attributes?.username} points={dat?.attributes?.total_point} />
+                            ))
+                        }
+
+                    </TableBody>
+                </Table></InfiniteScroll>
 
         </div>
     )

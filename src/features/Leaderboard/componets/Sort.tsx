@@ -27,6 +27,7 @@ const Sort = (props: Props) => {
         <div className='max-w-[388px]  w-full flex flex-col space-y-[18px] '>
             {/* leagues */}
             <Select onValueChange={(e) => {
+                // setData([])
                 setleague(e)
             }}>
                 <NewTrigger className="w-full px-[24px] text-white text-[16px] font-semibold leading-[22px]  h-[54px] rounded-[65px] bg-[#181928]">
@@ -47,6 +48,7 @@ const Sort = (props: Props) => {
 
             {/* country */}
             <Select onValueChange={(e) => {
+                // setData([])
                 setCountry(e)
             }}>
                 <NewTrigger className="w-full px-[24px] text-white text-[16px] font-semibold leading-[22px]  h-[54px] rounded-[65px] bg-[#181928]">

@@ -40,7 +40,7 @@ const Notifications = (props: Props) => {
     }, [checkNotifications]);
 
 
-    console.log("these are the checkednots", checkedNots)
+    // console.log("these are the checkednots", checkedNots)
 
     const handleNotificationClick = async (dat: any, url: string) => {
         if (checkedNots[dat?.id]) {
