@@ -1,14 +1,12 @@
 "use client";
-import React, { useContext, useState } from 'react'
+import { AuthContext } from '@/context/AuthContext';
+import { useGetCoaches } from '@/hooks/useGetCoaches';
+import { useGetPlayers } from '@/hooks/useGetPlayers';
+import { useTranslations } from "next-intl";
+import { useContext, useState } from 'react';
+import { TbLoader3 } from 'react-icons/tb';
 import PlayerCard from '../Profile/components/PlayerCard';
 import TabBar from '../Profile/components/TabBar';
-import { useGetCoaches } from '@/hooks/useGetCoaches';
-import { TbLoader3 } from 'react-icons/tb';
-import { useGetPlayers } from '@/hooks/useGetPlayers';
-import { AuthContext } from '@/context/AuthContext';
-import { useTranslations } from "next-intl";
-import { IoIosMenu } from 'react-icons/io';
-import Widget from '@/components/Widget';
 
 type Props = {}
 
@@ -17,7 +15,6 @@ const Explore = (props: Props) => {
     const { loading } = useContext(AuthContext)
     const { data: Coaches, loading: CoachLoad } = useGetCoaches()
     const { data: Players, loading: PlayerLoad } = useGetPlayers()
-    const [openn, setOpenn] = useState<boolean>(false)
     const t = useTranslations('Home.Explore');
 
 
@@ -35,7 +32,7 @@ const Explore = (props: Props) => {
                     <div onClick={() => { setRoute(1) }} className={`w-1/2 h-full  ${route === 1 && "bg-[#357EF8] rounded-[38px]"} cursor-pointer  grid place-items-center`}>
                         <h1 className='text-[16px] font-semibold leading-[12.13px] tracking-[0.3%] text-[#FFFFFF]'>{t("Professional")}</h1>
                     </div>
-                </div>
+                </div>  
             </div>
 
 

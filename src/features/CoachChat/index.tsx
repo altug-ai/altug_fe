@@ -111,8 +111,9 @@ const CoachChat = (props: Props) => {
 
     useEffect(() => {
         const playAudio = async () => {
+            let mess = messages[messages?.length - 1]
             let content: any = messages[messages?.length - 1]?.content
-            if (content?.role === "assistant") {
+            if (mess?.role === "assistant") {
                 const botVoiceResponse = await getElevenLabsResponse(content);
                 const reader = new FileReader();
                 reader.readAsDataURL(botVoiceResponse);
@@ -271,7 +272,7 @@ const CoachChat = (props: Props) => {
 
 
 
-    const handleChat = async (message: any) => {
+    const handleChat = async () => {
 
 
         if (!(coachIds?.has(parseInt(slug)))) {
@@ -452,15 +453,19 @@ const CoachChat = (props: Props) => {
                                 return
                             }
                             let response = await submitMessage(e)
-                            handleChat(messages)
+                            handleChat()
 
                         }} className='relative w-full max-w-[335px] rounded-[49px]  h-12 bg-white'>
 
                             <Input disabled={status === "in_progress" || load} onChange={handleInputChange} value={removeTextBetweenDelimiters(input)} required className='rounded-l-[49px] w-[80%] text-[16px] border-none focus-visible:ring-0  h-[48px]' placeholder='Ask your questions here' />
 
                             <div className='flex space-x-2 items-center absolute right-0 top-0'>
+                                {
+                                    (tier === "premium") && (
+                                        <MediaModal handleChat={handleChat} messagesLeft={messagesLeft} open={open} paid={paid} tier={tier} threadId={threadIdd} load={load} setLoad={setLoad} setMessages={setMessages} setInput={setInput} status={status} fileId={fileId} handleInputChange={handleInputChange} input={input} messages={messages} setFileId={setFileId} submitMessage={submitMessage} />
+                                    )
+                                }
 
-                                <MediaModal threadId={threadIdd} load={load} setLoad={setLoad} setMessages={setMessages} setInput={setInput} status={status} fileId={fileId} handleInputChange={handleInputChange} input={input} messages={messages} setFileId={setFileId} submitMessage={submitMessage} />
                                 <button disabled={status === "in_progress" || load} type='submit'>
                                     <Image src={"/onboard/send.png"} alt='send icon' width={500} height={500} className={`h-[48px] ${(status === "in_progress" || load) && "animate-pulse"} w-[48px] cursor-pointer `} />
                                 </button>
