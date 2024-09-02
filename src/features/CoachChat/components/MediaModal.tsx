@@ -36,7 +36,12 @@ type Props = {
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
     setLoad: React.Dispatch<React.SetStateAction<boolean>>;
     load: boolean;
-    threadId: string
+    threadId: string;
+    open(): void;
+    messagesLeft: number;
+    paid: boolean;
+    tier: any;
+    handleChat: () => Promise<void>
 }
 
 const openai = new OpenAI({
@@ -44,7 +49,7 @@ const openai = new OpenAI({
     dangerouslyAllowBrowser: true,
 });
 
-const MediaModal = ({ threadId, submitMessage, messages, setFileId, fileId, handleInputChange, input, status, setInput, setMessages, setLoad, load }: Props) => {
+const MediaModal = ({ threadId, submitMessage, messages, setFileId, fileId, handleChat, handleInputChange, input, status, setInput, setMessages, setLoad, load, messagesLeft, open, paid, tier }: Props) => {
     const [imagesrc, setImagesrc] = useState<string>("");
     const [videosrc, setVideosrc] = useState<string>("")
     const [filesrc, setFilesrc] = useState<any>()
@@ -135,11 +140,14 @@ const MediaModal = ({ threadId, submitMessage, messages, setFileId, fileId, hand
     }
 
     useEffect(() => {
-        if (input !== "" && load) {
-            resetAll()
-            submitMessage();
-
+        const getMessage = async () => {
+            if (input !== "" && load) {
+                resetAll()
+                let response = await submitMessage();
+                handleChat();
+            }
         }
+        getMessage()
     }, [input])
 
 
@@ -270,6 +278,11 @@ const MediaModal = ({ threadId, submitMessage, messages, setFileId, fileId, hand
 
                             <div className='flex space-x-2 items-center absolute right-0 top-0'>
                                 <button onClick={async () => {
+                                    if (messagesLeft < 1 && tier === "premium" && !paid) {
+                                        resetAll()
+                                        open()
+                                        return
+                                    }
                                     if (load) {
                                         return
                                     }

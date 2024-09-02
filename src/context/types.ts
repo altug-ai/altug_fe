@@ -70,6 +70,8 @@ export type AuthProps = {
 export type LeaderboardProps = {
   setCountry: Dispatch<SetStateAction<string>>;
   country: string;
+  setData: Dispatch<any>;
+  data: any;
   setleague: Dispatch<SetStateAction<string>>;
   league: string;
 };

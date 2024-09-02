@@ -8,7 +8,7 @@ export function useGetNotifications() {
     const [allIds, setAllIds] = useState(new Set());
     const [loading, setLoading] = useState<boolean>(false);
     const [page, setPage] = useState(1);
-    const [pageSize] = useState(15);  // Adjust the page size as needed
+    const [pageSize] = useState(25);  // Adjust the page size as needed
     const [hasMore, setHasMore] = useState(true);
 
     const getNotifications = useCallback(async (pageNumber = 1) => {
