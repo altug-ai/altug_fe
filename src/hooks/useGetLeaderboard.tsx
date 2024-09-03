@@ -18,7 +18,7 @@ export function useGetLeaderboard() {
 
     const getLeaderboard = useCallback(async (pageNumber = 1) => {
         setLoading(true);
-        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/client-profiles?sort=total_point:DESC&populate[0]=profile_pic  `;
+        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/client-profiles?sort=total_point:DESC&populate[0]=profile_pic&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`;
 
         if (country && country !== "all" && country !== "") {
             url += `&filters[country][$eq]=${country}`;
