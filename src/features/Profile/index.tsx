@@ -24,6 +24,8 @@ import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { useTranslations } from "next-intl";
 import Banner from './components/Banner';
 import Header from './components/Header';
+import { useGetChattedCoaches } from "@/hooks/useGetChattedCoaches";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 type Props = {}
 
@@ -36,6 +38,9 @@ const ProfileScreen = (props: Props) => {
     const router = useRouter();
     const [openn, setOpenn] = useState<boolean>(false)
     let [isOpen, setIsOpen] = useState(false)
+    const { hasMore, loadMore, data, loading: chatLoading } = useGetChattedCoaches()
+
+
 
     function open() {
         setIsOpen(true)
@@ -163,11 +168,25 @@ const ProfileScreen = (props: Props) => {
                     )
 
                 }
+
                 {
-                    coaches?.data?.map((coach) => (
-                        <PlayerCard point={coach?.attributes?.point} clubLogo={coach?.attributes?.club?.data?.attributes?.logo?.data?.attributes?.url} coach id={coach?.id} key={coach?.id} name={coach?.attributes?.name} picture={coach?.attributes?.profile?.data?.attributes?.url ?? coach?.attributes?.pic_url} />
-                    ))
+                    data?.map((dat: any) => {
+                        let coach = dat?.attributes?.coach?.data
+
+                        if (!dat?.attributes?.coach?.data) {
+                            coach = dat?.attributes?.player?.data
+                        }
+
+                        if (!coach?.id) {
+                            return
+                        }
+                        return (
+                            <PlayerCard point={coach?.attributes?.point} clubLogo={coach?.attributes?.club?.data?.attributes?.logo?.data?.attributes?.url} coach id={coach?.id} key={coach?.id} name={coach?.attributes?.name} picture={coach?.attributes?.profile?.data?.attributes?.url ?? coach?.attributes?.pic_url} />
+                        )
+
+                    })
                 }
+
             </div>
 
 
@@ -181,23 +200,41 @@ const ProfileScreen = (props: Props) => {
                     <div className="flex min-h-full items-center justify-center p-4">
                         <DialogPanel
                             transition
-                            className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-3xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-3"
+                            className="w-full max-w-md rounded-xl bg-[#262629] bg-opacity-95 backdrop-blur-md p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-3"
                         >
                             <DialogTitle as="h3" className="text-base/7 font-medium text-white">
                                 {t("AllChats")}
                             </DialogTitle>
+                            <InfiniteScroll
+                                dataLength={data.length}
+                                next={loadMore}
+                                hasMore={hasMore}
+                                loader={
+                                    <div className='max-w-[388px] w-full my-[30px] flex justify-center'>
+                                        <TbLoader3 className="text-white w-10 h-10 animate-spin" />
+                                    </div>
+                                }
+                                endMessage={<p className='text-center my-2 text-slate-400'>No more chats</p>}
+                            >
+                                {
+                                    data?.map((dat: any) => {
+                                        let coach = dat?.attributes?.coach?.data
 
-                            {
-                                coaches?.data?.map((coach) => (
-                                    <PlayerCard point={coach?.attributes?.point} clubLogo={coach?.attributes?.club?.data?.attributes?.logo?.data?.attributes?.url} coach id={coach?.id} key={coach?.id} name={coach?.attributes?.name} picture={coach?.attributes?.profile?.data?.attributes?.url ?? coach?.attributes?.pic_url} />
-                                ))
-                            }
+                                        if (!dat?.attributes?.coach?.data) {
+                                            coach = dat?.attributes?.player?.data
+                                        }
 
-                            {
-                                players?.data?.map((player) => (
-                                    <PlayerCard point={player?.attributes?.point} clubLogo={player?.attributes?.club?.data?.attributes?.logo?.data?.attributes?.url} id={player?.id} key={player?.id} name={player?.attributes?.name} picture={player?.attributes?.profile?.data?.attributes?.url ?? player?.attributes?.pic_url} />
-                                ))
-                            }
+                                        if (!coach?.id) {
+                                            return
+                                        }
+                                        return (
+                                            <PlayerCard point={coach?.attributes?.point} clubLogo={coach?.attributes?.club?.data?.attributes?.logo?.data?.attributes?.url} coach id={coach?.id} key={coach?.id} name={coach?.attributes?.name} picture={coach?.attributes?.profile?.data?.attributes?.url ?? coach?.attributes?.pic_url} />
+                                        )
+
+                                    })
+                                }
+
+                            </InfiniteScroll>
 
 
                             <div className="mt-4 flex items-center space-x-2">

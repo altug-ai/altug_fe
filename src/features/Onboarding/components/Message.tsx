@@ -26,6 +26,13 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
 
     let [isOpen, setIsOpen] = useState(false)
 
+    function removeAsterisks(str: string) {
+        if (!str) {
+            return ""
+        }
+        return str.replace(/\*/g, '');
+    }
+
 
     const getElevenLabsResponse = async (text: string) => {
         const response = await fetch("/api/speech", {
@@ -39,7 +46,7 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
             })
         });
 
-        if (response?.status ===  401) {
+        if (response?.status === 401) {
             const utterance = new SpeechSynthesisUtterance(text);
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
@@ -71,7 +78,8 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
 
 
     const theSpeaker = async () => {
-        const botVoiceResponse = await getElevenLabsResponse(message);
+        let mess = removeAsterisks(message)
+        const botVoiceResponse = await getElevenLabsResponse(mess);
         const reader = new FileReader();
         reader.readAsDataURL(botVoiceResponse);
         reader.onload = () => {
@@ -106,8 +114,9 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
         } catch (error) {
             return false;
         }
-    }   
+    }
     const extract = useMemo(() => extractUrlFromString(message), [message]);
+
 
 
     return (
@@ -139,7 +148,7 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                                 )
                             }
 
-                            <h1 className='text-[14px] leading-[18px] font-medium text-[#181928]'>{removeTextBetweenDelimiters(message)}</h1>
+                            <h1 className='text-[14px] leading-[18px] font-medium text-[#181928]'>{removeAsterisks(removeTextBetweenDelimiters(message))}</h1>
                             <h1 className='text-[#706A6A] text-[13px] leading-[16px] font-normal '>{date ? date : "10:54am"}</h1>
                         </div>
                     </div>

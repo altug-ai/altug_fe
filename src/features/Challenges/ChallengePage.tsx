@@ -18,6 +18,8 @@ import SubmissionLoad from './challengePageComponents/SubmissionLoad';
 import Submissionupload from './challengePageComponents/Submissionupload';
 import ChallengeBox from './components/ChallengeBox';
 import { acceptChallenge, sendNotification } from './functions/function';
+import { useGetSubmitted } from '@/hooks/useGetSubmitted';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 type Props = {}
 
@@ -34,6 +36,7 @@ const ChallengePage = (props: Props) => {
     const [openn, setOpenn] = useState<boolean>(false)
     const [loader, setLoader] = useState<boolean>(false)
     const { data, loading: challengeLoaderr } = useGetChallenges(slug)
+    const { data: submitted, hasMore, loadMore } = useGetSubmitted(data?.id)
     let [isOpen, setIsOpen] = useState(false)
     const searchParams = useSearchParams()
     const search = searchParams.get('id')
@@ -196,11 +199,23 @@ const ChallengePage = (props: Props) => {
                             </div>
                             <h1 className='font-medium text-[24px] mt-[10px] leading-[32.47px] text-[#FFFFFF]'>{t("Submitted")}</h1>
                             <div className='mt-[10px] pb-[90px]'>
-                                {
-                                    data?.attributes?.submitted_challenges?.data?.map((submit: any) => (
-                                        <ChallengeBox image={submit?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} goal={data?.attributes?.goal} key={submit?.id} title={data?.attributes?.title} video={submit?.attributes?.video?.data?.attributes?.url} submission />
-                                    ))
-                                }
+                                <InfiniteScroll
+                                    dataLength={submitted.length}
+                                    next={loadMore}
+                                    hasMore={hasMore}
+                                    loader={
+                                        <div className='max-w-[388px] w-full my-[30px] flex justify-center'>
+                                            <TbLoader3 className="text-white w-10 h-10 animate-spin" />
+                                        </div>
+                                    }
+                                    endMessage={<p className='text-center my-2 text-slate-400'>No more submitted challenges</p>}
+                                >
+                                    {
+                                        submitted?.map((submit: any) => (
+                                            <ChallengeBox image={submit?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} goal={data?.attributes?.goal} key={submit?.id} title={data?.attributes?.title} video={submit?.attributes?.video?.data?.attributes?.url} submission />
+                                        ))
+                                    }
+                                </InfiniteScroll>
                             </div>
                         </div>
 
