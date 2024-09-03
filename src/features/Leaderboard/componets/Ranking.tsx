@@ -93,7 +93,8 @@ const Ranking = (props: Props) => {
                         }
 
                     </TableBody>
-                </Table></InfiniteScroll>
+                </Table>
+            </InfiniteScroll>
 
         </div>
     )
