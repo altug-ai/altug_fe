@@ -107,13 +107,20 @@ const CoachChat = (props: Props) => {
         return data;
     };
 
+    function removeAsterisks(str: string) {
+        if (!str) {
+            return ""
+        }
+        return str.replace(/\*/g, '');
+    }
 
     useEffect(() => {
         const playAudio = async () => {
             let mess = messages[messages?.length - 1]
             let content: any = messages[messages?.length - 1]?.content
+            let newContent = removeAsterisks(content)
             if (mess?.role === "assistant") {
-                const botVoiceResponse = await getElevenLabsResponse(content);
+                const botVoiceResponse = await getElevenLabsResponse(newContent);
                 const reader = new FileReader();
                 reader.readAsDataURL(botVoiceResponse);
                 reader.onload = () => {
@@ -461,7 +468,7 @@ const CoachChat = (props: Props) => {
                             <div className='flex space-x-2 items-center absolute right-0 top-0'>
                                 {
                                     (tier === "premium") && (
-                                        <MediaModal handleChat={handleChat} messagesLeft={messagesLeft} open={open} paid={paid} tier={tier} threadId={threadIdd} load={load} setLoad={setLoad} setMessages={setMessages} setInput={setInput} status={status} fileId={fileId} handleInputChange={handleInputChange} input={input} messages={messages} setFileId={setFileId} submitMessage={submitMessage} />
+                                        <MediaModal coach={data?.attributes?.name} handleChat={handleChat} messagesLeft={messagesLeft} open={open} paid={paid} tier={tier} threadId={threadIdd} load={load} setLoad={setLoad} setMessages={setMessages} setInput={setInput} status={status} fileId={fileId} handleInputChange={handleInputChange} input={input} messages={messages} setFileId={setFileId} submitMessage={submitMessage} />
                                     )
                                 }
 

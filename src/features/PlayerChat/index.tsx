@@ -97,13 +97,20 @@ const PlayerChat = (props: Props) => {
         return data;
     };
 
+    function removeAsterisks(str: string) {
+        if (!str) {
+            return ""
+        }
+        return str.replace(/\*/g, '');
+    }
 
     useEffect(() => {
         const playAudio = async () => {
             let mess = messages[messages?.length - 1]
             let content: any = messages[messages?.length - 1]?.content
+            let newContent = removeAsterisks(content)
             if (mess?.role === "assistant") {
-                const botVoiceResponse = await getElevenLabsResponse(content);
+                const botVoiceResponse = await getElevenLabsResponse(newContent);
                 const reader = new FileReader();
                 reader.readAsDataURL(botVoiceResponse);
                 reader.onload = () => {

@@ -1,16 +1,16 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { fetcher } from '@/lib/functions';
 import { ChallengeContext } from '@/context/ChallengeContext';
-import { Stat } from '@/context/types';
 
 export function useGetSubmittedChallenges(day = 7) {
     const { profileId, jwt } = useContext(AuthContext);
     const { challengeLoader } = useContext(ChallengeContext);
     const [data, setData] = useState<any>([]);
-    const [allIds, setAllIds] = useState(new Set());
+    // const [allIds, setAllIds] = useState(new Set());
     const [allData, setAllData] = useState<any>();
     const [loading, setLoading] = useState<boolean>(false);
+
     const initialStats = {
         accuracy: 0,
         shooting: 0,
@@ -21,24 +21,26 @@ export function useGetSubmittedChallenges(day = 7) {
     };
     const [stats, setStats] = useState<any>(initialStats);
 
-    useEffect(() => {
-        let isMounted = true; // Flag to check if component is mounted
+    const getSubmittedChallenges = useCallback(async () => {
+        setLoading(true);
+        const currentDate = new Date();
+        const daysAgo = new Date();
+        daysAgo.setDate(currentDate.getDate() - day);
 
-        async function getSubmittedChallenges() {
-            setLoading(true);
-            setStats(initialStats); // Reset stats before fetching new data
+        const isoCurrentDate = currentDate.toISOString();
+        const isoDaysAgo = daysAgo.toISOString();
 
-            const currentDate = new Date();
-            const daysAgo = new Date();
-            daysAgo.setDate(currentDate.getDate() - day);
+        let page = 1;
+        const pageSize = 25;
+        let hasMore = true;
+        let allFetchedData: any[] = [];
+        let allIds = new Set();
+        let updatedStats: any = { ...initialStats };
 
-            // Format dates to ISO 8601 format
-            const isoCurrentDate = currentDate.toISOString();
-            const isoDaysAgo = daysAgo.toISOString();
-
+        while (hasMore) {
             try {
                 const personal = await fetcher(
-                    `${process.env.NEXT_PUBLIC_STRAPI_URL}/submitted-challenges/?filters[client_profile][id][$eq]=${profileId}&filters[updatedAt][$gte]=${isoDaysAgo}&filters[updatedAt][$lte]=${isoCurrentDate}`,
+                    `${process.env.NEXT_PUBLIC_STRAPI_URL}/submitted-challenges?sort=id:DESC&filters[client_profile][id][$eq]=${profileId}&filters[updatedAt][$gte]=${isoDaysAgo}&filters[updatedAt][$lte]=${isoCurrentDate}&pagination[page]=${page}&pagination[pageSize]=${pageSize}`,
                     {
                         headers: {
                             "Content-Type": "application/json",
@@ -47,38 +49,46 @@ export function useGetSubmittedChallenges(day = 7) {
                     }
                 );
 
-                if (isMounted && personal?.data) {
-                    setData(personal?.data);
+                if (personal?.data) {
+                    // Filter out duplicates and accumulate data
+                    const newData = personal.data.filter((item: any) => !allIds.has(item.id));
+                    allFetchedData = [...allFetchedData, ...newData];
 
-                    // Calculate new stats based on fetched data
-                    const newStats = personal.data.reduce((acc: any, data: any) => {
+                    newData.forEach((item: any) => {
+                        allIds = new Set(allIds).add(item.id)
+                    });
+
+                    // Update stats
+                    newData.forEach((data: any) => {
                         let stat = data?.attributes?.stat;
                         let point = data?.attributes?.points ?? 0;
-                        acc[stat] = (acc[stat] || 0) + parseInt(point);
-                        return acc;
-                    }, initialStats);
+                        updatedStats[stat] = (updatedStats[stat] || 0) + parseInt(point);
+                    });
 
-                    setStats(newStats);
                     setAllData(personal);
-                }
 
+                    // Check if there are more pages to fetch
+                    hasMore = page < personal.meta.pagination.pageCount;
+                    page++;
+                } else {
+                    hasMore = false;
+                }
             } catch (error) {
                 console.error('Error fetching submitted challenges:', error);
+                hasMore = false;
             }
-
-            setLoading(false);
         }
 
+        setData(allFetchedData);
+        setStats(updatedStats);
+        setLoading(false);
+    }, [profileId, jwt, day]);
+
+    useEffect(() => {
         if (jwt && profileId) {
             getSubmittedChallenges();
         }
-
-        // Cleanup function to reset stats if component unmounts or profileId/day changes
-        return () => {
-            isMounted = false;
-            setStats(initialStats);
-        };
     }, [profileId, challengeLoader, jwt, day]);
 
-    return { data, loading, allData, allIds, stats, setStats };
+    return { data, loading, allData, stats, setStats };
 }

@@ -41,6 +41,7 @@ type Props = {
     messagesLeft: number;
     paid: boolean;
     tier: any;
+    coach?: any;
     handleChat: () => Promise<void>
 }
 
@@ -49,7 +50,7 @@ const openai = new OpenAI({
     dangerouslyAllowBrowser: true,
 });
 
-const MediaModal = ({ threadId, submitMessage, messages, setFileId, fileId, handleChat, handleInputChange, input, status, setInput, setMessages, setLoad, load, messagesLeft, open, paid, tier }: Props) => {
+const MediaModal = ({ threadId, submitMessage, messages, coach, setFileId, fileId, handleChat, handleInputChange, input, status, setInput, setMessages, setLoad, load, messagesLeft, open, paid, tier }: Props) => {
     const [imagesrc, setImagesrc] = useState<string>("");
     const [videosrc, setVideosrc] = useState<string>("")
     const [filesrc, setFilesrc] = useState<any>()
