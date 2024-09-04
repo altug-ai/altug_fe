@@ -18,6 +18,7 @@ type Props = {
     children: React.ReactNode;
 };
 
+
 function AuthContextProvider({ children }: Props) {
     const { data: session } = useSession();
     const [loading, setLoading] = useState<boolean>(false);
