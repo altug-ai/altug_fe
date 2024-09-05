@@ -395,6 +395,13 @@ const SignupForm = (props: Props) => {
 
                                 {/* the error message */}
                                 <h1 className="text-red-500 text-[14px] font-medium mt-[50px]">{error}</h1>
+                                <div className="mb-5 w-full max-w-[388px] text-[#F5F7F8] text-[14px] leading-[20px]">
+                                    By signing up, you agree to our 
+                                    <a target="_blank" href="/terms-and-conditions" className="text-[#357EF8] hover:underline ml-1">Terms of Service</a>.
+                                    Learn more about how we collect, use, and share your data in our 
+                                    <a target="_blank" href="/user-agreement" className="text-[#357EF8] hover:underline ml-1">User Agreement</a>.
+                                    Please review these documents thoroughly. Make sure you understand and agree with the terms before using Pro Legacy.
+                                </div>
                                 {/* signup */}
                                 <div className=' w-full flex justify-center mt-[5px]'>
                                     <button type="submit" className='py-[12px] z-10  w-full max-w-[388px]  cursor-pointer  bg-[#357EF8] flex justify-center rounded-[24px] gap-[12px]'>
