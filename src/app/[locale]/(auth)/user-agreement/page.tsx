@@ -7,12 +7,12 @@ const Agreement = () => {
             <div className="max-w-3xl mx-auto">
                 <h2 className="text-[#357EF8] mt-8 mb-4 text-2xl">1. Acceptance of Terms</h2>
                 <p>
-                    By using the App, you confirm that you have read, understood, and agree to be bound by this Agreement. This Agreement applies to all visitors, users, and others who access the App (“Users”). If you do not agree with any part of these terms, you must discontinue use of the App immediately.
+                    By using the App, you confirm that you have read, understood, and agree to be bound by this Agreement. This Agreement applies to all visitors, users, and others who access the App (&ldquo;Users&rdquo;). If you do not agree with any part of these terms, you must discontinue use of the App immediately.
                 </p>
 
                 <h2 className="text-[#357EF8] mt-8 mb-4 text-2xl">2. Fictional Content and Educational Purpose</h2>
                 <p>
-                    The App provides interactive educational content through a fictional chatbot representing "legendary football players." The chatbots are not endorsed by, affiliated with, or representative of any real individuals, including but not limited to Lionel Messi or Didier Drogba. The content provided by the chatbots are fictional and intended for educational purposes only. All advice, insights, and commentary from the chatbots are simulations and should not be construed as professional or personal advice from real-life individuals.
+                    The App provides interactive educational content through a fictional chatbot representing &quot;legendary football players.&quot; The chatbots are not endorsed by, affiliated with, or representative of any real individuals, including but not limited to Lionel Messi or Didier Drogba. The content provided by the chatbots are fictional and intended for educational purposes only. All advice, insights, and commentary from the chatbots are simulations and should not be construed as professional or personal advice from real-life individuals.
                 </p>
 
                 <h2 className="text-[#357EF8] mt-8 mb-4 text-2xl">3. User Accounts</h2>
@@ -37,7 +37,7 @@ const Agreement = () => {
 
                 <h2 className="text-[#357EF8] mt-8 mb-4 text-2xl">6. Disclaimer of Warranties</h2>
                 <p>
-                    The App is provided on an “as is” and “as available” basis. Pro Legacy makes no representations or warranties of any kind, express or implied, regarding the use or the results of this App in terms of its correctness, accuracy, reliability, or otherwise. To the fullest extent permissible under applicable law, Pro Legacy disclaims all warranties, express or implied, including but not limited to implied warranties of merchantability and fitness for a particular purpose.
+                    The App is provided on an &ldquo;as is&rdquo; and &ldquo;as available&rdquo; basis. Pro Legacy makes no representations or warranties of any kind, express or implied, regarding the use or the results of this App in terms of its correctness, accuracy, reliability, or otherwise. To the fullest extent permissible under applicable law, Pro Legacy disclaims all warranties, express or implied, including but not limited to implied warranties of merchantability and fitness for a particular purpose.
                 </p>
 
                 <h2 className="text-[#357EF8] mt-8 mb-4 text-2xl">7. Limitation of Liability</h2>

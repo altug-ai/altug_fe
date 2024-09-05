@@ -25,7 +25,7 @@ const Terms = () => {
 
                 <h2 className="text-[#357EF8] mt-8 mb-4 text-2xl">3. Educational Purpose and Fictional Content</h2>
                 <p>
-                    The App provides educational content through fictional chatbots that simulate interactions with "legendary football players." The chatbots and any associated content are purely fictional and are not endorsed by, affiliated with, or representative of any real individuals, including but not limited to Lionel Messi or Didier Drogba. All advice or insights provided by the chatbots are simulations intended for educational purposes only.
+                    The App provides educational content through fictional chatbots that simulate interactions with &quot;legendary football players.&quot; The chatbots and any associated content are purely fictional and are not endorsed by, affiliated with, or representative of any real individuals, including but not limited to Lionel Messi or Didier Drogba. All advice or insights provided by the chatbots are simulations intended for educational purposes only.
                 </p>
 
                 <h2 className="text-[#357EF8] mt-8 mb-4 text-2xl">4. Intellectual Property Rights</h2>
@@ -58,7 +58,7 @@ const Terms = () => {
 
                 <h2 className="text-[#357EF8] mt-8 mb-4 text-2xl">8. Limitation of Liability</h2>
                 <p>
-                    To the maximum extent permitted by law, [Your Company Name], its affiliates, directors, employees, or agents shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses, arising out of:
+                    To the maximum extent permitted by law, Pro Legacy, its affiliates, directors, employees, or agents shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses, arising out of:
                 </p>
                 <ul className="list-disc ml-5 mb-4">
                     <li>Your use or inability to use the App.</li>
@@ -68,7 +68,7 @@ const Terms = () => {
 
                 <h2 className="text-[#357EF8] mt-8 mb-4 text-2xl">9. Indemnification</h2>
                 <p>
-                    You agree to indemnify, defend, and hold harmless [Your Company Name], its affiliates, officers, directors, employees, agents, and licensors from and against any claims, damages, obligations, losses, liabilities, costs, or debt, and expenses (including attorney’s fees) arising from:
+                    You agree to indemnify, defend, and hold harmless Pro Legacy, its affiliates, officers, directors, employees, agents, and licensors from and against any claims, damages, obligations, losses, liabilities, costs, or debt, and expenses (including attorney’s fees) arising from:
                 </p>
                 <ul className="list-disc ml-5 mb-4">
                     <li>Your use of the App.</li>
