@@ -7,6 +7,8 @@ const publicPages = [
   '/sign-in',
   '/sign-up',
   '/forgot-password',
+  '/terms-and-conditions',
+  '/user-agreement'
   // (/secret requires auth)
 ];
 
