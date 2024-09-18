@@ -14,6 +14,7 @@ import { acceptChallenge } from '../functions/function';
 import { TbLoader3 } from 'react-icons/tb';
 import { ChallengeContext } from '@/context/ChallengeContext';
 import { useTranslations } from "next-intl";
+import { FaHeart } from 'react-icons/fa'; // Import the heart icon
 
 type Props = {
     submission?: boolean;
@@ -24,17 +25,20 @@ type Props = {
     id?: number;
     accepted?: any;
     image?: string;
+    likes?: number; // Add the new likes prop
+    likedByUser?: boolean; // Add the new likedByUser prop
 }
 
-const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, accepted, image }: Props) => {
+const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, accepted, image, likes, likedByUser }: Props) => {
     const router = useRouter()
     const [loader, setLoader] = useState<boolean>(false)
     const [profiles, setProfiles] = useState(new Set());
+    const [isLiked, setIsLiked] = useState<boolean>(likedByUser); // Initialize state with prop value
+    const [likeCount, setLikeCount] = useState<number>(likes || 0); // Initialize like count
     const { jwt, profileId } = useContext(AuthContext)
     const { challengeLoader, setChallengeLoader, handleShare } = useContext(ChallengeContext);
     const { toast } = useToast();
     const t = useTranslations('Home.Challenge');
-
 
     useEffect(() => {
         if (accepted?.length > 0) {
@@ -45,6 +49,39 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
             setProfiles(updatedSet);
         }
     }, [accepted])
+
+    const likeChallenge = async () => {
+        if (!id || !profileId) return;
+
+        setLoader(true);
+        try {
+            const response = await fetcher(`/challenge/${id}/like`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${jwt}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({}),
+            });
+
+            if (response?.likes !== undefined) {
+                setLikeCount(response.likes);
+                setIsLiked(!isLiked);
+            } else {
+                toast({
+                    variant: "destructive",
+                    description: t("ErrorLikingChallenge"),
+                });
+            }
+        } catch (error) {
+            toast({
+                variant: "destructive",
+                description: t("ErrorLikingChallenge"),
+            });
+        } finally {
+            setLoader(false);
+        }
+    }
 
     const acceptChallenges = async () => {
         setLoader(true);
@@ -72,16 +109,9 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
         }
     }
 
-
-
     return (
         <div className='max-w-[388px] w-full mb-[20px]'>
-
             <div className={`w-full h-full rounded-[8px] ${!challengeHeader && "border border-[#D5D5D5]"}  `}>
-                {/* <div className='h-[192.52px] w-full bg-cover bg-center grid place-items-center' style={{ backgroundImage: 'url("/tab/Play.png")' }}>
-                    <Image src={"/profile/Video.png"} width={600} height={600} alt='video icon' className='w-[74.29px] h-[75.4px] cursor-pointer' />
-                </div> */}
-
                 <video className='h-[192.52px] w-full  rounded-md grid place-items-center' controls preload="none" poster={image}>
                     <source src={video} type="video/mp4" />
                     {t("Tag")}
@@ -96,7 +126,6 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                 </div>
 
                 <div className='flex space-x-5 items-center pb-[7px] mt-[10px] px-[8px]'>
-
                     {
                         accepted?.length > 0 && (
                             <div className="flex">
@@ -110,13 +139,12 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                                     />
                                 </span>
 
-                                {/* Render additional spans conditionally, limiting to a maximum of 2 */}
                                 {accepted?.slice(1).slice(0, 3).map((user: any, index: any) => (
                                     <span key={user?.id ?? index} className="rounded-full -ml-3 z-20 flex justify-center items-center ">
                                         <Image
                                             alt={user?.attributes?.profile_pic?.data?.attributes?.url ?? "/profile/unknownc.png"}
-                                            width={500} // Adjust width if necessary for consistent sizing
-                                            height={500} // Adjust height if necessary
+                                            width={500}
+                                            height={500}
                                             className="rounded-full object-cover object-top h-[40px] w-[40px]"
                                             src={user?.attributes?.profile_pic?.data?.attributes?.url ?? "/profile/unknownc.png"}
                                         />
@@ -131,6 +159,14 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                         )
                     }
 
+                    {/* Add the likes display */}
+                    <div className="flex items-center space-x-1">
+                        <FaHeart
+                            className={`cursor-pointer ${isLiked ? 'text-red-500' : 'text-white'}`}
+                            onClick={likeChallenge}
+                        />
+                        <span className="text-[12px] leading-[16.24px] font-medium text-white">{likeCount || 0}</span>
+                    </div>
                 </div>
 
                 {/* challenge and accept */}
@@ -151,7 +187,6 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                                         {t("View")}
                                     </div>
                                 ) : (
-
                                     <Popover >
                                         <PopoverTrigger className='w-full'>
                                             <div onClick={() => { }} className='rounded-[35px] cursor-pointer mt-3 w-full gap-[12px] h-[35.01px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
@@ -165,7 +200,6 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                                         <PopoverContent>
                                             <div className='flex flex-col space-y-2'>
                                                 <h1 className='text-[12px] text-center font-medium'>{t("Sure")}</h1>
-                                                {/* divs to accept the challenge */}
                                                 <div onClick={acceptChallenges} className='bg-[#357EF8] rounded-md text-white px-2 py-2 cursor-pointer'>
                                                     {
                                                         loader ? (
@@ -173,19 +207,14 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                                                         ) : t("Yes")
                                                     }
                                                 </div>
-                                                {/* <div className='bg-[#F5F7F8] rounded-md text-black px-2 py-2 cursor-pointer'>No</div> */}
                                             </div>
                                         </PopoverContent>
-                                    </Popover>)
+                                    </Popover>
+                                )
                             }
-
-
-
                         </div>
                     )
                 }
-
-
             </div>
         </div>
     )

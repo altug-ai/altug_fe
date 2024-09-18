@@ -115,7 +115,16 @@ const Challenges = (props: Props) => {
                             endMessage={<p className='text-center my-2 text-slate-400'>No more challenges</p>}
                         >   {
                                 data?.map((challenge: any) => (
-                                    <ChallengeBox image={challenge?.attributes?.banner?.data?.attributes?.url} accepted={challenge?.attributes?.accepted?.data} id={challenge?.id} title={challenge?.attributes?.title} video={challenge?.attributes?.video?.data?.attributes?.url} goal={challenge?.attributes?.goal} key={challenge?.id} />
+                                    <ChallengeBox 
+                                        image={challenge?.attributes?.banner?.data?.attributes?.url} 
+                                        accepted={challenge?.attributes?.accepted?.data} 
+                                        id={challenge?.id} 
+                                        title={challenge?.attributes?.title} 
+                                        video={challenge?.attributes?.video?.data?.attributes?.url} 
+                                        goal={challenge?.attributes?.goal} 
+                                        likes={challenge?.attributes?.likes} // Add this line
+                                        key={challenge?.id} 
+                                    />
                                 ))
                             }</InfiniteScroll>
 
