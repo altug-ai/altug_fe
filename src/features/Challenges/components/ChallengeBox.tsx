@@ -33,8 +33,8 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
     const router = useRouter()
     const [loader, setLoader] = useState<boolean>(false)
     const [profiles, setProfiles] = useState(new Set());
-    const [isLiked, setIsLiked] = useState<boolean>(likedByUser); // Initialize state with prop value
-    const [likeCount, setLikeCount] = useState<number>(likes || 0); // Initialize like count
+    const [isLiked, setIsLiked] = useState<boolean>(likedByUser || false); 
+    const [likeCount, setLikeCount] = useState<number>(likes || 0); 
     const { jwt, profileId } = useContext(AuthContext)
     const { challengeLoader, setChallengeLoader, handleShare } = useContext(ChallengeContext);
     const { toast } = useToast();
@@ -55,7 +55,7 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
 
         setLoader(true);
         try {
-            const response = await fetcher(`/challenge/${id}/like`, {
+            const response = await fetcher(`${process.env.NEXT_PUBLIC_STRAPI_URL}/challenges/${id}/like`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${jwt}`,
@@ -160,9 +160,9 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                     }
 
                     {/* Add the likes display */}
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center space-x-1 justify-end w-[95%]">
                         <FaHeart
-                            className={`cursor-pointer ${isLiked ? 'text-red-500' : 'text-white'}`}
+                            className={`cursor-pointer ${isLiked ? 'text-white' : 'text-red-500'}`}
                             onClick={likeChallenge}
                         />
                         <span className="text-[12px] leading-[16.24px] font-medium text-white">{likeCount || 0}</span>
