@@ -21,7 +21,7 @@ export function useGetAcceptedChallenges() {
 
 
         const personal = await fetcher(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/challenges?sort=id:DESC&filters[accepted][id][$eq]=${profileId}&populate[0]=video&populate[1]=accepted.profile_pic&populate[2]=client_profile&populate[3]=submitted_challenges.video&populate[4]=submitted_challenges.client_profile.profile_pic&populate[5]=banner&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`,
+            `${process.env.NEXT_PUBLIC_STRAPI_URL}/challenges?sort=id:DESC&filters[accepted][id][$eq]=${profileId}&populate[0]=video&populate[1]=accepted.profile_pic&populate[2]=client_profile&populate[3]=submitted_challenges.video&populate[4]=submitted_challenges.client_profile.profile_pic&populate[5]=banner&populate[6]=liked&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`,
             {
                 headers: {
                     "Content-Type": "application/json",

@@ -29,6 +29,34 @@ export const acceptChallenge = async (id: any, profileId: any, jwt: any) => {
     }
 }
 
+
+export const likeChallenge = async (id: any, profileId: any, isLiked: boolean, jwt: any) => {
+    try {
+        const data = {
+            data: {
+                liked: {
+                    [isLiked ? 'disconnect' : 'connect']: [profileId],
+                },
+            },
+        };
+
+        const updateChallenge = await axios.put(
+            `${process.env.NEXT_PUBLIC_STRAPI_URL}/challenges/${id}`,
+            data,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${jwt}`,
+                },
+            }
+        );
+
+        return updateChallenge;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 export const processNots = async (dat: any, profileId: any, jwt: any) => {
     try {
         const data = {

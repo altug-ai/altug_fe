@@ -18,10 +18,10 @@ export function useGetChallenges(id?: string | string[]) {
 
     const getChallenge = useCallback(async (pageNumber = 1) => {
         setLoading(true);
-        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/challenges?sort=id:DESC&populate[0]=video&populate[1]=accepted.profile_pic&populate[2]=client_profile&populate[3]=submitted_challenges.video&populate[4]=submitted_challenges.client_profile.profile_pic&populate[5]=banner&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`
+        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/challenges?sort=id:DESC&populate[0]=video&populate[1]=accepted.profile_pic&populate[2]=client_profile&populate[3]=submitted_challenges.video&populate[4]=submitted_challenges.client_profile.profile_pic&populate[5]=banner&populate[6]=liked&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`;
 
         if (id) {
-            url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/challenges/${id}?sort=id:DESC&populate[0]=video&populate[1]=accepted.profile_pic&populate[2]=client_profile&populate[3]=submitted_challenges.video&populate[4]=submitted_challenges.client_profile.profile_pic&populate[5]=banner`
+            url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/challenges/${id}?sort=id:DESC&populate[0]=video&populate[1]=accepted.profile_pic&populate[2]=client_profile&populate[3]=submitted_challenges.video&populate[4]=submitted_challenges.client_profile.profile_pic&populate[5]=banner&populate[6]=liked`
         }
 
         const personal = await fetcher(
