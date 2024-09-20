@@ -153,11 +153,10 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                         </h1>
                     )}
 
-                    {/* Add the likes display */}
                     <div className="flex items-center space-x-1 justify-end w-[95%]">
                         <FaHeart
-                            className={`cursor-pointer ${isLiked ? 'text-red-500' : 'text-white'}`}
-                            onClick={likeChallenges}
+                            className={`cursor-pointer ${isLiked ? 'text-red-500' : 'text-white'} ${loader ? 'cursor-not-allowed' : ''}`}
+                            onClick={!loader ? likeChallenges : undefined}
                         />
                         <span className="text-[12px] leading-[16.24px] font-medium text-white">{likeCount || 0}</span>
                     </div>
