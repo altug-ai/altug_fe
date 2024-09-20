@@ -188,7 +188,14 @@ const ChallengePage = (props: Props) => {
                 (route === 0 && data?.attributes) && (
                     <div className='py-[20px]  h-full  flex flex-col items-center '>
                         <div className='mt-[30px]'>
-                            <ChallengeBox image={data?.attributes?.banner?.data?.attributes?.url} accepted={data?.attributes?.accepted?.data} title={data?.attributes?.title} video={data?.attributes?.video?.data?.attributes?.url} goal={data?.attributes?.goal} submission challengeHeader />
+                            <ChallengeBox 
+                                image={data?.attributes?.banner?.data?.attributes?.url} 
+                                accepted={data?.attributes?.accepted?.data}
+                                liked={data?.attributes?.liked?.data} 
+                                title={data?.attributes?.title} 
+                                video={data?.attributes?.video?.data?.attributes?.url} 
+                                goal={data?.attributes?.goal} submission challengeHeader 
+                            />
                         </div>
 
                         <div className='w-full max-w-[388px] mt-[20px] mb-[70px] flex flex-col space-y-9'>

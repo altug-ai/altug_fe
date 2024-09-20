@@ -91,7 +91,15 @@ const Challenges = (props: Props) => {
                         >
                             {
                                 accepted?.map((challenge: any) => (
-                                    <ChallengeBox image={challenge?.attributes?.banner?.data?.attributes?.url} accepted={challenge?.attributes?.accepted?.data} id={challenge?.id} title={challenge?.attributes?.title} video={challenge?.attributes?.video?.data?.attributes?.url} goal={challenge?.attributes?.goal} key={challenge?.id} />
+                                    <ChallengeBox 
+                                    image={challenge?.attributes?.banner?.data?.attributes?.url} 
+                                    accepted={challenge?.attributes?.accepted?.data}
+                                    liked={challenge?.attributes?.liked?.data} 
+                                    id={challenge?.id} 
+                                    title={challenge?.attributes?.title} 
+                                    video={challenge?.attributes?.video?.data?.attributes?.url} 
+                                    goal={challenge?.attributes?.goal} key={challenge?.id}
+                                    />
                                 ))
                             }
                         </InfiniteScroll>
@@ -117,12 +125,12 @@ const Challenges = (props: Props) => {
                                 data?.map((challenge: any) => (
                                     <ChallengeBox 
                                         image={challenge?.attributes?.banner?.data?.attributes?.url} 
-                                        accepted={challenge?.attributes?.accepted?.data} 
+                                        accepted={challenge?.attributes?.accepted?.data}
+                                        liked={challenge?.attributes?.liked?.data} 
                                         id={challenge?.id} 
                                         title={challenge?.attributes?.title} 
                                         video={challenge?.attributes?.video?.data?.attributes?.url} 
                                         goal={challenge?.attributes?.goal} 
-                                        likes={challenge?.attributes?.likes} // Add this line
                                         key={challenge?.id} 
                                     />
                                 ))
