@@ -14,6 +14,7 @@ import { TbLoader3 } from 'react-icons/tb';
 import { ChallengeContext } from '@/context/ChallengeContext';
 import { useTranslations } from "next-intl";
 import { FaHeart } from 'react-icons/fa';
+import { SlActionRedo } from 'react-icons/sl';
 
 type Props = {
     submission?: boolean;
@@ -24,7 +25,7 @@ type Props = {
     id?: number;
     accepted?: any;
     image?: string;
-    liked?: any; // Added liked field (list of profiles who liked the challenge)
+    liked?: any; 
 };
 
 const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, accepted, image, liked }: Props) => {
@@ -49,7 +50,6 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
         }
     }, [accepted]);
 
-    // Check if the user has liked the challenge
     useEffect(() => {
         if (liked && liked.some((user: any) => user?.id === profileId)) {
             setIsLiked(true);
@@ -154,6 +154,13 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                     )}
 
                     <div className="flex items-center space-x-1 justify-end w-[95%]">
+                        <div
+                            onClick={() => { if (id) handleShare(id) }}
+                            className='cursor-pointer flex justify-center items-center'
+                        >
+                            <SlActionRedo className="text-white" />
+                        </div>
+
                         <FaHeart
                             className={`cursor-pointer ${isLiked ? 'text-red-500' : 'text-white'} ${loader ? 'cursor-not-allowed' : ''}`}
                             onClick={!loader ? likeChallenges : undefined}
@@ -165,10 +172,6 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                 {/* challenge and accept */}
                 {!submission && (
                     <div className='flex items-center space-x-2 px-[8px] pb-[12px]'>
-                        <div onClick={() => { if (id) handleShare(id) }} className='rounded-[35px] cursor-pointer mt-3 w-full gap-[12px] border border-[#F5F7F8] h-[35.01px] bg-black text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
-                            {t("Friend")}
-                        </div>
-
                         {profiles?.has(profileId) ? (
                             <div onClick={() => { router?.push(`/challenge/${id}`) }} className='rounded-[35px] cursor-pointer mt-3 w-full gap-[12px] h-[35.01px] bg-[#357EF8] text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
                                 {t("View")}
