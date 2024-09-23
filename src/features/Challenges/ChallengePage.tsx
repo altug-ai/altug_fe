@@ -189,6 +189,7 @@ const ChallengePage = (props: Props) => {
                     <div className='py-[20px]  h-full  flex flex-col items-center '>
                         <div className='mt-[30px]'>
                             <ChallengeBox 
+                                id={data?.id}
                                 image={data?.attributes?.banner?.data?.attributes?.url} 
                                 accepted={data?.attributes?.accepted?.data}
                                 liked={data?.attributes?.liked?.data} 
