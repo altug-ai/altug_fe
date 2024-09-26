@@ -14,6 +14,7 @@ import { acceptChallenge } from '../functions/function';
 import { TbLoader3 } from 'react-icons/tb';
 import { ChallengeContext } from '@/context/ChallengeContext';
 import { useTranslations } from "next-intl";
+import FirstCommentBox from './FirstCommentBox';
 
 type Props = {
     submission?: boolean;
@@ -24,9 +25,11 @@ type Props = {
     id?: number;
     accepted?: any;
     image?: string;
+    submit?: boolean;
+    setShowOverlay?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, accepted, image }: Props) => {
+const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, accepted, image, submit, setShowOverlay }: Props) => {
     const router = useRouter()
     const [loader, setLoader] = useState<boolean>(false)
     const [profiles, setProfiles] = useState(new Set());
@@ -133,6 +136,18 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
 
                 </div>
 
+                {/* this is for the comments */}
+                {
+                    (submit && setShowOverlay) && (
+                        <div className='px-[8px]'>
+                            <FirstCommentBox />
+                            <h1 onClick={() => {
+                                setShowOverlay(true)
+                            }} className='text-[12px] font-bold leading-[26.63px] cursor-pointer text-[#1B76FF]'>All Comments</h1>
+                        </div>
+                    )
+                }
+
                 {/* challenge and accept */}
                 {
                     !submission && (
@@ -184,6 +199,8 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                         </div>
                     )
                 }
+
+
 
 
             </div>

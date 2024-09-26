@@ -20,6 +20,7 @@ import ChallengeBox from './components/ChallengeBox';
 import { acceptChallenge, sendNotification } from './functions/function';
 import { useGetSubmitted } from '@/hooks/useGetSubmitted';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import CommentsOverlay from './components/CommentsOverlay';
 
 type Props = {}
 
@@ -27,6 +28,7 @@ const ChallengePage = (props: Props) => {
 
     const { loading, profileId, jwt } = useContext(AuthContext)
     const params = useParams();
+    const [showOverlay, setShowOverlay] = useState(false);
     const { slug }: any = params;
     const { handleStartCaptureClick, route, setRoute, setVideoUrl, setVideoBlob, point, challengeLoader, setChallengeLoader, chal, setChal } = useContext(ChallengeContext)
     const [profiles, setProfiles] = useState(new Set());
@@ -170,7 +172,7 @@ const ChallengePage = (props: Props) => {
     }
 
     return (
-        <div className='py-[20px] px-[20px] h-full  flex flex-col items-center '>
+        <div  className='py-[20px] px-[20px] h-full  flex flex-col items-center '>
 
             <Header title={data?.attributes?.title} route={route} setRoute={setRoute} />
 
@@ -212,7 +214,7 @@ const ChallengePage = (props: Props) => {
                                 >
                                     {
                                         submitted?.map((submit: any) => (
-                                            <ChallengeBox image={submit?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} goal={data?.attributes?.goal} key={submit?.id} title={data?.attributes?.title} video={submit?.attributes?.video?.data?.attributes?.url} submission />
+                                            <ChallengeBox setShowOverlay={setShowOverlay} submit={true} image={submit?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} goal={data?.attributes?.goal} key={submit?.id} title={data?.attributes?.title} video={submit?.attributes?.video?.data?.attributes?.url} submission />
                                         ))
                                     }
                                 </InfiniteScroll>
@@ -359,6 +361,14 @@ const ChallengePage = (props: Props) => {
                     </div>
                 </div>
             </Dialog>
+
+
+            {/* the comments overlay */}
+            {
+                showOverlay && (
+                    <CommentsOverlay />
+                )
+            }
 
         </div >
     )
