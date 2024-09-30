@@ -317,3 +317,15 @@ export type OnboardingProps = {
   formIndex: FormIndex;
   setFormIndex: Dispatch<SetStateAction<FormIndex>>;
 };
+
+export type Comment = {
+  attributes: {
+    comment: string;
+    client_profile: { data: Profile };
+    coach: Coach;
+    player: Player;
+    likes: Profile[];
+    createdAt: string;
+  };
+  id: number;
+};

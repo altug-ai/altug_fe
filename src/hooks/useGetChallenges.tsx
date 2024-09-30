@@ -74,9 +74,12 @@ export function useGetChallenges(id?: string | string[]) {
         if (jwt && profileId && hasMore) {
             getChallenge(page);
         }
-    }, [profileId, challengeLoader, jwt, id, refetch, page])
+    }, [profileId, jwt, id, refetch, page, hasMore])
 
-
+    useEffect(() => {
+        setHasMore(true)
+        setPage(1);
+    }, [challengeLoader])
     const loadMore = () => {
         if (hasMore) {
             setPage((prevPage) => prevPage + 1);
