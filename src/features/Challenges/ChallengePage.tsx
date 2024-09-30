@@ -50,6 +50,21 @@ const ChallengePage = (props: Props) => {
     function close() {
         setIsOpen(false)
     }
+
+    // const handleWheel = (event : any) => {
+    //     if (event.deltaY > 0) {
+    //         // Swipe down detected
+    //         console.log('Swiped down!');
+    //         yourFunction(); // Call your function here
+    //     }
+    // };
+
+    // const yourFunction = () => {
+    //     alert('Swipe down action triggered!');
+    //     // Add your desired functionality here
+    // };
+
+
     useEffect(() => {
         if (data?.attributes?.accepted?.data?.length > 0) {
             const updatedSet = new Set(profiless);
@@ -172,7 +187,7 @@ const ChallengePage = (props: Props) => {
     }
 
     return (
-        <div  className='py-[20px] px-[20px] h-full  flex flex-col items-center '>
+        <div className='py-[20px] px-[20px] h-full  flex flex-col items-center '>
 
             <Header title={data?.attributes?.title} route={route} setRoute={setRoute} />
 
@@ -214,7 +229,7 @@ const ChallengePage = (props: Props) => {
                                 >
                                     {
                                         submitted?.map((submit: any) => (
-                                            <ChallengeBox setShowOverlay={setShowOverlay} submit={true} image={submit?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} goal={data?.attributes?.goal} key={submit?.id} title={data?.attributes?.title} video={submit?.attributes?.video?.data?.attributes?.url} submission />
+                                            <ChallengeBox submitId={submit?.id} submit={true} image={submit?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} goal={data?.attributes?.goal} key={submit?.id} title={data?.attributes?.title} video={submit?.attributes?.video?.data?.attributes?.url} submission />
                                         ))
                                     }
                                 </InfiniteScroll>
@@ -222,8 +237,6 @@ const ChallengePage = (props: Props) => {
                         </div>
 
                         <div className='w-full max-w-[388px]'>
-
-
                             {
                                 profiless?.has(profileId) ? (
                                     <div className='w-full max-w-[388px] '>
@@ -238,16 +251,13 @@ const ChallengePage = (props: Props) => {
                                                         onChange={handleVideoChange}
                                                     />
                                                     <Label htmlFor="video" >
-                                                        <div className='rounded-[35px]  cursor-pointer mt-3 w-full gap-[12px] h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
+                                                        <div className='rounded-[35px]  cursor-pointer mt-3  w-full  h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
                                                             {t("Testing")}
                                                         </div>
                                                     </Label>
                                                 </div>
                                             )
                                         }
-
-
-
 
                                         {/* Start Recording */}
                                         {
@@ -364,11 +374,7 @@ const ChallengePage = (props: Props) => {
 
 
             {/* the comments overlay */}
-            {
-                showOverlay && (
-                    <CommentsOverlay />
-                )
-            }
+
 
         </div >
     )

@@ -1,37 +1,40 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { fetcher } from '@/lib/functions';
-import { ChallengeContext } from '@/context/ChallengeContext';
+import { CoachContext } from '@/context/CoachContext';
+import { Comment } from '@/context/types';
 
 
 
-export function useGetAcceptedChallenges() {
+export function useGetComments(id?: number) {
     const { profileId, jwt } = useContext(AuthContext)
-    const { challengeLoader } = useContext(ChallengeContext);
-    const [data, setData] = useState<any>([]);
+    const [data, setData] = useState<Comment[]>([]);
     const [allIds, setAllIds] = useState(new Set());
     const [allData, setAllData] = useState<any>();
     const [loading, setLoading] = useState<boolean>(false);
+    const [reload, setReload] = useState<boolean>(false);
     const [page, setPage] = useState(1);
     const [pageSize] = useState(25);  // Adjust the page size as needed
     const [hasMore, setHasMore] = useState(true);
 
-    const getChallenge = useCallback(async (pageNumber = 1) => {
+    const getComments = useCallback(async (pageNumber = 1) => {
+        if (!id) {
+            return
+        }
         setLoading(true);
-
+        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/comments?sort=id:DESC&filters[submitted_challenge][id][$eq]=${id}&populate[0]=client_profile.profile_pic&populate[1]=likes&populate[2]=coach&populatep[3]=player&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`
 
         const personal = await fetcher(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/challenges?sort=id:DESC&filters[accepted][id][$eq]=${profileId}&populate[0]=video&populate[1]=accepted.profile_pic&populate[2]=client_profile&populate[3]=submitted_challenges.video&populate[4]=submitted_challenges.client_profile.profile_pic&populate[5]=banner&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`,
+            url,
             {
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${jwt}`,
                 },
             }
-        )
+        );
 
         if (personal?.data) {
-            // console.log("here is the personal", personal)
             setData((prevData: any) => {
                 const idMap = new Map(prevData.map((item: any) => [item.id, item]))
 
@@ -46,28 +49,22 @@ export function useGetAcceptedChallenges() {
             setHasMore(pageNumber < personal.meta.pagination.pageCount);
             setAllData(personal);
 
-            //     const updatedSet = new Set(allIds);
-            //     await personal?.data?.map(async (dat: any) => {
-            //         updatedSet?.add(dat?.id);
-            //     });
-            //     setAllIds(updatedSet);
-
-
         }
 
         setLoading(false);
-    }, [profileId, challengeLoader, jwt, pageSize]);
+    }, [profileId, jwt, pageSize]);
+
 
     useEffect(() => {
         if (jwt && profileId && hasMore) {
-            getChallenge(page);
+            getComments(page);
         }
     }, [profileId, jwt, page, hasMore])
 
     useEffect(() => {
         setHasMore(true)
         setPage(1);
-    }, [challengeLoader])
+    }, [reload])
 
     const loadMore = () => {
         if (hasMore) {
@@ -75,5 +72,6 @@ export function useGetAcceptedChallenges() {
         }
     };
 
-    return { data, loading, allData, allIds, hasMore, loadMore };
+
+    return { data, loading, allData, allIds, reload, setReload, hasMore, loadMore };
 }
