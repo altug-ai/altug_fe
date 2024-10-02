@@ -16,13 +16,14 @@ export function useGetComments(id?: number) {
     const [page, setPage] = useState(1);
     const [pageSize] = useState(25);  // Adjust the page size as needed
     const [hasMore, setHasMore] = useState(true);
+    const [likes, setLikes] = useState<number[]>([])
 
     const getComments = useCallback(async (pageNumber = 1) => {
         if (!id) {
             return
         }
         setLoading(true);
-        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/comments?sort=id:DESC&filters[submitted_challenge][id][$eq]=${id}&populate[0]=client_profile.profile_pic&populate[1]=likes&populate[2]=coach&populatep[3]=player&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`
+        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/comments?sort=id:DESC&filters[submitted_challenge][id][$eq]=${id}&filters[coach][id][$null][$eq]=true&filters[player][id][$null][$eq]=true&populate[0]=client_profile.profile_pic&populate[1]=likes&populate[2]=coach&populate[3]=player&populate[4]=likes&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`
 
         const personal = await fetcher(
             url,
@@ -35,6 +36,8 @@ export function useGetComments(id?: number) {
         );
 
         if (personal?.data) {
+
+
             setData((prevData: any) => {
                 const idMap = new Map(prevData.map((item: any) => [item.id, item]))
 
@@ -73,5 +76,5 @@ export function useGetComments(id?: number) {
     };
 
 
-    return { data, loading, allData, allIds, reload, setReload, hasMore, loadMore };
+    return { data, loading, allData, allIds, reload, setReload, hasMore, loadMore, likes, setLikes };
 }

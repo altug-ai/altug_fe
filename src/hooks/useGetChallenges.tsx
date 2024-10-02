@@ -15,13 +15,14 @@ export function useGetChallenges(id?: string | string[]) {
     const [hasMore, setHasMore] = useState(true);
     const [allData, setAllData] = useState<any>();
     const [loading, setLoading] = useState<boolean>(false);
+    const [coach, setCoach] = useState<{ type: string, id: number }>()
 
     const getChallenge = useCallback(async (pageNumber = 1) => {
         setLoading(true);
         let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/challenges?sort=id:DESC&populate[0]=video&populate[1]=accepted.profile_pic&populate[2]=client_profile&populate[3]=submitted_challenges.video&populate[4]=submitted_challenges.client_profile.profile_pic&populate[5]=banner&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`
 
         if (id) {
-            url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/challenges/${id}?sort=id:DESC&populate[0]=video&populate[1]=accepted.profile_pic&populate[2]=client_profile&populate[3]=submitted_challenges.video&populate[4]=submitted_challenges.client_profile.profile_pic&populate[5]=banner`
+            url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/challenges/${id}?sort=id:DESC&populate[0]=video&populate[1]=accepted.profile_pic&populate[2]=client_profile&populate[3]=submitted_challenges.video&populate[4]=submitted_challenges.client_profile.profile_pic&populate[5]=banner&populate[6]=coach&populate[7]=player`
         }
 
         const personal = await fetcher(
@@ -61,6 +62,17 @@ export function useGetChallenges(id?: string | string[]) {
                 setVideoBlob(null)
                 setUrlVideo(personal?.data?.attributes?.video?.data?.attributes?.url)
                 setGoal(personal?.data?.attributes?.goal)
+                if (personal?.data?.attributes?.coach?.data?.id) {
+                    setCoach({
+                        type: "coach",
+                        id: personal?.data?.attributes?.coach?.data?.id
+                    })
+                } else if (personal?.data?.attributes?.player?.data?.id) {
+                    setCoach({
+                        type: "player",
+                        id: personal?.data?.attributes?.player?.data?.id
+                    })
+                }
             }
             setAllData(personal);
 
@@ -86,5 +98,5 @@ export function useGetChallenges(id?: string | string[]) {
         }
     };
 
-    return { data, loading, allData, allIds, loadMore, hasMore, };
+    return { data, loading, allData, allIds, loadMore, hasMore, coach };
 }

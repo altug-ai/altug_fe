@@ -152,7 +152,41 @@ function ChallengeContextProvider(props: any) {
     }, [])
 
 
-    const handleUploadChallengeVideo = async (point: string) => {
+    const handleGetComment = async (coach: {
+        type: string;
+        id: number;
+    }, desc: string) => {
+        const completion = await openai.chat.completions.create({
+            model: 'gpt-4o',
+            messages: [
+                {
+                    role: 'system',
+                    content: `based on the challenge ${header}, ${descriptionn} and ${goal}, give a short comment on the user's video description uploaded for the challenge
+                   `,
+                },
+
+                {
+                    role: "user",
+                    content: `this is the user's video description ${desc}`
+                }
+
+            ],
+            max_tokens: 1000,
+        });
+
+        if (completion?.choices?.length > 0) {
+            // console.log("the result", completion?.choices[0]?.message?.content)
+            return completion?.choices[0]?.message?.content
+        } else {
+            return false
+        }
+    }
+
+
+    const handleUploadChallengeVideo = async (point: string, coach: {
+        type: string;
+        id: number;
+    } | undefined, desc: any) => {
         setRoute(2);
         setError(false)
         try {
@@ -176,6 +210,10 @@ function ChallengeContextProvider(props: any) {
                     },
                 }
             );
+            let comment;
+            if (coach) {
+                comment = await handleGetComment(coach, desc)
+            }
 
             let profile: any;
 
@@ -223,6 +261,38 @@ function ChallengeContextProvider(props: any) {
 
             if (profile?.data?.data?.id) {
                 // update the stats and total_point in the client profile
+                if (coach) {
+                    let newData : any = {
+                        data: {
+                            client_profile: profileId,
+                            comment: comment,
+                            submitted_challenge: profile?.data?.data?.id,
+                            coach: coach.id
+                        }
+                    }
+
+                    if (coach?.type === "player") {
+                        newData = {
+                            data: {
+                                client_profile: profileId,
+                                comment: comment,
+                                submitted_challenge: profile?.data?.data?.id,
+                                player: coach.id
+                            }
+                        }
+                    }
+
+                    const submitComment = await axios.post(
+                        `${process.env.NEXT_PUBLIC_STRAPI_URL}/comments`,
+                        newData,
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${jwt}`,
+                            },
+                        }
+                    );
+                }
                 let data: any = {
                     data: {
                         total_point: (parseInt(totalPoint) + (point === "" ? 0 : point === null ? 0 : point ? parseInt(point) : 0)),
@@ -322,7 +392,10 @@ function ChallengeContextProvider(props: any) {
         return score >= minimumScore ? point : 0;
     }
 
-    const handleRetriveData = async (content: any) => {
+    const handleRetriveData = async (content: any, coach: {
+        type: string;
+        id: number;
+    } | undefined, desc: any) => {
         try {
             const fixedContent = content.replace(/\n\s*/g, "").trim();
             // Parse the content as JSON
@@ -338,7 +411,7 @@ function ChallengeContextProvider(props: any) {
             setExplanation(explanation);
 
             if (newScore !== 0) {
-                handleUploadChallengeVideo(`${newScore}`)
+                handleUploadChallengeVideo(`${newScore}`, coach, desc)
             }
             return { score, explanation };
         } catch (error) {
@@ -351,7 +424,10 @@ function ChallengeContextProvider(props: any) {
 
 
     // get the score for the submitted challenge
-    const handleDesc = async (description: string, desc?: any) => {
+    const handleDesc = async (description: string, coach?: {
+        type: string;
+        id: number;
+    } | undefined, desc?: any,) => {
 
 
         // console.log("here", description)
@@ -411,7 +487,7 @@ Score the user based on how well their uploaded video/frames description matches
 
             if (completion?.choices?.length > 0) {
                 // console.log("the result", completion?.choices[0]?.message?.content)
-                handleRetriveData(completion?.choices[0]?.message?.content)
+                handleRetriveData(completion?.choices[0]?.message?.content, coach, description)
             }
         } catch (error) {
             setError(true);
@@ -420,7 +496,12 @@ Score the user based on how well their uploaded video/frames description matches
 
 
     // get the challenge video description
-    const handleChat = async () => {
+    const handleChat = async (
+        coach: {
+            type: string;
+            id: number;
+        } | undefined
+    ) => {
         setError(false);
         const batchSize = 10; // Number of frames to process per batch
         let extractedFrames;
@@ -555,7 +636,7 @@ if the challenge involves a count, please state the count, for example do not sa
             // Now response state should be populated with descriptions
             setTimeout(() => {
                 setResponse([])
-                handleDesc(newDescription)
+                handleDesc(newDescription, coach)
             }, 2000);
 
         } catch (error) {

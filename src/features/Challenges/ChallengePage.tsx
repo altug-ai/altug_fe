@@ -37,7 +37,7 @@ const ChallengePage = (props: Props) => {
     const { toast } = useToast();
     const [openn, setOpenn] = useState<boolean>(false)
     const [loader, setLoader] = useState<boolean>(false)
-    const { data, loading: challengeLoaderr } = useGetChallenges(slug)
+    const { data, loading: challengeLoaderr, coach } = useGetChallenges(slug)
     const { data: submitted, hasMore, loadMore } = useGetSubmitted(data?.id)
     let [isOpen, setIsOpen] = useState(false)
     const searchParams = useSearchParams()
@@ -323,7 +323,7 @@ const ChallengePage = (props: Props) => {
 
             {
                 route === 1 && (
-                    <Submissionupload setRoute={setRoute} />
+                    <Submissionupload coach={coach} setRoute={setRoute} />
                 )
             }
 

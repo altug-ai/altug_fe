@@ -252,7 +252,16 @@ export type ChallengeProps = {
   descriptionn: string;
   setDescriptionn: Dispatch<SetStateAction<string>>;
   setError: Dispatch<SetStateAction<boolean>>;
-  handleUploadChallengeVideo: (point: string) => Promise<void>;
+  handleUploadChallengeVideo: (
+    point: string,
+    coach:
+      | {
+          type: string;
+          id: number;
+        }
+      | undefined,
+    desc: any
+  ) => Promise<void>;
   handleShare: (id: number) => Promise<void>;
   facingMode: string;
   setFacingMode: Dispatch<SetStateAction<string>>;
@@ -261,7 +270,14 @@ export type ChallengeProps = {
   progress: number;
   response: any[];
   setResponse: Dispatch<SetStateAction<any[]>>;
-  handleChat: () => Promise<void>;
+  handleChat: (
+    coach:
+      | {
+          type: string;
+          id: number;
+        }
+      | undefined
+  ) => Promise<void>;
   setProgress: Dispatch<SetStateAction<number>>;
   refetch: boolean;
   score: any;
@@ -322,9 +338,9 @@ export type Comment = {
   attributes: {
     comment: string;
     client_profile: { data: Profile };
-    coach: Coach;
-    player: Player;
-    likes: Profile[];
+    coach: { data: Coach };
+    player: { data: Player };
+    likes: { data: Profile[] };
     createdAt: string;
   };
   id: number;
