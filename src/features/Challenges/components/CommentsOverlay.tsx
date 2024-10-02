@@ -9,6 +9,7 @@ import axios from 'axios';
 import { AuthContext } from '@/context/AuthContext';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { IoMdClose } from "react-icons/io";
 
 type Props = {
     id?: number;
@@ -19,7 +20,7 @@ type Props = {
 }
 
 const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength }: Props) => {
-    const { data, reload, setReload, loading, hasMore, loadMore } = useGetComments(id)
+    const { data, reload, setReload, loading, hasMore, loadMore, likes, setLikes } = useGetComments(id)
     const { jwt, profileId } = useContext(AuthContext)
     const [comment, setComment] = useState<string>("")
     const [load, setLoad] = useState<boolean>(false);
@@ -94,31 +95,47 @@ const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength }: P
                             />
                         </div>
 
-
+                        <IoMdClose onClick={() => {
+                            if (setShowOverlay) {
+                                setShowOverlay(false);
+                            }
+                        }} className='text-red-500 h-[30px] w-[30px] cursor-pointer' />
 
                         <h1 className='text-[16px] font-bold leading-[17.6px] text-white'>{data?.length} {data?.length < 2 ? "Comment" : "Comments"}</h1>
-                        <div className='mt-[20px] flex flex-col h-[500px] space-y-[16px] pb-[40px]'>
-                            <ScrollArea className='w-full flex-1  max-w-[388px] text-white px-2'>
+                        <div className='mt-[20px] flex flex-col h-[500px] space-y-[16px] pb-[50px]'>
+                            <div id="scrollableDiv" style={{ overflow: "auto" }}>
 
                                 <InfiniteScroll
                                     dataLength={data.length}
                                     next={loadMore}
                                     hasMore={hasMore}
+                                    scrollableTarget="scrollableDiv"
                                     loader={
                                         <div className='max-w-[388px] w-full my-[30px] flex justify-center'>
                                             <TbLoader3 className="text-white w-10 h-10 animate-spin" />
                                         </div>
                                     }
+                                    // scrollableTarget="scrollableDiv"
                                     endMessage={<p className='text-center my-2 text-slate-400'>No more comments</p>}
                                 >
                                     {
-                                        data?.map((dat) => (
-                                            <Commentbox key={dat?.id} profile={dat?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} comment={dat?.attributes?.comment} nameHeader={dat?.attributes?.client_profile?.data?.attributes?.username} time={dat?.attributes?.createdAt} />
-                                        ))
+                                        data?.map((dat) => {
+
+
+                                            let newLikes = dat?.attributes?.likes?.data?.map((per: any) => {
+                                                return per?.id
+                                            })
+
+
+
+                                            return (
+                                                <Commentbox id={dat?.id} newlikes={newLikes} key={dat?.id} profile={dat?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} comment={dat?.attributes?.comment} nameHeader={dat?.attributes?.client_profile?.data?.attributes?.username} time={dat?.attributes?.createdAt} />
+                                            )
+                                        })
                                     }
                                 </InfiniteScroll>
                                 <div ref={scrollRef} />
-                            </ScrollArea>
+                            </div>
                         </div>
 
 
@@ -145,20 +162,18 @@ const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength }: P
                                                     <TbLoader3 className="text-white w-6 h-6 animate-spin" />
                                                 ) : <Image src={"/profile/send.png"} alt='send icon' width={500} height={500} className={`h-[20px] w-[20px] cursor-pointer `} />
                                             }
-
                                         </button>
                                     </div>
 
                                 </form>
                             </div>
-
                         </div>
 
                     </div>
                 </div>
 
             </div>
-        </div>
+        </div >
 
     )
 }

@@ -49,7 +49,7 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
     useEffect(() => {
         async function getComments() {
             setLoading(true);
-            let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/comments?sort=id:ASC&filters[submitted_challenge][id][$eq]=${submitId}&populate[0]=client_profile.profile_pic&populate[1]=likes&populate[2]=coach&populatep[3]=player&pagination[pageSize]=${1}`
+            let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/comments?sort=id:ASC&filters[submitted_challenge][id][$eq]=${submitId}&filters[$or][0][coach][id][$notNull][$eq]=true&filters[$or][1][player][id][$notNull][$eq]=true&populate[0]=client_profile.profile_pic&populate[1]=likes&populate[2]=coach.profile&populate[3]=player.profile&pagination[pageSize]=${1}`
 
             const personal = await fetcher(
                 url,
@@ -188,7 +188,11 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                             }
                             {
                                 data?.map((dat) => (
-                                    <FirstCommentBox key={dat?.id} profile={dat?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} comment={dat?.attributes?.comment} nameHeader={dat?.attributes?.client_profile?.data?.attributes?.username} />
+                                    <FirstCommentBox coach key={dat?.id} profile={
+                                        dat?.attributes?.coach?.data?.id ?
+                                            dat?.attributes?.coach?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.coach?.data?.attributes?.pic_url ?? "/profile/unknownp.png" :
+                                            dat?.attributes?.player?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.player?.data?.attributes?.pic_url ?? "/profile/unknownp.png"
+                                    } comment={dat?.attributes?.comment} nameHeader={dat?.attributes?.coach?.data?.attributes?.name} />
                                 ))
                             }
 
