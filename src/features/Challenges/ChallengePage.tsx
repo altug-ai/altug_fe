@@ -329,7 +329,7 @@ const ChallengePage = (props: Props) => {
 
             {
                 route === 2 && (
-                    <SubmissionLoad image={data?.attributes?.banner?.data?.attributes?.url} accepted={data?.attributes?.accepted?.data} description={data?.attributes?.description} goal={data?.attributes?.goal} title={data?.attributes?.title} setRoute={setRoute} />
+                    <SubmissionLoad coach={coach} image={data?.attributes?.banner?.data?.attributes?.url} accepted={data?.attributes?.accepted?.data} description={data?.attributes?.description} goal={data?.attributes?.goal} title={data?.attributes?.title} setRoute={setRoute} />
                 )
             }
 

@@ -10,10 +10,14 @@ type Props = {
     title?: string;
     image?: string;
     accepted?: any;
+    coach: {
+        type: string;
+        id: number;
+    } | undefined
 }
 
 
-const SubmissionLoad = ({ setRoute, description, goal, accepted, title, image }: Props) => {
+const SubmissionLoad = ({ setRoute, description, goal, accepted, title, image, coach }: Props) => {
     const { videoUrl, error, handleUploadChallengeVideo, progress, score, explanation, handleChat, point, setExplanation } = useContext(ChallengeContext)
     const t = useTranslations('Home.ChallengePage');
 
@@ -89,7 +93,9 @@ const SubmissionLoad = ({ setRoute, description, goal, accepted, title, image }:
             {
                 error ? (
                     <div className='w-full max-w-[388px] fixed bottom-[15%] '>
-                        <div onClick={handleChat} className='rounded-[35px]  cursor-pointer mt-3 w-full gap-[12px] h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
+                        <div onClick={() => {
+                            handleChat(coach);
+                        }} className='rounded-[35px]  cursor-pointer mt-3 w-full gap-[12px] h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
                             {t("Again")}
                         </div>
                         <h1 className='text-[12px] text-center  leading-[16.24px] font-medium text-white'>{t("Incomplete")}</h1>

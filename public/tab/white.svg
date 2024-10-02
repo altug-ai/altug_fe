@@ -1,0 +1,10 @@
+<svg width="43" height="43" viewBox="0 0 43 43" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Logo">
+<rect id="Mask" width="43" height="43" rx="21.5" fill="#E7EDF3"/>
+<mask id="mask0_2018_734" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="43" height="43">
+<rect id="Mask_2" width="43" height="43" rx="21.5" fill="white"/>
+</mask>
+<g mask="url(#mask0_2018_734)">
+</g>
+</g>
+</svg>

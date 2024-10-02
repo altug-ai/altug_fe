@@ -126,8 +126,6 @@ const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength }: P
                                                 return per?.id
                                             })
 
-
-
                                             return (
                                                 <Commentbox id={dat?.id} newlikes={newLikes} key={dat?.id} profile={dat?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} comment={dat?.attributes?.comment} nameHeader={dat?.attributes?.client_profile?.data?.attributes?.username} time={dat?.attributes?.createdAt} />
                                             )
