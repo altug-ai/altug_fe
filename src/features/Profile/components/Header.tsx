@@ -15,7 +15,7 @@ const Header = (props: Props) => {
     const { data, loading } = useGetNotViewed()
 
     return (
-        <div className='flex w-full max-w-[388px] items-center justify-between'>
+        <div className='flex w-full max-w-[388px] items-center justify-between mb-[32px]'>
             <div onClick={() => {
                 router.push("/profile")
             }} className='flex space-x-3 items-center'>
@@ -39,8 +39,11 @@ const Header = (props: Props) => {
                     </h1>
                 </div>
 
-                <div className='  h-[72.7px] w-[68.94px] bg-cover flex flex-col items-center justify-center' style={{ backgroundImage: 'url("/profile/Number.png")' }}>
-                    <h1 className='font-semibold text-[20px] font-clash leading-[12.54px] text-white'>{totalPoint ?? 0}</h1>
+                <div onClick={() => {
+                    router.push("/wallet")
+                }} className='bg-white rounded-[21.5px] cursor-pointer py-[8px] px-[8px] flex space-x-2 items-center'>
+                    <Image src={"/tab/lay.svg"} className="w-[26px] h-[26px]" alt='wallet' width={500} height={500} />
+                    <h1 className='text-black text-[15px] font-bold leading-[12.546px]'>55 $Pro</h1>
                 </div>
             </div>
         </div>

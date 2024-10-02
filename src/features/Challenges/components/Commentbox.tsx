@@ -53,9 +53,9 @@ const Commentbox = ({ nameHeader, time, comment, profile, newlikes, id }: Props)
         } catch (error) {
             console.error(error);
         }
-
     }
 
+    
     const handleCommentDislike = async () => {
         let newLike = likes?.filter((like) => {
             like !== profileId
@@ -120,8 +120,6 @@ const Commentbox = ({ nameHeader, time, comment, profile, newlikes, id }: Props)
                     </h1>
                 </div>
             </div>
-
-
         </div>
     )
 }
