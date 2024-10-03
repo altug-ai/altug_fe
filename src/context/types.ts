@@ -345,3 +345,12 @@ export type Comment = {
   };
   id: number;
 };
+
+export type Task = {
+  attributes: {
+    title: string;
+    reward: number;
+    period: string;
+  };
+  id: number;
+};
