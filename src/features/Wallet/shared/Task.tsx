@@ -5,9 +5,11 @@ type Props = {
     claim?: boolean;
     join?: boolean;
     completed?: boolean;
+    title?: string;
+    number?: number;
 }
 
-const Task = ({ claim, join, completed }: Props) => {
+const Task = ({ claim, join, completed, title, number }: Props) => {
     return (
         <div style={{
             boxShadow: "0px 2px 48px 0px rgba(0, 0, 0, 0.04)"
@@ -17,8 +19,8 @@ const Task = ({ claim, join, completed }: Props) => {
                 <Image alt='The image' width={500} height={500} src="/tab/white.svg" className='w-[43px] h-[43px] rounded-full' />
 
                 <div className='flex flex-col space-y-[8px]'>
-                    <h1 className='text-white text-[14px] font-bold leading-normal font-plus'>Defense challenge</h1>
-                    <h1 className='text-[#737883] text-[12px] font-normal leading-normal font-plus'>0.5 $Pro Token</h1>
+                    <h1 className='text-white text-[14px] font-bold leading-normal font-plus'>{title ?? "Defense challenge"}</h1>
+                    <h1 className='text-[#737883] text-[12px] font-normal leading-normal font-plus'>{number ?? "0.5"} $Pro Token</h1>
                 </div>
             </div>
 
@@ -43,7 +45,7 @@ const Task = ({ claim, join, completed }: Props) => {
             {
                 completed && (
                     <div>
-                        <Image src="/tab/markT.png" width={500} height={500} alt='mark' className='w-[28px] h-[27px]'/>
+                        <Image src="/tab/markT.png" width={500} height={500} alt='mark' className='w-[28px] h-[27px]' />
                     </div>
                 )
             }
