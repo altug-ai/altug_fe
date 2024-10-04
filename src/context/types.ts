@@ -1,5 +1,5 @@
-import { Current, FormIndex } from '@/features/Onboarding/lib/types';
-import { Dispatch, MutableRefObject, SetStateAction } from 'react';
+import { Current, FormIndex } from "@/features/Onboarding/lib/types";
+import { Dispatch, MutableRefObject, SetStateAction } from "react";
 
 export type AuthProps = {
   jwt?: string | null;
@@ -182,12 +182,15 @@ interface ProfileAttributes {
   DOB?: string | null;
   height?: string | null;
   weight?: string | null;
-  foot?: ['right', 'left', 'both'] | null;
+  foot?: ["right", "left", "both"] | null;
   rank?: string | null;
   preference?: any;
-  role?: ['player', 'coach'];
+  role?: ["player", "coach"];
   profile_pic?: any;
   country?: string | null;
+  privateKey?: string | null;
+  smartAccountAddress?: string | null;
+  isWalletDeployed?: boolean | null;
 }
 
 export interface UserData {
@@ -208,7 +211,7 @@ export type Profile = {
   attributes: ProfileAttributes;
 };
 
-export type Tier = undefined | '' | 'free' | 'premium';
+export type Tier = undefined | "" | "free" | "premium";
 export type CoachProps = {
   coachLoader: boolean;
   setCoachLoader: Dispatch<SetStateAction<boolean>>;
