@@ -16,6 +16,7 @@ export function useGetAcceptedChallenges() {
     const [pageSize] = useState(25);  // Adjust the page size as needed
     const [hasMore, setHasMore] = useState(true);
 
+    
     const getChallenge = useCallback(async (pageNumber = 1) => {
         setLoading(true);
 
