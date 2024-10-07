@@ -20,7 +20,7 @@ type Props = {
 }
 
 const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength }: Props) => {
-    const { data, reload, setReload, loading, hasMore, loadMore, likes, setLikes } = useGetComments(id)
+    const { data, reload, setReload, loading, hasMore, loadMore, likes, setLikes, setData } = useGetComments(id)
     const { jwt, profileId } = useContext(AuthContext)
     const [comment, setComment] = useState<string>("")
     const [load, setLoad] = useState<boolean>(false);
@@ -126,8 +126,25 @@ const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength }: P
                                                 return per?.id
                                             })
 
+                                            let profile = dat?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url
+                                            let nameHeader = dat?.attributes?.client_profile?.data?.attributes?.username
+                                            let coachId = dat?.attributes?.coach?.data?.id;
+                                            let coach = false
+                                            if (!coachId) {
+                                                coachId = dat?.attributes?.player?.data?.id
+                                                if (coachId) {
+                                                    profile = dat?.attributes?.player?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.player?.data?.attributes?.pic_url ?? "/profile/unknownp.png";
+                                                    nameHeader = dat?.attributes?.player?.data?.attributes?.name;
+                                                    coach = true;
+                                                }
+                                            } else {
+                                                profile = dat?.attributes?.coach?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.coach?.data?.attributes?.pic_url ?? "/profile/unknownp.png";
+                                                nameHeader = dat?.attributes?.coach?.data?.attributes?.name;
+                                                coach = true;
+                                            }
+
                                             return (
-                                                <Commentbox id={dat?.id} newlikes={newLikes} key={dat?.id} profile={dat?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} comment={dat?.attributes?.comment} nameHeader={dat?.attributes?.client_profile?.data?.attributes?.username} time={dat?.attributes?.createdAt} />
+                                                <Commentbox coach={coach} id={dat?.id} newlikes={newLikes} key={dat?.id} profile={profile} comment={dat?.attributes?.comment} nameHeader={nameHeader} time={dat?.attributes?.createdAt} />
                                             )
                                         })
                                     }

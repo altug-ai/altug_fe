@@ -192,7 +192,9 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                                         dat?.attributes?.coach?.data?.id ?
                                             dat?.attributes?.coach?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.coach?.data?.attributes?.pic_url ?? "/profile/unknownp.png" :
                                             dat?.attributes?.player?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.player?.data?.attributes?.pic_url ?? "/profile/unknownp.png"
-                                    } comment={dat?.attributes?.comment} nameHeader={dat?.attributes?.coach?.data?.attributes?.name} />
+                                    } comment={dat?.attributes?.comment} nameHeader={dat?.attributes?.coach?.data?.id ?
+                                        dat?.attributes?.coach?.data?.attributes?.name :
+                                        dat?.attributes?.player?.data?.attributes?.name} />
                                 ))
                             }
 

@@ -15,7 +15,7 @@ const Tasks = (props: Props) => {
   const { data: dat, loading: load } = useGetClaimedTasks()
   const { data: dataa, loading: loader } = useGetDoneTasks()
   const { profileId } = useContext(AuthContext);
- 
+
   // console.log("the dat", dataa)
   return (
     <div className="max-w-[388px] w-full pb-[50px]">
@@ -61,6 +61,7 @@ const Tasks = (props: Props) => {
         }
       }).map((dat) => (
         <Task
+          challengeId={dat?.attributes?.challenge?.data?.id}
           number={dat?.attributes?.reward}
           title={dat?.attributes?.title}
           key={dat.id}
