@@ -1,5 +1,5 @@
-import { Current, FormIndex } from "@/features/Onboarding/lib/types";
-import { Dispatch, MutableRefObject, SetStateAction } from "react";
+import { Current, FormIndex } from '@/features/Onboarding/lib/types';
+import { Dispatch, MutableRefObject, SetStateAction } from 'react';
 
 export type AuthProps = {
   jwt?: string | null;
@@ -74,6 +74,8 @@ export type LeaderboardProps = {
   data: any;
   setleague: Dispatch<SetStateAction<string>>;
   league: string;
+  reload: boolean;
+  setReload: Dispatch<SetStateAction<boolean>>;
 };
 
 export type Coaches = {
@@ -182,10 +184,10 @@ interface ProfileAttributes {
   DOB?: string | null;
   height?: string | null;
   weight?: string | null;
-  foot?: ["right", "left", "both"] | null;
+  foot?: ['right', 'left', 'both'] | null;
   rank?: string | null;
   preference?: any;
-  role?: ["player", "coach"];
+  role?: ['player', 'coach'];
   profile_pic?: any;
   country?: string | null;
   privateKey?: string | null;
@@ -211,7 +213,7 @@ export type Profile = {
   attributes: ProfileAttributes;
 };
 
-export type Tier = undefined | "" | "free" | "premium";
+export type Tier = undefined | '' | 'free' | 'premium';
 export type CoachProps = {
   coachLoader: boolean;
   setCoachLoader: Dispatch<SetStateAction<boolean>>;
@@ -354,6 +356,7 @@ export type Task = {
     title: string;
     reward: number;
     period: string;
+    claimed: any[];
   };
   id: number;
 };

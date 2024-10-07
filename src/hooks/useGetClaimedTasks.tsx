@@ -6,7 +6,7 @@ import { LeaderboardContext } from '@/context/LeaderboardContext';
 
 
 
-export function useGetTasks() {
+export function useGetClaimedTasks() {
     const { profileId, jwt } = useContext(AuthContext)
     const [data, setData] = useState<Task[]>([]);
     const [allIds, setAllIds] = useState(new Set());
@@ -22,7 +22,7 @@ export function useGetTasks() {
     const getComments = useCallback(async (pageNumber = 1) => {
 
         setLoading(true);
-        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/tasks?populate[0]=completed`
+        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/tasks?filters[completed][id][$eq]=${profileId}&filters[claimed][$containsi]=${`"id": "${profileId}"`}`
 
         const personal = await fetcher(
             url,

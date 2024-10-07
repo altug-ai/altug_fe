@@ -10,12 +10,16 @@ import { getBalance } from "@/wallet/getBalance";
 import { claimReward } from "@/wallet/claimReward";
 import { AuthContext } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import axios from "axios";
+import { LeaderboardContext } from "@/context/LeaderboardContext";
 type Props = {};
 
 const Wallet = (props: Props) => {
   const [tab, setTab] = useState<number>(0);
   const { loading, profile } = useContext(AuthContext);
   const [balance, setBalance] = useState("");
+  const { profileId, jwt } = useContext(AuthContext);
+  const { setReload: setR, reload: re } = useContext(LeaderboardContext)
 
   const adminPrivateKey =
     "3cdbb6228da5a7785c5826cee0e5f84e0ede6a1fd612e11c8d22ecd74fab9d59";
@@ -29,7 +33,7 @@ const Wallet = (props: Props) => {
     }
   }
 
-  async function handleClaim(amount: any, setLoading: any) {
+  async function handleClaim(amount: any, setLoading: any, id: number) {
     setLoading(true);
     const res = await claimReward(
       adminPrivateKey,
@@ -46,6 +50,27 @@ const Wallet = (props: Props) => {
       });
     } else {
       await _getBalance();
+      const data = {
+        data: {
+          claimed: [
+            {
+              "id": `${profileId}`
+            }
+          ]
+        },
+      };
+
+      const updateNots = await axios.put(
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/tasks/${id}`,
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+      setR(!re)
       toast({
         variant: "destructive",
         description: "Reward Claimed Successfully",

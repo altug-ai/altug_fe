@@ -1,4 +1,7 @@
 "use client";
+import { AuthContext } from "@/context/AuthContext";
+import { LeaderboardContext } from "@/context/LeaderboardContext";
+import axios from "axios";
 import Image from "next/image";
 import React, { useContext, useState } from "react";
 import { TbLoader3 } from "react-icons/tb";
@@ -10,6 +13,7 @@ type Props = {
   title?: string;
   number?: number;
   handleClaim?: any;
+  id: number;
 };
 
 const Task = ({
@@ -19,8 +23,45 @@ const Task = ({
   title,
   number,
   handleClaim,
+  id
 }: Props) => {
   const [loading, setLoading] = useState(false);
+  const [loader, setLoader] = useState<boolean>(false);
+  const { profileId, jwt } = useContext(AuthContext);
+  const { setReload: setR, reload: re } = useContext(LeaderboardContext)
+
+  const handleJoinTask = async () => {
+    try {
+      setLoader(true)
+      const data = {
+        data: {
+          completed: {
+            connect: [profileId],
+          },
+        },
+      };
+
+      const updateNots = await axios.put(
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/tasks/${id}`,
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+
+      setR(!re)
+      setLoader(false);
+      return updateNots
+    } catch (error) {
+      setLoader(false)
+      console.error(error);
+    }
+
+  }
+
   return (
     <div
       style={{
@@ -54,7 +95,7 @@ const Task = ({
           ) : (
             <div
               className="rounded-[47px] bg-[#357EF8] px-[24px] py-[6px] text-white text-[12px] font-medium"
-              onClick={() => handleClaim("0.1", setLoading)}
+              onClick={() => handleClaim(`${number}`, setLoading, id)}
             >
               claim
             </div>
@@ -63,9 +104,18 @@ const Task = ({
       )}
 
       {join && (
-        <div className="rounded-[47px] bg-[#28B446] px-[24px] py-[6px] text-white text-[12px] font-medium">
-          Join
-        </div>
+        <>
+          {loader ? (
+            <TbLoader3 className="rounded-[47px] bg-[#357EF8] mr-6 text-white text-[12px] w-7 h-7 animate-spin" />
+          ) : (
+            <div
+              className="rounded-[47px] bg-[#357EF8] px-[24px] py-[6px] text-white text-[12px] font-medium"
+              onClick={() => handleJoinTask()}
+            >
+              Join
+            </div>
+          )}
+        </>
       )}
 
       {completed && (
