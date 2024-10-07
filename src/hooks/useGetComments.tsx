@@ -23,7 +23,7 @@ export function useGetComments(id?: number) {
             return
         }
         setLoading(true);
-        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/comments?sort=id:DESC&filters[submitted_challenge][id][$eq]=${id}&filters[coach][id][$null][$eq]=true&filters[player][id][$null][$eq]=true&populate[0]=client_profile.profile_pic&populate[1]=likes&populate[2]=coach&populate[3]=player&populate[4]=likes&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`
+        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/comments?sort=id:ASC&filters[submitted_challenge][id][$eq]=${id}&populate[0]=client_profile.profile_pic&populate[1]=likes&populate[2]=coach&populate[3]=player&populate[4]=likes&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`
 
         const personal = await fetcher(
             url,
@@ -76,5 +76,5 @@ export function useGetComments(id?: number) {
     };
 
 
-    return { data, loading, allData, allIds, reload, setReload, hasMore, loadMore, likes, setLikes };
+    return { data, loading, allData, allIds, reload, setReload, hasMore, loadMore, likes, setLikes, setData };
 }

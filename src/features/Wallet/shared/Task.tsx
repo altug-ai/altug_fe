@@ -5,6 +5,7 @@ import axios from "axios";
 import Image from "next/image";
 import React, { useContext, useState } from "react";
 import { TbLoader3 } from "react-icons/tb";
+import { useRouter } from "next/navigation";
 
 type Props = {
   claim?: boolean;
@@ -14,6 +15,7 @@ type Props = {
   number?: number;
   handleClaim?: any;
   id: number;
+  challengeId?: number;
 };
 
 const Task = ({
@@ -23,8 +25,10 @@ const Task = ({
   title,
   number,
   handleClaim,
-  id
+  id,
+  challengeId
 }: Props) => {
+  const router = useRouter()
   const [loading, setLoading] = useState(false);
   const [loader, setLoader] = useState<boolean>(false);
   const { profileId, jwt } = useContext(AuthContext);
@@ -109,8 +113,11 @@ const Task = ({
             <TbLoader3 className="rounded-[47px] bg-[#357EF8] mr-6 text-white text-[12px] w-7 h-7 animate-spin" />
           ) : (
             <div
-              className="rounded-[47px] bg-[#357EF8] px-[24px] py-[6px] text-white text-[12px] font-medium"
-              onClick={() => handleJoinTask()}
+              className="rounded-[47px] cursor-pointer bg-[#357EF8] px-[24px] py-[6px] text-white text-[12px] font-medium"
+              onClick={() => {
+                router.push(`/challenge/${challengeId}`)
+                // handleJoinTask()
+              }}
             >
               Join
             </div>

@@ -11,7 +11,8 @@ type Props = {
     comment: string;
     profile: string;
     newlikes: number[];
-    id: number
+    id: number;
+    coach?: boolean;
 }
 const TimeAgo = (timestamp: any) => {
     const timeAgo = formatDistanceToNow(new Date(timestamp), { addSuffix: true });
@@ -19,7 +20,7 @@ const TimeAgo = (timestamp: any) => {
     return timeAgo
 };
 
-const Commentbox = ({ nameHeader, time, comment, profile, newlikes, id }: Props) => {
+const Commentbox = ({ nameHeader, time, comment, profile, newlikes, id, coach }: Props) => {
     const { profileId, jwt } = useContext(AuthContext)
     const [likes, setLikes] = useState<number[]>(newlikes)
 
@@ -55,7 +56,7 @@ const Commentbox = ({ nameHeader, time, comment, profile, newlikes, id }: Props)
         }
     }
 
-    
+
     const handleCommentDislike = async () => {
         let newLike = likes?.filter((like) => {
             like !== profileId
@@ -95,9 +96,16 @@ const Commentbox = ({ nameHeader, time, comment, profile, newlikes, id }: Props)
             </div>
 
             {/* the name and the left */}
-            <div className='flex flex-col space-y-[4px]'>
+            <div className='flex flex-col space-y-[4px] max-w-[80%]'>
                 <div className='flex items-center space-x-[3px]'>
                     <h1 className='text-[12px] leading-[19.2px] font-normal text-white'>{nameHeader} • {TimeAgo(time)}</h1>
+                    {
+                        coach && (
+                            <div className='px-[8px] py-[1px] rounded-[8px] bg-[#EAFF62] text-black text-[12px] leading-[15.12px] font-medium font-plus'>
+                                Coach
+                            </div>
+                        )
+                    }
                 </div>
                 <h1 className='text-[14px] leading-[21px] font-normal text-white'>{comment}</h1>
 

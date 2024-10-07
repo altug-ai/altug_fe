@@ -357,6 +357,16 @@ export type Task = {
     reward: number;
     period: string;
     claimed: any[];
+    challenge: {
+      data: {
+        attributes: {
+          title: string;
+          description: string;
+          goal: string;
+        };
+        id: number;
+      };
+    };
   };
   id: number;
 };

@@ -22,7 +22,7 @@ export function useGetDoneTasks() {
     const getComments = useCallback(async (pageNumber = 1) => {
 
         setLoading(true);
-        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/tasks?filters[completed][id][$eq]=${profileId}&populate[0]=completed&populate[1]=claimed`
+        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/tasks?filters[completed][id][$eq]=${profileId}&populate[0]=completed&populate[1]=claimed&populate[2]=challenge`
 
         const personal = await fetcher(
             url,
