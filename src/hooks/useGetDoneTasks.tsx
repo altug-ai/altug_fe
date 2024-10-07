@@ -53,6 +53,7 @@ export function useGetDoneTasks() {
 
         }
 
+        
         setLoading(false);
     }, [profileId, jwt, pageSize]);
 
