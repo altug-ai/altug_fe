@@ -8,6 +8,7 @@ import Transfer from "./components/Transfer";
 import Success from "./components/Success";
 import { getBalance } from "@/wallet/getBalance";
 import { claimReward } from "@/wallet/claimReward";
+import { encryptPrivateKey, decryptPrivateKey } from "@/wallet/encrypt";
 import { AuthContext } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 type Props = {};
@@ -16,23 +17,31 @@ const Wallet = (props: Props) => {
   const [tab, setTab] = useState<number>(0);
   const { loading, profile } = useContext(AuthContext);
   const [balance, setBalance] = useState("");
+  const [receipentAddress, setReceipentAddress] = useState("");
+  const [transferAmount, setTransferAmount] = useState("");
 
-  const adminPrivateKey =
-    "3cdbb6228da5a7785c5826cee0e5f84e0ede6a1fd612e11c8d22ecd74fab9d59";
   const { toast } = useToast();
 
   async function _getBalance() {
-    const _balance: any = await getBalance(profile?.attributes?.privateKey);
+    try {
+      const privateKey = await decryptPrivateKey(
+        profile?.attributes?.privateKey,
+        profile?.attributes?.smartAccountAddress
+      );
+      const _balance: any = await getBalance(privateKey);
 
-    if (_balance?.length) {
-      setBalance(_balance[_balance.length - 1]?.formattedAmount || "0");
+      if (_balance?.length) {
+        setBalance(_balance[_balance.length - 1]?.formattedAmount || "0");
+      } else setBalance("0");
+    } catch (error) {
+      console.log("error is ", error);
+      setBalance("0");
     }
   }
 
   async function handleClaim(amount: any, setLoading: any) {
     setLoading(true);
     const res = await claimReward(
-      adminPrivateKey,
       profile?.attributes?.smartAccountAddress,
       amount
     );
@@ -54,6 +63,7 @@ const Wallet = (props: Props) => {
     setLoading(false);
   }
 
+  function handleGoBackToHome() {}
   useEffect(() => {
     profile && _getBalance();
   }, [profile]);
@@ -61,6 +71,29 @@ const Wallet = (props: Props) => {
   return (
     <div className="py-[20px] px-[20px] h-full flex flex-col items-center ">
       <Header setTab={setTab} tab={tab} />
+      <button
+        onClick={async () => {
+          // withdrawFund(
+          //   profile?.attributes?.privateKey,
+          //   "0xaFc53BBD1816A0EA9bda0Dcc7F94CbcEc0D4A73A",
+          //   "0.16"
+          // );
+          const _encryptedPrivateKey = await encryptPrivateKey(
+            "Shamail",
+            "abbas"
+          );
+
+          console.log("encryptPrivateKey is ", _encryptedPrivateKey);
+
+          const decryptedPrivateKey = await decryptPrivateKey(
+            _encryptedPrivateKey,
+            "abbas"
+          );
+          console.log("decryptPrivateKey is ", decryptedPrivateKey);
+        }}
+      >
+        Withdraw
+      </button>
       {tab === 0 && (
         <>
           <div className="max-w-[388px] w-full">
@@ -70,9 +103,25 @@ const Wallet = (props: Props) => {
         </>
       )}
 
-      {tab == 1 && <Transfer setTab={setTab} />}
+      {tab == 1 && (
+        <Transfer
+          setTab={setTab}
+          setReceipentAddress={setReceipentAddress}
+          receipentAddress={receipentAddress}
+          setTransferAmount={setTransferAmount}
+          transferAmount={transferAmount}
+          balance={balance}
+          _getBalance={_getBalance}
+        />
+      )}
 
-      {tab == 2 && <Success />}
+      {tab == 2 && (
+        <Success
+          receipentAddress={receipentAddress}
+          transferAmount={transferAmount}
+          handleGoBackToHome={handleGoBackToHome}
+        />
+      )}
 
       <TabBar page="profile" />
     </div>
