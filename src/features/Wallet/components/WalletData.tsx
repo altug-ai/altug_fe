@@ -40,7 +40,12 @@ const WalletData = ({ setTab, balance }: Props) => {
       </div>
 
       <div className="w-[50%] flex flex-col space-y-[8px] ">
-        <div className="w-full cursor-pointer hover:scale-x-105 rounded-[16px] bg-[#EDEDED] px-[16px] py-[16px] h-[50%] grid place-content-center">
+        <div
+          className="w-full cursor-pointer hover:scale-x-105 rounded-[16px] bg-[#EDEDED] px-[16px] py-[16px] h-[50%] grid place-content-center"
+          onClick={() => {
+            setTab(3);
+          }}
+        >
           <div className="flex items-center space-x-[12px]">
             <Image
               className="w-[42px] h-[42px]"

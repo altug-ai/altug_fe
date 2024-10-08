@@ -11,6 +11,7 @@ import { claimReward } from "@/wallet/claimReward";
 import { encryptPrivateKey, decryptPrivateKey } from "@/wallet/encrypt";
 import { AuthContext } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import Deposite from "./components/Deposite";
 type Props = {};
 
 const Wallet = (props: Props) => {
@@ -71,29 +72,7 @@ const Wallet = (props: Props) => {
   return (
     <div className="py-[20px] px-[20px] h-full flex flex-col items-center ">
       <Header setTab={setTab} tab={tab} />
-      <button
-        onClick={async () => {
-          // withdrawFund(
-          //   profile?.attributes?.privateKey,
-          //   "0xaFc53BBD1816A0EA9bda0Dcc7F94CbcEc0D4A73A",
-          //   "0.16"
-          // );
-          const _encryptedPrivateKey = await encryptPrivateKey(
-            "Shamail",
-            "abbas"
-          );
 
-          console.log("encryptPrivateKey is ", _encryptedPrivateKey);
-
-          const decryptedPrivateKey = await decryptPrivateKey(
-            _encryptedPrivateKey,
-            "abbas"
-          );
-          console.log("decryptPrivateKey is ", decryptedPrivateKey);
-        }}
-      >
-        Withdraw
-      </button>
       {tab === 0 && (
         <>
           <div className="max-w-[388px] w-full">
@@ -120,6 +99,12 @@ const Wallet = (props: Props) => {
           receipentAddress={receipentAddress}
           transferAmount={transferAmount}
           handleGoBackToHome={handleGoBackToHome}
+        />
+      )}
+      {tab == 3 && (
+        <Deposite
+          receipentAddress={profile?.attributes?.smartAccountAddress}
+          setTab={setTab}
         />
       )}
 

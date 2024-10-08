@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@biconomy/account": "^4.5.6",
     "@ffmpeg/ffmpeg": "^0.12.10",
     "@headlessui/react": "^2.1.0",
     "@hookform/resolvers": "^3.6.0",
@@ -28,10 +29,12 @@
     "canvas": "^2.11.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "copy-to-clipboard": "^3.3.3",
     "countries-list": "^3.1.0",
     "date-fns": "^4.1.0",
     "elevenlabs": "^0.15.0",
     "embla-carousel-react": "^8.1.6",
+    "ethers": "^5.7.2",
     "ffmpeg": "^0.0.4",
     "fs": "^0.0.1-security",
     "i18next": "^23.12.1",
@@ -60,11 +63,9 @@
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^10.0.0",
+    "viem": "^2.21.16",
     "workerjs": "^0.1.1",
-    "zod": "^3.23.8",
-    "@biconomy/account": "^4.5.6",
-    "ethers": "^5.7.2",
-    "viem": "^2.21.16"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20",
