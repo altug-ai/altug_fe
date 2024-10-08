@@ -8,13 +8,13 @@ const openai = new OpenAI({
   apiKey: process.env.OPEN_API_KEY || '',
 });
 
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '100mb', // Adjust the size as needed
-    },
-  },
-};
+// export const config = {
+//   api: {
+//     bodyParser: {
+//       sizeLimit: '100mb', // Adjust the size as needed
+//     },
+//   },
+// };
 
 export async function POST(req: NextRequest) {
   const userSession: any = await getServerSession(authOptions);
