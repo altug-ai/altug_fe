@@ -11,14 +11,12 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { AuthContext } from "./AuthContext";
 import { ChallengeProps } from "./types";
 import { usePathname } from 'next/navigation'
+import { fetcher } from "@/lib/functions";
 
 // @ts-ignore
 export const ChallengeContext = createContext<ChallengeProps>({});
 
-const openai = new OpenAI({
-    apiKey: process.env.NEXT_PUBLIC_OPEN_API_KEY || "",
-    dangerouslyAllowBrowser: true,
-});
+
 
 function ChallengeContextProvider(props: any) {
     const [challengeLoader, setChallengeLoader] = useState<boolean>(false)
@@ -156,23 +154,29 @@ function ChallengeContextProvider(props: any) {
         type: string;
         id: number;
     }, desc: string) => {
-        const completion = await openai.chat.completions.create({
-            model: 'gpt-4o',
-            messages: [
-                {
-                    role: 'system',
-                    content: `based on the challenge ${header}, ${descriptionn} and ${goal}, give a short comment on the user's video description uploaded for the challenge
-                   `,
-                },
 
-                {
-                    role: "user",
-                    content: `this is the user's video description ${desc}`
-                }
+        let batch = [
+            {
+                role: 'system',
+                content: `based on the challenge ${header}, ${descriptionn} and ${goal}, give a short comment on the user's video description uploaded for the challenge
+               `,
+            },
 
-            ],
-            max_tokens: 1000,
+            {
+                role: "user",
+                content: `this is the user's video description ${desc}`
+            }
+
+        ]
+
+        const completion = await fetcher('/api/get-comment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ batch: batch }),
         });
+
 
         if (completion?.choices?.length > 0) {
             // console.log("the result", completion?.choices[0]?.message?.content)
@@ -262,7 +266,7 @@ function ChallengeContextProvider(props: any) {
             if (profile?.data?.data?.id) {
                 // update the stats and total_point in the client profile
                 if (coach) {
-                    let newData : any = {
+                    let newData: any = {
                         data: {
                             client_profile: profileId,
                             comment: comment,
@@ -456,14 +460,11 @@ function ChallengeContextProvider(props: any) {
 
             let duration: any = await getDuration(videoUrl);
 
-
-            const completion = await openai.chat.completions.create({
-                model: 'gpt-4o',
-                messages: [
-                    {
-                        role: 'system',
-                        content: `
-                       You are a challenge scorer responsible for evaluating user-uploaded videos based on the goal and header of the challenge. The title of the challenge is "${header}" with the description: "${descriptionn}" and the goal : "${goal}". The maximum points for this challenge are ${point}.
+            let batch = [
+                {
+                    role: 'system',
+                    content: `
+       You are a challenge scorer responsible for evaluating user-uploaded videos based on the goal and header of the challenge. The title of the challenge is "${header}" with the description: "${descriptionn}" and the goal : "${goal}". The maximum points for this challenge are ${point}.
 
 You have been provided with a sequence of frame descriptions, where each frame (ignoring IDs or frame number) details what happens next in the video. The frames are part of a larger video, and they represent a continuous sequence with no change in scene or participants. Your task is to ensure the user's video aligns with the challenge requirements.
 if the goal/desciption involves counting then look at the number of times the action is performed in the provided frames description to count. 
@@ -473,17 +474,23 @@ For example, if the challenge is for dribbling and the user is just juggling, th
 Check if the actions  align with the overall goal/description of the challenge. 
 Also note that the user can start or do the challenge at any part of the video, just look through and check for the user doing the actual challenge, ignore any activities done that does not include the challenge, any activities that does not involve the challenge should be ignored, just make sure the user eventually does the challenge
 Score the user based on how well their uploaded video/frames description matches the challenge header, description, and goal. The maximum score achievable for this challenge is ${point} points.when returning the score and explanation  just return the score and explanation for the user in a json object, for example if it is 0 return score : 0, if it is 1, return score :1 etc, then give an explanation for the score in the same object , just return it as a pure object, do not add anythinbg like ${"```json"} etc, just a pure object, do not add any thing that will be hard to change to Json REMEMBER return it in json like for example ${"{ \n 'score':3, \n 'explanation' : 'yesss'}"}}`,
-                    },
+                },
 
-                    {
-                        role: "user",
-                        content: `this is the description of the various frames of the user video ${description}`
-                    }
+                {
+                    role: "user",
+                    content: `this is the description of the various frames of the user video ${description}`
+                }
 
-                ],
-                response_format: { "type": "json_object" },
-                max_tokens: 1000,
+            ]
+
+            const completion = await fetcher('/api/get-score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ batch: batch }),
             });
+
 
             if (completion?.choices?.length > 0) {
                 // console.log("the result", completion?.choices[0]?.message?.content)
@@ -590,13 +597,20 @@ if the challenge involves a count, please state the count, for example do not sa
 
             // Call OpenAI API to process this batch
             try {
-                const completion = await openai.chat.completions.create({
-                    model: 'gpt-4o',
-                    messages: batchMessages,
-                    max_tokens: 4096,
+                // const completion = await openai.chat.completions.create({
+                //     model: 'gpt-4o',
+                //     messages: batchMessages,
+                //     max_tokens: 4096,
+                // });
+                const completion = await fetcher('/api/get-frame-description', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ batch: batchMessages }),
                 });
 
-                const systemResponse = completion.choices.find((choice) => choice.message.role === 'assistant');
+                const systemResponse = completion.choices.find((choice: any) => choice.message.role === 'assistant');
                 if (systemResponse) {
                     done = done + 1
                     const description = systemResponse.message.content;

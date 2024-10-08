@@ -64,6 +64,7 @@ export function useGetTasks() {
     }, [profileId, jwt, page, hasMore])
 
     useEffect(() => {
+        setData([])
         setHasMore(true)
         setPage(1);
     }, [reload, re])

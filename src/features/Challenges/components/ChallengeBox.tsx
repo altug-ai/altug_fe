@@ -152,7 +152,7 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                                     />
                                 </span>
 
-                                {/* Render additional spans conditionally, limiting to a maximum of 2 */}
+                
                                 {accepted?.slice(1).slice(0, 3).map((user: any, index: any) => (
                                     <span key={user?.id ?? index} className="rounded-full -ml-3 z-20 flex justify-center items-center ">
                                         <Image

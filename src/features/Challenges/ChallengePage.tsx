@@ -170,6 +170,9 @@ const ChallengePage = (props: Props) => {
                 toast({
                     description: t("ChallengeAccepted"),
                 });
+                const updatedSet = new Set(profiless);
+                updatedSet?.add(profileId);
+                setProfiless(updatedSet);
             } else {
                 setLoader(false)
                 toast({
