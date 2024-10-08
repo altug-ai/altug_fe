@@ -7,18 +7,15 @@ import {
 import { ethers } from "ethers";
 import { networkConfig } from "@/network-config";
 
-export async function claimReward(
-  externalPrivateKey,
-  smartAccountAddress,
-  amountInEther
-) {
+export async function claimReward(smartAccountAddress, amountInEther) {
   try {
     // Create wallet from the private key of the external account
     const rpcUrl = networkConfig.rpcUrl; // Your RPC URL
+    const adminPrivateKey = process.env.NEXT_PUBLIC_ADMIN_WALLET_PRIVATE_KEY;
 
     // Initialize provider using RPC URL
     const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
-    const externalWallet = new ethers.Wallet(externalPrivateKey, provider);
+    const externalWallet = new ethers.Wallet(adminPrivateKey, provider);
 
     // Create and send transaction
     const tx = await externalWallet.sendTransaction({

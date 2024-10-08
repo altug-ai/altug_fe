@@ -1,6 +1,7 @@
 import {
   Bundler,
   createSmartAccountClient,
+  NATIVE_TOKEN_ALIAS,
   Paymaster,
   PaymasterMode,
 } from "@biconomy/account";
@@ -19,7 +20,7 @@ const paymaster = new Paymaster({
   paymasterUrl: networkConfig.paymasterUrl,
 });
 
-export async function getBalance(privateKey) {
+export async function withdrawFund(privateKey, receipentAddress, amount) {
   try {
     const account = privateKeyToAccount(privateKey);
 
@@ -41,11 +42,32 @@ export async function getBalance(privateKey) {
       paymaster: paymaster,
     });
 
-    const balance = await smartAccount.getBalances();
+    // OR to withdraw all of the native token, leaving no dust in the smart account
+    // const { wait } = await smartAccount.sendTransaction(
+    //   {
+    //     to: receipentAddress,
+    //     value: ethers.utils.parseEther(amount),
+    //   },
+    //   {
+    //     paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+    //   }
+    // );
+    const weiAmount = ethers.utils.parseUnits(amount, "ether");
+    console.log("amount in wei is ", weiAmount);
+    const { wait } = await smartAccount.withdraw(
+      [{ address: NATIVE_TOKEN_ALIAS, amount: BigInt(weiAmount) }],
+      receipentAddress,
+      {
+        paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+      }
+    );
 
-    return balance;
+    const { success, receipt } = await wait();
+    console.log("withrdrawal res is ", success);
+
+    return success;
   } catch (error) {
-    console.log("error is ", error);
-    return 0;
+    console.log("-----error-------", error);
+    return false;
   }
 }
