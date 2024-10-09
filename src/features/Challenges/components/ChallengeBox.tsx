@@ -1,6 +1,6 @@
 "use client";
 import Image from 'next/image'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import {
     Popover,
@@ -30,9 +30,13 @@ type Props = {
     accepted?: any;
     image?: string;
     submit?: boolean;
+    audioEnabled?: boolean;
+    setAudioEnabled?: Dispatch<SetStateAction<boolean>>;
+    clientId?: number;
+    challengeId?: number;
 }
 
-const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, accepted, image, submit, submitId }: Props) => {
+const ChallengeBox = ({ clientId, challengeId, submission, challengeHeader, title, goal, video, id, accepted, image, submit, submitId, audioEnabled, setAudioEnabled }: Props) => {
     const router = useRouter()
     const [loader, setLoader] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
@@ -152,7 +156,7 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                                     />
                                 </span>
 
-                
+
                                 {accepted?.slice(1).slice(0, 3).map((user: any, index: any) => (
                                     <span key={user?.id ?? index} className="rounded-full -ml-3 z-20 flex justify-center items-center ">
                                         <Image
@@ -194,7 +198,11 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                                             dat?.attributes?.player?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.player?.data?.attributes?.pic_url ?? "/profile/unknownp.png"
                                     } comment={dat?.attributes?.comment} nameHeader={dat?.attributes?.coach?.data?.id ?
                                         dat?.attributes?.coach?.data?.attributes?.name :
-                                        dat?.attributes?.player?.data?.attributes?.name} />
+                                        dat?.attributes?.player?.data?.attributes?.name} voice={dat?.attributes?.coach?.data?.id ?
+                                            dat?.attributes?.coach?.data?.attributes?.voice :
+                                            dat?.attributes?.player?.data?.attributes?.voice
+
+                                        } audioEnabled={audioEnabled} setAudioEnabled={setAudioEnabled} />
                                 ))
                             }
 
@@ -262,7 +270,7 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
             </div>
             {
                 showOverlay && (
-                    <CommentsOverlay dLength={data?.length} reloadd={reload} setReloadd={setReload} id={submitId} setShowOverlay={setShowOverlay} />
+                    <CommentsOverlay challengeId={challengeId} clientId={clientId} dLength={data?.length} reloadd={reload} setReloadd={setReload} id={submitId} setShowOverlay={setShowOverlay} />
                 )
             }
 

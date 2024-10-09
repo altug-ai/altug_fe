@@ -42,6 +42,7 @@ const ChallengePage = (props: Props) => {
     let [isOpen, setIsOpen] = useState(false)
     const searchParams = useSearchParams()
     const search = searchParams.get('id')
+    const [audioEnabled, setAudioEnabled] = useState<boolean>(false)
 
     function open() {
         setIsOpen(true)
@@ -232,7 +233,7 @@ const ChallengePage = (props: Props) => {
                                 >
                                     {
                                         submitted?.map((submit: any) => (
-                                            <ChallengeBox submitId={submit?.id} submit={true} image={submit?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} goal={data?.attributes?.goal} key={submit?.id} title={data?.attributes?.title} video={submit?.attributes?.video?.data?.attributes?.url} submission />
+                                            <ChallengeBox audioEnabled={audioEnabled} setAudioEnabled={setAudioEnabled} challengeId={submit?.attributes?.challenge?.data?.id} clientId={submit?.attributes?.client_profile?.data?.id} submitId={submit?.id} submit={true} image={submit?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} goal={data?.attributes?.goal} key={submit?.id} title={data?.attributes?.title} video={submit?.attributes?.video?.data?.attributes?.url} submission />
                                         ))
                                     }
                                 </InfiniteScroll>
