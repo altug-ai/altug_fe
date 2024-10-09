@@ -9,6 +9,7 @@ import { createWalletClient, http } from "viem";
 import { privateKeyToAccount, generatePrivateKey } from "viem/accounts";
 
 import { networkConfig } from "@/network-config";
+import { encryptPrivateKey } from "./encrypt";
 
 const bundler = new Bundler({
   bundlerUrl: networkConfig.bundlerUrl,
@@ -43,6 +44,7 @@ export async function createWallet() {
       entryPointAddress: networkConfig.entryPointAddress,
       paymaster: paymaster,
     });
+
     const smartAccountAddress = await smartAccount.getAccountAddress();
     console.log("smartAccountAddress   ", smartAccountAddress);
     const { wait } = await smartAccount.deploy(
@@ -60,9 +62,12 @@ export async function createWallet() {
 
     const { success, receipt } = await wait();
     console.log("success", success);
-
-    return {
+    const _encryptedPrivateKey = await encryptPrivateKey(
       privateKey,
+      smartAccountAddress
+    );
+    return {
+      privateKey: _encryptedPrivateKey,
       smartAccountAddress,
       success,
     };

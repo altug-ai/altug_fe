@@ -471,7 +471,6 @@ const SignupForm = (props: Props) => {
             </h1>
             <div className="w-[50%] h-[1px] bg-[#F5F7F8]" />
           </div>
-
           {/* continue with google */}
           <div className=" w-full flex justify-center ">
             <div
