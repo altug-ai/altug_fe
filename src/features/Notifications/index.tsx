@@ -91,7 +91,7 @@ const Notifications = (props: Props) => {
             } else if (dat?.attributes?.type === "Comment") {
                 url = `/challenge/${dat?.attributes?.challenge?.data?.id}`;
                 header = "A new comment has been added"
-                text = data?.attributes?.text
+                text = dat?.attributes?.text
                 prof = "/auth/Data.png"
             } else {
                 return
