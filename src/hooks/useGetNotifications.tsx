@@ -13,7 +13,7 @@ export function useGetNotifications() {
 
     const getNotifications = useCallback(async (pageNumber = 1) => {
         setLoading(true);
-        const url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/notifications?sort=id:DESC&filters[createdAt][$gt]=${published}&filters[$or][0][type][$eq]=${"Coach"}&filters[$or][1][type][$eq]=${"Player"}&filters[$or][2][type][$eq]=${"Challenge"}&filters[$or][3][accepted][$containsi]=${`"id": "${profileId}"`}&populate[0]=client_profile&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`;
+        const url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/notifications?sort=id:DESC&filters[createdAt][$gt]=${published}&filters[$or][0][type][$eq]=${"Coach"}&filters[$or][1][type][$eq]=${"Player"}&filters[$or][2][type][$eq]=${"Challenge"}&filters[$or][3][accepted][$containsi]=${`"id": "${profileId}"`}&populate[0]=client_profile&populate[1]=challenge&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}`;
 
         const personal = await fetcher(
             url,
