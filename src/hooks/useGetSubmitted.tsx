@@ -18,7 +18,7 @@ export function useGetSubmitted(id: string | string[]) {
 
     const getSubmitted = useCallback(async (pageNumber = 1) => {
         setLoading(true);
-        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/submitted-challenges?sort=id:DESC&filters[challenge][id][$eq]=${id}&populate[0]=video&populate[1]=client_profile.profile_pic&pagination[pageSize]=${pageSize}&pagination[page]=${page}`;
+        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/submitted-challenges?sort=id:DESC&filters[challenge][id][$eq]=${id}&populate[0]=video&populate[1]=client_profile.profile_pic&populate[2]=challenge&pagination[pageSize]=${pageSize}&pagination[page]=${page}`;
 
 
         const personal = await fetcher(

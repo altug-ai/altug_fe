@@ -17,14 +17,17 @@ type Props = {
     reloadd: boolean;
     setReloadd: React.Dispatch<React.SetStateAction<boolean>>;
     dLength: number;
+    clientId?: number;
+    challengeId?: number;
 }
 
-const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength }: Props) => {
+const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength, clientId, challengeId }: Props) => {
     const { data, reload, setReload, loading, hasMore, loadMore, likes, setLikes, setData } = useGetComments(id)
     const { jwt, profileId } = useContext(AuthContext)
     const [comment, setComment] = useState<string>("")
     const [load, setLoad] = useState<boolean>(false);
     const scrollRef = useRef<HTMLDivElement>(null);  // Scroll re
+    const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
 
     const scrollToBottom = () => {
         scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -129,22 +132,25 @@ const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength }: P
                                             let profile = dat?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url
                                             let nameHeader = dat?.attributes?.client_profile?.data?.attributes?.username
                                             let coachId = dat?.attributes?.coach?.data?.id;
+                                            let voice
                                             let coach = false
                                             if (!coachId) {
                                                 coachId = dat?.attributes?.player?.data?.id
                                                 if (coachId) {
                                                     profile = dat?.attributes?.player?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.player?.data?.attributes?.pic_url ?? "/profile/unknownp.png";
                                                     nameHeader = dat?.attributes?.player?.data?.attributes?.name;
+                                                    voice =  dat?.attributes?.player?.data?.attributes?.voice;
                                                     coach = true;
                                                 }
                                             } else {
                                                 profile = dat?.attributes?.coach?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.coach?.data?.attributes?.pic_url ?? "/profile/unknownp.png";
                                                 nameHeader = dat?.attributes?.coach?.data?.attributes?.name;
+                                                voice =  dat?.attributes?.coach?.data?.attributes?.voice;
                                                 coach = true;
                                             }
 
                                             return (
-                                                <Commentbox coach={coach} id={dat?.id} newlikes={newLikes} key={dat?.id} profile={profile} comment={dat?.attributes?.comment} nameHeader={nameHeader} time={dat?.attributes?.createdAt} />
+                                                <Commentbox voice={voice} audioEnabled={audioEnabled} setAudioEnabled={setAudioEnabled} coach={coach} id={dat?.id} newlikes={newLikes} key={dat?.id} profile={profile} comment={dat?.attributes?.comment} nameHeader={nameHeader} time={dat?.attributes?.createdAt} />
                                             )
                                         })
                                     }

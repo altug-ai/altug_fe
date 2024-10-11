@@ -268,7 +268,6 @@ function ChallengeContextProvider(props: any) {
                 if (coach) {
                     let newData: any = {
                         data: {
-                            client_profile: profileId,
                             comment: comment,
                             submitted_challenge: profile?.data?.data?.id,
                             coach: coach.id
@@ -278,7 +277,6 @@ function ChallengeContextProvider(props: any) {
                     if (coach?.type === "player") {
                         newData = {
                             data: {
-                                client_profile: profileId,
                                 comment: comment,
                                 submitted_challenge: profile?.data?.data?.id,
                                 player: coach.id

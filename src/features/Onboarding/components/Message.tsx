@@ -28,11 +28,10 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
 
     function removeAsterisks(str: string) {
         if (!str) {
-            return ""
+            return "";
         }
-        return str.replace(/\*/g, '');
+        return str.replace(/[\*#]/g, '');
     }
-
 
     const getElevenLabsResponse = async (text: string) => {
         const response = await fetch("/api/speech", {
@@ -140,7 +139,6 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                                         } else {
                                             theSpeaker()
                                         }
-
                                     }} className='w-full flex justify-end'>
                                         <HiMiniSpeakerWave className='h-4 w-4 text-slate-800 cursor-pointer' />
                                     </div>

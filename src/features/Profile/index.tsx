@@ -154,7 +154,7 @@ const ProfileScreen = (props: Props) => {
                     )
                 }
                 {
-                    (!loading && coaches?.data && coaches?.data?.length < 1) && (
+                    (!loading && coaches?.data && coaches?.data?.length < 1 && data?.length < 1) && (
                         <div className='text-white flex flex-col mt-[20px] items-center h-full text-center'>
                             <h1>{t("Followed")}</h1>
                             <h1>{t("FollowCoaches")} </h1>

@@ -241,7 +241,7 @@ const SignupForm = (props: Props) => {
             <Image
               src={"/auth/arrow-left.png"}
               alt="the arrow left"
-              width={300}
+              width={300}                                                                    
               height={300}
               className="w-[24px] h-[24px] mb-[30px] cursor-pointer"
             />

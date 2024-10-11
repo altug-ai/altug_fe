@@ -94,6 +94,7 @@ interface Player {
     age?: string;
     point?: number;
     foot?: string;
+    voice?: string;
     club?: {
       data?: {
         attributes?: {
@@ -149,6 +150,7 @@ interface Coach {
       };
     };
     pic_url?: string;
+    voice?: string;
     profile?: {
       data?: {
         attributes?: {
