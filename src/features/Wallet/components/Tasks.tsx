@@ -5,6 +5,7 @@ import { TbLoader3 } from "react-icons/tb";
 import { useGetClaimedTasks } from "@/hooks/useGetClaimedTasks";
 import { AuthContext } from "@/context/AuthContext";
 import { checkTask } from "../function";
+import { useTranslations } from "next-intl";
 
 type Props = {
   handleClaim?: any;
@@ -16,6 +17,7 @@ const Tasks = (props: Props) => {
   const { profileId, jwt, loading: loader } = useContext(AuthContext);
   const [claimedTasks, setClaimedTasks] = useState<any[]>([]);
   const [pendingTasks, setPendingTasks] = useState<any[]>([]);
+  const t = useTranslations('Home.Wallet');
 
   const filterTasks = useMemo(async () => {
     if (!data) return { claimedTasks: [], pendingTasks: [] };
@@ -60,7 +62,7 @@ const Tasks = (props: Props) => {
   return (
     <div className="max-w-[388px] w-full pb-[50px]">
       <h1 className="text-[16px] font-medium leading-normal tracking-[1px] text-[#EDEDED]">
-        Claim Rewards
+        {t("ClaimRewards")}
       </h1>
       {(loading && loader) ? (
         <div className="max-w-[388px] w-full my-[30px] flex justify-center">
@@ -80,7 +82,7 @@ const Tasks = (props: Props) => {
       )}
 
       <h1 className="text-[16px] font-medium leading-normal tracking-[1px] text-[#EDEDED]">
-        Pending Tasks
+        {t("Pending")}
       </h1>
       {(loading && loader) ? (
         <div className="max-w-[388px] w-full my-[30px] flex justify-center">
@@ -100,7 +102,7 @@ const Tasks = (props: Props) => {
       )}
 
       <h1 className="text-[16px] font-medium leading-normal tracking-[1px] text-[#EDEDED]">
-        Claimed
+        {t("Claimed")}
       </h1>
       {claimedLoading ? (
         <div className="max-w-[388px] w-full my-[30px] flex justify-center">

@@ -5,6 +5,7 @@ import { withdrawFund } from "@/wallet/withdrawFund";
 import Image from "next/image";
 import React, { useContext, useState } from "react";
 import { TbLoader3 } from "react-icons/tb";
+import { useTranslations } from "next-intl";
 
 type Props = {
   setTab: React.Dispatch<React.SetStateAction<number>>;
@@ -27,6 +28,9 @@ const Transfer = ({
 }: Props) => {
   const { profile } = useContext(AuthContext);
   const [isTransfering, setisTransfering] = useState(false);
+  const t = useTranslations('Home.Wallet');
+
+
   return (
     <div className="max-w-[388px] w-full">
       <div className="w-full bg-[#3640F0] rounded-[16px] px-[16px] py-[16px]">
@@ -39,18 +43,18 @@ const Transfer = ({
         />
 
         <div className="flex flex-col text-[20px] font-extrabold text-white leading-[24px] font-plus">
-          <h1>{balance} CHZ Token </h1>
+          <h1>{balance} {t("Token")} </h1>
           <h1 className="text-[14px] font-normal leading-[24px]">2,108.22$</h1>
         </div>
       </div>
 
       <h1 className="text-[16px] font-plus font-semibold leading-[28px] text-[#EDEDED] my-[12px]">
-        Enter Amount
+        {t("EnterAmount")}
       </h1>
 
       <div className="w-full bg-[#EDEDED] rounded-[16px] px-[16px] py-[16px]">
         <div className="flex flex-col text-[12px] font-semibold text-[#9BA0AF] leading-[170%] tracking-[0.3px] font-plus">
-          <h1>Amount </h1>
+          <h1>{t("Amount")} </h1>
           <div className="flex items-center h-full">
             <Input
               className="border-none bg-[#EDEDED] focus-visible:ring-0 focus-visible:ring-offset-0 text-[28px] font-bold text-[#061237] leading-[150%]"
@@ -68,7 +72,7 @@ const Transfer = ({
                 className="text-[12px] font-bold leading-[170%] tracking-[0.3px] text-[#83899B] "
                 onClick={() => setTransferAmount(balance)}
               >
-                Max.
+                {t("Max")}
               </h1>
             </div>
           </div>
@@ -76,7 +80,7 @@ const Transfer = ({
       </div>
 
       <h1 className="text-[16px] font-plus font-semibold leading-[28px] text-[#EDEDED] my-[12px]">
-        Wallet Address
+        {t("Address")}
       </h1>
 
       <div className="w-full bg-[#EDEDED] rounded-[16px] px-[16px] py-[16px]">
@@ -91,7 +95,7 @@ const Transfer = ({
                 height={500}
               />
               <h1 className="text-[12px]  font-bold leading-[170%] tracking-[0.3px] text-[#83899B] ">
-                Chiliz Chain
+                {t("Chain")}
               </h1>
             </div>
             <Input
@@ -136,7 +140,7 @@ const Transfer = ({
           }}
           className="w-full bg-[#357EF8] rounded-[47px] grid place-content-center cursor-pointer hover:scale-105 mt-[21px] h-[49px] text-white text-[16px] font-medium leading-[126.006%] "
         >
-          Send
+          {t("Send")}
         </div>
       ) : (
         <div className="w-full bg-[#357EF8] rounded-[47px] grid place-content-center   mt-[21px] h-[49px] text-white text-[16px] font-medium leading-[126.006%] ">

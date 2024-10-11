@@ -2,6 +2,8 @@ import Image from 'next/image'
 import React, { Dispatch, SetStateAction, useRef, useState } from 'react'
 import { HiMiniSpeakerWave } from 'react-icons/hi2';
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { useTranslations } from "next-intl";
+import { TbLoader3 } from 'react-icons/tb';
 
 type Props = {
     nameHeader?: string | null;
@@ -11,14 +13,14 @@ type Props = {
     voice?: string;
     audioEnabled?: boolean;
     setAudioEnabled?: Dispatch<SetStateAction<boolean>>;
-    
+
 }
 
 const FirstCommentBox = ({ nameHeader, coach, comment, profile, voice, audioEnabled, setAudioEnabled }: Props) => {
     const audioRef = useRef<HTMLAudioElement>(null);
     let [isOpen, setIsOpen] = useState(false)
-
-
+    const [loader, setLoader] = useState<boolean>(false)
+    const t = useTranslations('Home.Comments');
 
     function open() {
         setIsOpen(true)
@@ -60,17 +62,24 @@ const FirstCommentBox = ({ nameHeader, coach, comment, profile, voice, audioEnab
 
 
     const theSpeaker = async () => {
+        try {
+            setLoader(true)
+            let mess = removeAsterisks(comment)
+            const botVoiceResponse = await getElevenLabsResponse(mess);
+            const reader = new FileReader();
+            reader.readAsDataURL(botVoiceResponse);
+            reader.onload = () => {
+                if (audioRef.current) {
+                    audioRef.current.src = reader.result as string;
+                    setLoader(false)
+                    audioRef.current.play();
+                }
+            };
+        } catch (error) {
+            console.error("this is the error", error)
+            setLoader(false)
+        }
 
-        let mess = removeAsterisks(comment)
-        const botVoiceResponse = await getElevenLabsResponse(mess);
-        const reader = new FileReader();
-        reader.readAsDataURL(botVoiceResponse);
-        reader.onload = () => {
-            if (audioRef.current) {
-                audioRef.current.src = reader.result as string;
-                audioRef.current.play();
-            }
-        };
     }
 
     return (
@@ -92,19 +101,29 @@ const FirstCommentBox = ({ nameHeader, coach, comment, profile, voice, audioEnab
                     {
                         coach && (
                             <div className='px-[8px] py-[1px] rounded-[8px] bg-[#EAFF62] text-black text-[12px] leading-[15.12px] font-medium font-plus'>
-                                Coach
+                                {t("Coach")}
                             </div>
                         )
                     }
 
                     <div onClick={() => {
+                        if (loader) {
+                            return
+                        }
                         if (!audioEnabled) {
                             open()
                         } else {
                             theSpeaker()
                         }
                     }} className='w-full flex justify-end'>
-                        <HiMiniSpeakerWave className='h-4 w-4 text-[#1B76FF] cursor-pointer' />
+                        {
+                            loader ? (
+                                <TbLoader3 className="text-[#1B76FF] w-4 h-4 animate-spin" />
+                            ) : (
+                                <HiMiniSpeakerWave className='h-4 w-4 text-[#1B76FF] cursor-pointer' />
+                            )
+                        }
+
                     </div>
                 </div>
                 <h1 className='text-[12px] leading-[13.8px] font-normal text-white'>

@@ -6,7 +6,7 @@ import Image from "next/image";
 import React, { useContext, useState } from "react";
 import { TbLoader3 } from "react-icons/tb";
 import { useRouter } from "next/navigation";
-
+import { useTranslations } from "next-intl";
 type Props = {
   claim?: boolean;
   join?: boolean;
@@ -33,6 +33,7 @@ const Task = ({
   const [loader, setLoader] = useState<boolean>(false);
   const { profileId, jwt } = useContext(AuthContext);
   const { setReload: setR, reload: re } = useContext(LeaderboardContext)
+  const t = useTranslations('Home.Wallet');
 
   const handleJoinTask = async () => {
     try {
@@ -87,7 +88,7 @@ const Task = ({
             {title ?? "Defense challenge"}
           </h1>
           <h1 className="text-[#737883] text-[12px] font-normal leading-normal font-plus">
-            {number ?? "0.1"} $Pro Token
+            {number ?? "0.1"} {t("ProToken")}
           </h1>
         </div>
       </div>
@@ -101,7 +102,7 @@ const Task = ({
               className="rounded-[47px] bg-[#357EF8] px-[24px] py-[6px] text-white text-[12px] font-medium"
               onClick={() => handleClaim(`${number}`, setLoading, id)}
             >
-              claim
+              {t("Claim")}
             </div>
           )}
         </>
@@ -119,7 +120,7 @@ const Task = ({
                 // handleJoinTask()
               }}
             >
-              Join
+              {t("Join")}
             </div>
           )}
         </>

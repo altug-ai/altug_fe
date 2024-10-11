@@ -49,6 +49,7 @@ function ChallengeContextProvider(props: any) {
     const [elapsedTime, setElapsedTime] = useState(0);
     const [res, setRes] = useState<any[]>([]);
     const [chal, setChal] = useState<any>()
+    const [lang, setLang] = useState<any>("")
     const t = useTranslations('Home.ChallengePage');
     const pathname = usePathname()
     const maxDuration = 2 * 60 * 1000; // 2 minutes in milliseconds
@@ -155,10 +156,16 @@ function ChallengeContextProvider(props: any) {
         id: number;
     }, desc: string) => {
 
+        let language = "English"
+
+        if(lang === "tr"){
+            language = "Turkish"
+        }
+
         let batch = [
             {
                 role: 'system',
-                content: `based on the challenge ${header}, ${descriptionn} and ${goal}, give a short comment on the user's video description uploaded for the challenge
+                content: `based on the challenge ${header}, ${descriptionn} and ${goal}, in the ${language} languague, give a short comment on the user's video description uploaded for the challenge, make sure the comment is in ${language}
                `,
             },
 
@@ -470,6 +477,7 @@ Pay attention to details:
 
 For example, if the challenge is for dribbling and the user is just juggling, then mark the user low.
 Check if the actions  align with the overall goal/description of the challenge. 
+if the challenge involves a count, like score 3 goals , there wouldn't be any definitive success counts in the frames, you will be the one that will count the number of times the user does the action based on the frames description.
 Also note that the user can start or do the challenge at any part of the video, just look through and check for the user doing the actual challenge, ignore any activities done that does not include the challenge, any activities that does not involve the challenge should be ignored, just make sure the user eventually does the challenge
 Score the user based on how well their uploaded video/frames description matches the challenge header, description, and goal. The maximum score achievable for this challenge is ${point} points.when returning the score and explanation  just return the score and explanation for the user in a json object, for example if it is 0 return score : 0, if it is 1, return score :1 etc, then give an explanation for the score in the same object , just return it as a pure object, do not add anythinbg like ${"```json"} etc, just a pure object, do not add any thing that will be hard to change to Json REMEMBER return it in json like for example ${"{ \n 'score':3, \n 'explanation' : 'yesss'}"}}`,
                 },
@@ -541,14 +549,14 @@ Score the user based on how well their uploaded video/frames description matches
         let duration: any = await getDuration(videoUrl);
 
         if (duration < 11) {
-            frame = 6
+            frame = 10
         }
         else if (duration > 10 && duration < 16) {
-            frame = 6
+            frame = 10
         } else if (duration > 15 && duration < 31) {
-            frame = 3
+            frame = 5
         } else if (duration > 30 && duration < 80) {
-            frame = 3
+            frame = 5
         }
 
         try {
@@ -587,10 +595,10 @@ Score the user based on how well their uploaded video/frames description matches
             // Add system message for the batch
             batchMessages.push({
                 role: 'system',
-                content: `In this video frame, describe the actions performed by the user., if an action is performed by the user, say all that is being done, no summary, all. 
-also this is the description and goal of the challenge ${descriptionn}, ${goal} given to the user, do not allow the description and goal of the challenge cloud your descriptions, for example if the user is just tapping the ball and not juggling, say they are tapping the ball eteec, do not say things like "in an attempt to juggle" or things in that nature, just say the actions exactly as it is. do not hallucinate result , or say the user is during the goal/description of the challenge when they are not.
+                content: `In the video frames, describe the actions performed by the user., if an action is performed by the user, say all that is being done, no summary, all. 
+also this is the description and goal of the challenge ${descriptionn}, ${goal} given to the user, do not allow the description and goal of the challenge cloud your descriptions, for example if the user is just tapping the ball and not juggling, say they are tapping the ball eteec, do not say things like "in an attempt to juggle" or things in that nature, just say the actions exactly as it is, if you see the user performing an action that relates to the challenge description or goal please say, or any action relating to the description or goal. do not hallucinate result , or say the user is doing the goal/description of the challenge when they are not.
 if the challenge involves a count, please state the count, for example do not say something like "the user is repeatedly tapping the ball", say something like, the user just tapped the ball with his foot, they just tapped the ball again, just did again, etec, state all action clearly no matter how small. state what the user is doing and what part of the body the user is using etec. make it extremely detailed
-                Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1", first image", secong image" etc., in your response`,
+                Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1", first image", secong image" etc., in your response. also pay attention on the ball if there is, for example if the challenge is to hit the crossbar, if you see the ball hit the crossbar then say it,say the position of the ball, where it is hiting etc. Also do not say anything that does not align with the challenge description/goal, only generate the description of actions done that will help in the scoring of the challenge, things like description the user's cloth, the grass etc that isn't relevant to the challenge should not be generated/it should be ignored.only say actions that will help in scoring the user for the challenge, if the user is doing nothing, do not say it etc. `,
             });
 
             // Call OpenAI API to process this batch
@@ -658,6 +666,7 @@ if the challenge involves a count, please state the count, for example do not sa
         }
     };
 
+    console.log("the response", response)
     return (
         <ChallengeContext.Provider
             value={{
@@ -711,7 +720,9 @@ if the challenge involves a count, please state the count, for example do not sa
                 setExplanation,
                 setScore,
                 progress,
-                refetch, setRefetch
+                refetch, setRefetch,
+                lang,
+                setLang
             }}
         >
             {props.children}

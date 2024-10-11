@@ -9,7 +9,9 @@ import axios from 'axios';
 import { AuthContext } from '@/context/AuthContext';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useTranslations } from "next-intl";
 import { IoMdClose } from "react-icons/io";
+
 
 type Props = {
     id?: number;
@@ -28,6 +30,7 @@ const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength, cli
     const [load, setLoad] = useState<boolean>(false);
     const scrollRef = useRef<HTMLDivElement>(null);  // Scroll re
     const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
+    const t = useTranslations('Home.Comments');
 
     const scrollToBottom = () => {
         scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -104,7 +107,7 @@ const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength, cli
                             }
                         }} className='text-red-500 h-[30px] w-[30px] cursor-pointer' />
 
-                        <h1 className='text-[16px] font-bold leading-[17.6px] text-white'>{data?.length} {data?.length < 2 ? "Comment" : "Comments"}</h1>
+                        <h1 className='text-[16px] font-bold leading-[17.6px] text-white'>{data?.length} {data?.length < 2 ? t("Comment") : t("Comments")}</h1>
                         <div className='mt-[20px] flex flex-col h-[500px] space-y-[16px] pb-[50px]'>
                             <div id="scrollableDiv" style={{ overflow: "auto" }}>
 
@@ -119,7 +122,7 @@ const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength, cli
                                         </div>
                                     }
                                     // scrollableTarget="scrollableDiv"
-                                    endMessage={<p className='text-center my-2 text-slate-400'>No more comments</p>}
+                                    endMessage={<p className='text-center my-2 text-slate-400'>{t("NoMoreComments")}</p>}
                                 >
                                     {
                                         data?.map((dat) => {
@@ -139,13 +142,13 @@ const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength, cli
                                                 if (coachId) {
                                                     profile = dat?.attributes?.player?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.player?.data?.attributes?.pic_url ?? "/profile/unknownp.png";
                                                     nameHeader = dat?.attributes?.player?.data?.attributes?.name;
-                                                    voice =  dat?.attributes?.player?.data?.attributes?.voice;
+                                                    voice = dat?.attributes?.player?.data?.attributes?.voice;
                                                     coach = true;
                                                 }
                                             } else {
                                                 profile = dat?.attributes?.coach?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.coach?.data?.attributes?.pic_url ?? "/profile/unknownp.png";
                                                 nameHeader = dat?.attributes?.coach?.data?.attributes?.name;
-                                                voice =  dat?.attributes?.coach?.data?.attributes?.voice;
+                                                voice = dat?.attributes?.coach?.data?.attributes?.voice;
                                                 coach = true;
                                             }
 
@@ -174,7 +177,7 @@ const CommentsOverlay = ({ id, setShowOverlay, reloadd, setReloadd, dLength, cli
 
                                     <Input value={comment} onChange={(e) => {
                                         setComment(e.target.value)
-                                    }} required className='rounded-l-[49px] w-[80%] text-[16px] text-white placeholder:text-white bg-[#838c9e] leading-[24px] font-semibold border-none focus-visible:ring-0  h-[48px]' placeholder='Leave comment here' />
+                                    }} required className='rounded-l-[49px] w-[80%] text-[16px] text-white placeholder:text-white bg-[#838c9e] leading-[24px] font-semibold border-none focus-visible:ring-0  h-[48px]' placeholder={t("LeaveCommentHere")} />
 
                                     <div className='flex space-x-2 items-center absolute right-5 top-3'>
                                         <button disabled={load} type='submit'>

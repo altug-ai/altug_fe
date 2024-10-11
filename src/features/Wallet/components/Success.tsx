@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 type Props = {
   receipentAddress?: any;
   transferAmount?: any;
@@ -9,6 +10,7 @@ type Props = {
 };
 
 const Success = ({ receipentAddress, transferAmount }: Props) => {
+  const t = useTranslations('Home.Wallet');
   const router = useRouter();
   const formatTimestamp = () => {
     const now = new Date();
@@ -39,13 +41,13 @@ const Success = ({ receipentAddress, transferAmount }: Props) => {
         <div className="h-[50%] gride place-content-center">
           <div className="flex flex-col items-center ">
             <h1 className="text-[#3640F0] text-[14px] font-semibold leading-[22px] text-center">
-              Great!
+              {t("Great")}
             </h1>
             <h1 className="text-[#202226] font-plus text-[24px] font-bold leading-[32px]">
-              Your transaction success
+              {t("TranSuccess")}
             </h1>
             <h1 className="text-center text-[#838383] text-[14px] font-normal leading-[140%] max-w-[332px]">
-              You have successfully transferred your Pro tokens.
+             {t("ProSuccess")}
             </h1>
           </div>
         </div>
@@ -53,10 +55,10 @@ const Success = ({ receipentAddress, transferAmount }: Props) => {
         <div className="h-[50%] gride place-content-center border-t-4 border-t-[#EDEDED] border-dotted ">
           <div className="flex flex-col items-center ">
             <h1 className="text-[#838383] text-[16px] font-normal leading-[24px] tracking-[0.3px]  text-center">
-              Total
+              {t("Total")}
             </h1>
             <h1 className="text-[#3640F0] font-plus text-[36px] font-bold leading-[44px]">
-              {transferAmount} CHZ Token
+              {transferAmount} {t("Token")}
             </h1>
             <div className="px-[12px] py-[12px] bg-[#F3F3F3] rounded-[16px] flex space-x-[16px] items-center">
               <div className="rounded-[12px]  bg-white px-[10px] py-[10px]">
@@ -94,7 +96,7 @@ const Success = ({ receipentAddress, transferAmount }: Props) => {
           }}
           className="w-[50%] bg-[#357EF8] absolute transform translate-x-[-50%] translate-y-[-50%] left-[50%] bottom-[-40px] rounded-[47px] grid place-content-center cursor-pointer hover:scale-105 mt-[21px] py-[10px] text-white text-[16px] font-medium leading-[126.006%] "
         >
-          Back To Home
+          {t("BackHome")}
         </div>
       </div>
       <Image

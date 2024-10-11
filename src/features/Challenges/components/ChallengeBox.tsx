@@ -208,7 +208,7 @@ const ChallengeBox = ({ clientId, challengeId, submission, challengeHeader, titl
 
                             <h1 onClick={() => {
                                 setShowOverlay(true)
-                            }} className='text-[12px] font-bold leading-[26.63px] cursor-pointer text-[#1B76FF]'>All Comments</h1>
+                            }} className='text-[12px] font-bold leading-[26.63px] cursor-pointer text-[#1B76FF]'>{t("AllComments")}</h1>
                         </div>
                     )
                 }

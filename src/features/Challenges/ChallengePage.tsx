@@ -22,15 +22,17 @@ import { useGetSubmitted } from '@/hooks/useGetSubmitted';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import CommentsOverlay from './components/CommentsOverlay';
 
-type Props = {}
+type Props = {
+    language: string;
+}
 
-const ChallengePage = (props: Props) => {
+const ChallengePage = ({ language }: Props) => {
 
     const { loading, profileId, jwt } = useContext(AuthContext)
     const params = useParams();
     const [showOverlay, setShowOverlay] = useState(false);
     const { slug }: any = params;
-    const { handleStartCaptureClick, route, setRoute, setVideoUrl, setVideoBlob, point, challengeLoader, setChallengeLoader, chal, setChal } = useContext(ChallengeContext)
+    const { handleStartCaptureClick, route, setRoute, setVideoUrl, setVideoBlob, point, challengeLoader, setChallengeLoader, chal, setChal, setLang, lang } = useContext(ChallengeContext)
     const [profiles, setProfiles] = useState(new Set());
     const [profiless, setProfiless] = useState(new Set());
     const t = useTranslations('Home.ChallengePage');
@@ -51,6 +53,14 @@ const ChallengePage = (props: Props) => {
     function close() {
         setIsOpen(false)
     }
+
+
+    useEffect(() => {
+        setLang(language)
+    }, [language])
+
+
+    console.log("this is the current lang", lang)
 
     // const handleWheel = (event : any) => {
     //     if (event.deltaY > 0) {

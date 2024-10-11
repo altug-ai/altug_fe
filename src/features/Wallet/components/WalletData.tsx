@@ -4,6 +4,7 @@ import { getBalance } from "@/wallet/getBalance";
 import Image from "next/image";
 import React, { useContext, useEffect, useState } from "react";
 import { TbLoader3 } from "react-icons/tb";
+import { useTranslations } from "next-intl";
 
 type Props = {
   setTab: React.Dispatch<React.SetStateAction<number>>;
@@ -11,6 +12,7 @@ type Props = {
 };
 
 const WalletData = ({ setTab, balance }: Props) => {
+  const t = useTranslations('Home.Wallet');
   return (
     <div
       style={{
@@ -31,7 +33,7 @@ const WalletData = ({ setTab, balance }: Props) => {
           <TbLoader3 className="rounded-[47px] bg-[#357EF8] mr-6 text-white text-[12px] w-7 h-7 animate-spin" />
         ) : (
           <div className="flex flex-col text-[20px] font-extrabold text-white leading-[24px] font-plus">
-            <h1>{balance?.toString().trim().slice(0, 4)} CHZ Token </h1>
+            <h1>{balance?.toString().trim().slice(0, 4)} {t("Token")} </h1>
             <h1 className="text-[14px] font-normal leading-[24px]">
               2,108.22$
             </h1>
@@ -55,7 +57,7 @@ const WalletData = ({ setTab, balance }: Props) => {
               src={"/tab/checkdown.png"}
             />
             <h1 className="text-[16px] font-bold leading-[24px] text-[#202226]">
-              Deposit
+              {t("Deposit")}
             </h1>
           </div>
         </div>
@@ -75,7 +77,7 @@ const WalletData = ({ setTab, balance }: Props) => {
               src={"/tab/checkup.png"}
             />
             <h1 className="text-[16px] font-bold leading-[24px] text-[#202226]">
-              Withdraw
+              {t("Withdraw")}
             </h1>
           </div>
         </div>

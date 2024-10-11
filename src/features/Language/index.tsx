@@ -13,11 +13,13 @@ const Language = ({ language }: Props) => {
     const router = useRouter();
 
     const ChangeToEnglish = () => {
-        router.replace('/language', { locale: 'en' });
+        router.push('/language', { locale: 'en' });
+        router.refresh();
     }
 
     const ChangeToTurkish = () => {
-        router.replace('/language', { locale: 'tr' });
+        router.push('/language', { locale: 'tr' });
+        router.refresh()
     }
 
     return (
@@ -26,7 +28,7 @@ const Language = ({ language }: Props) => {
             {/* the header */}
             <div className='flex items-center max-w-[388px] w-full justify-between mb-[30px]'>
                 <div onClick={() => {
-                    router.push("/settings")
+                    router.push("/settings", { locale: language })
                 }} className='cursor-pointer flex space-x-3 items-center'>
                     <Image src={"/auth/arrow-left.png"} alt='the arrow left' width={300} height={300} className='w-[24px] h-[24px]  cursor-pointer' />
                     <h1 className='text-[18px] font-medium leading-[24.35px] text-[#FFFFFF]'>{t("Language")}</h1>
@@ -39,7 +41,7 @@ const Language = ({ language }: Props) => {
                     <Image className="w-[48px] h-[48px]" alt='The turkey flag' src={'/onboard/TurkeyFlag.png'} width={600} height={600} />
                     <h1 className='text-[16px] leading-[16px] font-medium text-white font-plus'>{t("Turkish")}</h1>
                 </div>
-                {   
+                {
                     language === "tr" && (
                         <Image src={"/auth/Check.png"} alt='Check' width={600} height={600} className='w-[18px] h-[18px]' />
                     )

@@ -14,6 +14,8 @@ import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { LeaderboardContext } from "@/context/LeaderboardContext";
 import Deposite from "./components/Deposite";
+import { useTranslations } from "next-intl";
+
 type Props = {};
 
 const Wallet = (props: Props) => {
@@ -24,7 +26,7 @@ const Wallet = (props: Props) => {
   const { setReload: setR, reload: re } = useContext(LeaderboardContext);
   const [receipentAddress, setReceipentAddress] = useState("");
   const [transferAmount, setTransferAmount] = useState("");
-
+  const t = useTranslations('Home.Wallet');
   const { toast } = useToast();
 
   async function _getBalance() {
@@ -56,7 +58,7 @@ const Wallet = (props: Props) => {
     if (!res.txHash || !res.receipt) {
       toast({
         variant: "destructive",
-        description: "Something went wrong. Please try again",
+        description: t("SomethingWentWrong"),
       });
     } else {
       await _getBalance();
@@ -83,13 +85,13 @@ const Wallet = (props: Props) => {
       setR(!re);
       toast({
         variant: "destructive",
-        description: "Reward Claimed Successfully",
+        description: t("RewardClaimedSuccessfully"),
       });
     }
     setLoading(false);
   }
 
-  function handleGoBackToHome() {}
+  function handleGoBackToHome() { }
   useEffect(() => {
     profile && _getBalance();
   }, [profile]);

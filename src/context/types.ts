@@ -292,6 +292,8 @@ export type ChallengeProps = {
   explanation: string;
   setExplanation: Dispatch<SetStateAction<string>>;
   setRefetch: Dispatch<SetStateAction<boolean>>;
+  setLang: Dispatch<any>;
+  lang: any;
 };
 
 export type Stat = {

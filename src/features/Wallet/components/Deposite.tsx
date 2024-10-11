@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import copy from "copy-to-clipboard";
 import { MdOutlineContentCopy } from "react-icons/md";
 import { useToast } from "@/components/ui/use-toast";
@@ -12,6 +13,7 @@ type Props = {
 
 const Deposite = ({ receipentAddress, setTab }: Props) => {
   const { toast } = useToast();
+  const t = useTranslations('Home.Wallet');
   const formatString = (str: string, startLength = 10, endLength = 3) => {
     if (str.length <= startLength + endLength) {
       return str; // No need to trim if string is shorter than the required length
@@ -28,7 +30,7 @@ const Deposite = ({ receipentAddress, setTab }: Props) => {
         <div className="h-[50%] gride place-content-center">
           <div className="flex flex-col items-center px-4">
             <h1 className="text-[#202226] font-plus text-[24px] font-bold leading-[32px]">
-              Copy the address below and make sure the network is chz.
+              {t("AddressBelow")}
             </h1>
           </div>
         </div>
@@ -78,7 +80,7 @@ const Deposite = ({ receipentAddress, setTab }: Props) => {
           }}
           className="w-[50%] bg-[#357EF8] absolute transform translate-x-[-50%] translate-y-[-50%] left-[50%] bottom-[-40px] rounded-[47px] grid place-content-center cursor-pointer hover:scale-105 mt-[21px] py-[10px] text-white text-[16px] font-medium leading-[126.006%] "
         >
-          Back To Wallet
+          {t("BackWallet")}
         </div>
       </div>
       <Image
