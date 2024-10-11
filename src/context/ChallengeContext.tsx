@@ -11,14 +11,12 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { AuthContext } from "./AuthContext";
 import { ChallengeProps } from "./types";
 import { usePathname } from 'next/navigation'
+import { fetcher } from "@/lib/functions";
 
 // @ts-ignore
 export const ChallengeContext = createContext<ChallengeProps>({});
 
-const openai = new OpenAI({
-    apiKey: process.env.NEXT_PUBLIC_OPEN_API_KEY || "",
-    dangerouslyAllowBrowser: true,
-});
+
 
 function ChallengeContextProvider(props: any) {
     const [challengeLoader, setChallengeLoader] = useState<boolean>(false)
@@ -51,6 +49,7 @@ function ChallengeContextProvider(props: any) {
     const [elapsedTime, setElapsedTime] = useState(0);
     const [res, setRes] = useState<any[]>([]);
     const [chal, setChal] = useState<any>()
+    const [lang, setLang] = useState<any>("")
     const t = useTranslations('Home.ChallengePage');
     const pathname = usePathname()
     const maxDuration = 2 * 60 * 1000; // 2 minutes in milliseconds
@@ -152,7 +151,53 @@ function ChallengeContextProvider(props: any) {
     }, [])
 
 
-    const handleUploadChallengeVideo = async (point: string) => {
+    const handleGetComment = async (coach: {
+        type: string;
+        id: number;
+    }, desc: string) => {
+
+        let language = "English"
+
+        if(lang === "tr"){
+            language = "Turkish"
+        }
+
+        let batch = [
+            {
+                role: 'system',
+                content: `based on the challenge ${header}, ${descriptionn} and ${goal}, in the ${language} languague, give a short comment on the user's video description uploaded for the challenge, make sure the comment is in ${language}
+               `,
+            },
+
+            {
+                role: "user",
+                content: `this is the user's video description ${desc}`
+            }
+
+        ]
+
+        const completion = await fetcher('/api/get-comment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ batch: batch }),
+        });
+
+
+        if (completion?.choices?.length > 0) {
+            // console.log("the result", completion?.choices[0]?.message?.content)
+            return completion?.choices[0]?.message?.content
+        } else {
+            return false
+        }
+    }
+
+
+    const handleUploadChallengeVideo = async (point: string, coach: {
+        type: string;
+        id: number;
+    } | undefined, desc: any) => {
         setRoute(2);
         setError(false)
         try {
@@ -176,6 +221,10 @@ function ChallengeContextProvider(props: any) {
                     },
                 }
             );
+            let comment;
+            if (coach) {
+                comment = await handleGetComment(coach, desc)
+            }
 
             let profile: any;
 
@@ -223,6 +272,36 @@ function ChallengeContextProvider(props: any) {
 
             if (profile?.data?.data?.id) {
                 // update the stats and total_point in the client profile
+                if (coach) {
+                    let newData: any = {
+                        data: {
+                            comment: comment,
+                            submitted_challenge: profile?.data?.data?.id,
+                            coach: coach.id
+                        }
+                    }
+
+                    if (coach?.type === "player") {
+                        newData = {
+                            data: {
+                                comment: comment,
+                                submitted_challenge: profile?.data?.data?.id,
+                                player: coach.id
+                            }
+                        }
+                    }
+
+                    const submitComment = await axios.post(
+                        `${process.env.NEXT_PUBLIC_STRAPI_URL}/comments`,
+                        newData,
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${jwt}`,
+                            },
+                        }
+                    );
+                }
                 let data: any = {
                     data: {
                         total_point: (parseInt(totalPoint) + (point === "" ? 0 : point === null ? 0 : point ? parseInt(point) : 0)),
@@ -322,7 +401,10 @@ function ChallengeContextProvider(props: any) {
         return score >= minimumScore ? point : 0;
     }
 
-    const handleRetriveData = async (content: any) => {
+    const handleRetriveData = async (content: any, coach: {
+        type: string;
+        id: number;
+    } | undefined, desc: any) => {
         try {
             const fixedContent = content.replace(/\n\s*/g, "").trim();
             // Parse the content as JSON
@@ -338,7 +420,7 @@ function ChallengeContextProvider(props: any) {
             setExplanation(explanation);
 
             if (newScore !== 0) {
-                handleUploadChallengeVideo(`${newScore}`)
+                handleUploadChallengeVideo(`${newScore}`, coach, desc)
             }
             return { score, explanation };
         } catch (error) {
@@ -351,7 +433,10 @@ function ChallengeContextProvider(props: any) {
 
 
     // get the score for the submitted challenge
-    const handleDesc = async (description: string, desc?: any) => {
+    const handleDesc = async (description: string, coach?: {
+        type: string;
+        id: number;
+    } | undefined, desc?: any,) => {
 
 
         // console.log("here", description)
@@ -380,14 +465,11 @@ function ChallengeContextProvider(props: any) {
 
             let duration: any = await getDuration(videoUrl);
 
-
-            const completion = await openai.chat.completions.create({
-                model: 'gpt-4o',
-                messages: [
-                    {
-                        role: 'system',
-                        content: `
-                       You are a challenge scorer responsible for evaluating user-uploaded videos based on the goal and header of the challenge. The title of the challenge is "${header}" with the description: "${descriptionn}" and the goal : "${goal}". The maximum points for this challenge are ${point}.
+            let batch = [
+                {
+                    role: 'system',
+                    content: `
+       You are a challenge scorer responsible for evaluating user-uploaded videos based on the goal and header of the challenge. The title of the challenge is "${header}" with the description: "${descriptionn}" and the goal : "${goal}". The maximum points for this challenge are ${point}.
 
 You have been provided with a sequence of frame descriptions, where each frame (ignoring IDs or frame number) details what happens next in the video. The frames are part of a larger video, and they represent a continuous sequence with no change in scene or participants. Your task is to ensure the user's video aligns with the challenge requirements.
 if the goal/desciption involves counting then look at the number of times the action is performed in the provided frames description to count. 
@@ -395,23 +477,30 @@ Pay attention to details:
 
 For example, if the challenge is for dribbling and the user is just juggling, then mark the user low.
 Check if the actions  align with the overall goal/description of the challenge. 
+if the challenge involves a count, like score 3 goals , there wouldn't be any definitive success counts in the frames, you will be the one that will count the number of times the user does the action based on the frames description.
 Also note that the user can start or do the challenge at any part of the video, just look through and check for the user doing the actual challenge, ignore any activities done that does not include the challenge, any activities that does not involve the challenge should be ignored, just make sure the user eventually does the challenge
 Score the user based on how well their uploaded video/frames description matches the challenge header, description, and goal. The maximum score achievable for this challenge is ${point} points.when returning the score and explanation  just return the score and explanation for the user in a json object, for example if it is 0 return score : 0, if it is 1, return score :1 etc, then give an explanation for the score in the same object , just return it as a pure object, do not add anythinbg like ${"```json"} etc, just a pure object, do not add any thing that will be hard to change to Json REMEMBER return it in json like for example ${"{ \n 'score':3, \n 'explanation' : 'yesss'}"}}`,
-                    },
+                },
 
-                    {
-                        role: "user",
-                        content: `this is the description of the various frames of the user video ${description}`
-                    }
+                {
+                    role: "user",
+                    content: `this is the description of the various frames of the user video ${description}`
+                }
 
-                ],
-                response_format: { "type": "json_object" },
-                max_tokens: 1000,
+            ]
+
+            const completion = await fetcher('/api/get-score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ batch: batch }),
             });
+
 
             if (completion?.choices?.length > 0) {
                 // console.log("the result", completion?.choices[0]?.message?.content)
-                handleRetriveData(completion?.choices[0]?.message?.content)
+                handleRetriveData(completion?.choices[0]?.message?.content, coach, description)
             }
         } catch (error) {
             setError(true);
@@ -420,7 +509,12 @@ Score the user based on how well their uploaded video/frames description matches
 
 
     // get the challenge video description
-    const handleChat = async () => {
+    const handleChat = async (
+        coach: {
+            type: string;
+            id: number;
+        } | undefined
+    ) => {
         setError(false);
         const batchSize = 10; // Number of frames to process per batch
         let extractedFrames;
@@ -455,14 +549,14 @@ Score the user based on how well their uploaded video/frames description matches
         let duration: any = await getDuration(videoUrl);
 
         if (duration < 11) {
-            frame = 6
+            frame = 10
         }
         else if (duration > 10 && duration < 16) {
-            frame = 6
+            frame = 10
         } else if (duration > 15 && duration < 31) {
-            frame = 3
+            frame = 5
         } else if (duration > 30 && duration < 80) {
-            frame = 3
+            frame = 5
         }
 
         try {
@@ -501,21 +595,28 @@ Score the user based on how well their uploaded video/frames description matches
             // Add system message for the batch
             batchMessages.push({
                 role: 'system',
-                content: `In this video frame, describe the actions performed by the user., if an action is performed by the user, say all that is being done, no summary, all. 
-also this is the description and goal of the challenge ${descriptionn}, ${goal} given to the user, do not allow the description and goal of the challenge cloud your descriptions, for example if the user is just tapping the ball and not juggling, say they are tapping the ball eteec, do not say things like "in an attempt to juggle" or things in that nature, just say the actions exactly as it is. do not hallucinate result , or say the user is during the goal/description of the challenge when they are not.
+                content: `In the video frames, describe the actions performed by the user., if an action is performed by the user, say all that is being done, no summary, all. 
+also this is the description and goal of the challenge ${descriptionn}, ${goal} given to the user, do not allow the description and goal of the challenge cloud your descriptions, for example if the user is just tapping the ball and not juggling, say they are tapping the ball eteec, do not say things like "in an attempt to juggle" or things in that nature, just say the actions exactly as it is, if you see the user performing an action that relates to the challenge description or goal please say, or any action relating to the description or goal. do not hallucinate result , or say the user is doing the goal/description of the challenge when they are not.
 if the challenge involves a count, please state the count, for example do not say something like "the user is repeatedly tapping the ball", say something like, the user just tapped the ball with his foot, they just tapped the ball again, just did again, etec, state all action clearly no matter how small. state what the user is doing and what part of the body the user is using etec. make it extremely detailed
-                Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1", first image", secong image" etc., in your response`,
+                Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1", first image", secong image" etc., in your response. also pay attention on the ball if there is, for example if the challenge is to hit the crossbar, if you see the ball hit the crossbar then say it,say the position of the ball, where it is hiting etc. Also do not say anything that does not align with the challenge description/goal, only generate the description of actions done that will help in the scoring of the challenge, things like description the user's cloth, the grass etc that isn't relevant to the challenge should not be generated/it should be ignored.only say actions that will help in scoring the user for the challenge, if the user is doing nothing, do not say it etc. `,
             });
 
             // Call OpenAI API to process this batch
             try {
-                const completion = await openai.chat.completions.create({
-                    model: 'gpt-4o',
-                    messages: batchMessages,
-                    max_tokens: 4096,
+                // const completion = await openai.chat.completions.create({
+                //     model: 'gpt-4o',
+                //     messages: batchMessages,
+                //     max_tokens: 4096,
+                // });
+                const completion = await fetcher('/api/get-frame-description', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ batch: batchMessages }),
                 });
 
-                const systemResponse = completion.choices.find((choice) => choice.message.role === 'assistant');
+                const systemResponse = completion.choices.find((choice: any) => choice.message.role === 'assistant');
                 if (systemResponse) {
                     done = done + 1
                     const description = systemResponse.message.content;
@@ -555,7 +656,7 @@ if the challenge involves a count, please state the count, for example do not sa
             // Now response state should be populated with descriptions
             setTimeout(() => {
                 setResponse([])
-                handleDesc(newDescription)
+                handleDesc(newDescription, coach)
             }, 2000);
 
         } catch (error) {
@@ -565,6 +666,7 @@ if the challenge involves a count, please state the count, for example do not sa
         }
     };
 
+    console.log("the response", response)
     return (
         <ChallengeContext.Provider
             value={{
@@ -618,7 +720,9 @@ if the challenge involves a count, please state the count, for example do not sa
                 setExplanation,
                 setScore,
                 progress,
-                refetch, setRefetch
+                refetch, setRefetch,
+                lang,
+                setLang
             }}
         >
             {props.children}

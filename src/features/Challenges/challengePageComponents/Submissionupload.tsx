@@ -7,13 +7,17 @@ import { useTranslations } from "next-intl";
 
 type Props = {
     setRoute: React.Dispatch<React.SetStateAction<number>>;
+    coach: {
+        type: string;
+        id: number;
+    } | undefined
 }
 const openai = new OpenAI({
     apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || "",
     dangerouslyAllowBrowser: true,
 });
 
-const Submissionupload = ({ setRoute }: Props) => {
+const Submissionupload = ({ setRoute, coach }: Props) => {
     const { videoUrl, handleStartCaptureClick, setVideoUrl, handleChat } = useContext(ChallengeContext)
     const [frames, setFrames] = useState<any>([]);
     const t = useTranslations('Home.ChallengePage');
@@ -43,7 +47,9 @@ const Submissionupload = ({ setRoute }: Props) => {
             </div>
 
             <div className='flex flex-col w-full space-y-[20px] mt-[20px] mb-[50px]'>
-                <div onClick={handleChat} className='rounded-[35px] cursor-pointer mt-3 w-full gap-[12px] h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
+                <div onClick={() => {
+                    handleChat(coach)
+                }} className='rounded-[35px] cursor-pointer mt-3 w-full gap-[12px] h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
                     {t("Submission")}
                 </div>
                 <div onClick={() => {

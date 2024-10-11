@@ -21,10 +21,6 @@ const Header = (props: Props) => {
                 </div>
             </div>
         </div>
-
-
-
-
     )
 }
 

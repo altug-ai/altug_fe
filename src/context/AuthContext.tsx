@@ -19,6 +19,7 @@ type Props = {
 };
 
 
+
 function AuthContextProvider({ children }: Props) {
     const { data: session } = useSession();
     const [loading, setLoading] = useState<boolean>(false);

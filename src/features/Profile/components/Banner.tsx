@@ -44,7 +44,7 @@ const Banner = (props: Props) => {
                         {/* Right hand */}
                     </div>
 
-                    <div className='flex flex-col absolute top-3 left-3 space-y-3 h-fit '>
+                    <div className='flex flex-col absolute top-3 left-3 space-y-3 h-fit  z-[1000]'>
                         <div className='h-[72.7px] w-[68.94px] bg-cover flex flex-col items-center justify-center' style={{ backgroundImage: 'url("/profile/Number.png")' }}>
                             <h1 className='font-semibold text-[20px] font-clash leading-[12.54px] text-white'>{totalPoint ?? 0}</h1>
                         </div>
@@ -53,7 +53,7 @@ const Banner = (props: Props) => {
                         </div>
                     </div>
 
-                    <div className='flex flex-col absolute top-3 right-3 space-y-3 h-fit'>
+                    <div className='flex flex-col absolute top-3 z-[1000] right-3 space-y-3 h-fit'>
                         <div className='h-[72.7px] w-[68.94px] bg-cover flex flex-col items-center justify-center' style={{ backgroundImage: 'url("/profile/Number.png")' }}>
                             <Flag country={getCountryCode(country)} size={35} />
                         </div>

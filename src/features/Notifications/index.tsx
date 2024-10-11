@@ -88,6 +88,11 @@ const Notifications = (props: Props) => {
             } else if (dat?.attributes?.type === 'CoachMessage' || dat?.attributes?.type === 'PlayerMessage') {
                 let boy = dat?.attributes?.type === 'Player' ? 'player' : 'coach';
                 url = `/chat/${boy}/${dat?.attributes?.coachId}`
+            } else if (dat?.attributes?.type === "Comment") {
+                url = `/challenge/${dat?.attributes?.challenge?.data?.id}`;
+                header = "A new comment has been added"
+                text = dat?.attributes?.text
+                prof = "/auth/Data.png"
             } else {
                 return
             }
@@ -124,7 +129,7 @@ const Notifications = (props: Props) => {
         }
     }
 
- 
+
 
     return (
         <div className='py-[20px] px-[20px] h-full flex flex-col items-center '>

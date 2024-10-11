@@ -12,6 +12,7 @@ import {
 import { Progress } from "@/components/ui/progress"
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import ReactPlayer from 'react-player/youtube'
+import { useTranslations } from "next-intl";
 
 type Props = {
     data?: any;
@@ -21,6 +22,7 @@ const Highlights = ({ data }: Props) => {
     const [api, setApi] = React.useState<CarouselApi>()
     const [current, setCurrent] = React.useState(0)
     const [count, setCount] = React.useState(0)
+    const t = useTranslations('Home.CoachProfile');
     let [isOpen, setIsOpen] = useState(false)
 
     function open() {
@@ -52,10 +54,10 @@ const Highlights = ({ data }: Props) => {
     return (
         <div className='max-w-[388px] w-full mt-[30px]'>
             <div className='w-full max-w-[388px]   flex justify-between items-center'>
-                <h1 className='font-semibold text-[16px] leading-[12.13px] tracking-[0.3%] text-[#FFFFFF]'>Career Highlights</h1>
+                <h1 className='font-semibold text-[16px] leading-[12.13px] tracking-[0.3%] text-[#FFFFFF]'>{t("Career")}</h1>
                 {
                     data?.length > 1 && (
-                        <h1 onClick={open} className='font-semibold cursor-pointer text-[12px] leading-[12.13px] tracking-[0.3%] text-[#357EF8]'>View All</h1>
+                        <h1 onClick={open} className='font-semibold cursor-pointer text-[12px] leading-[12.13px] tracking-[0.3%] text-[#357EF8]'>{t("View")}</h1>
                     )
                 }
 
@@ -69,7 +71,7 @@ const Highlights = ({ data }: Props) => {
                                 className="w-full max-w-md rounded-xl bg-white/3 p-6 backdrop-blur-3xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-3"
                             >
                                 <DialogTitle as="h3" className="text-base/7 font-medium text-white">
-                                    All Highlights
+                                    {t("All")}
                                 </DialogTitle>
 
                                 <div>
@@ -96,7 +98,7 @@ const Highlights = ({ data }: Props) => {
                                         className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
                                         onClick={close}
                                     >
-                                        Close
+                                        {t("Close")}
                                     </Button>
 
                                 </div>

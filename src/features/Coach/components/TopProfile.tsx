@@ -2,6 +2,7 @@
 import Image from 'next/image'
 import React from 'react'
 import { useRouter } from 'next/navigation';
+import { useTranslations } from "next-intl";
 
 type Props = {
     name?: string;
@@ -19,7 +20,7 @@ type Props = {
 const TopProfile = ({ name, position, DOB, club, coach, height, weight, foot, profilepic, id }: Props) => {
 
     const router = useRouter()
-
+    const t = useTranslations('Home.CoachProfile');
     return (
         <div className='w-full rounded-[12px] max-w-[388px] bg-[#181928] min-h-[8px]'>
 
@@ -33,17 +34,17 @@ const TopProfile = ({ name, position, DOB, club, coach, height, weight, foot, pr
                 <h1 className='text-[14px] font-normal leading-[20px] text-[#FFFFFF] mt-[16px]'>{position ? `${position} :` : ""} <span className='font-bold '>{club}</span></h1>
                 {
                     !coach && (
-                        <h1 className='text-[14px] font-normal leading-[20px] text-[#FFFFFF] mt-[16px]'>Date Of Birth: <span className='font-bold '>{DOB}</span></h1>
+                        <h1 className='text-[14px] font-normal leading-[20px] text-[#FFFFFF] mt-[16px]'>{t("DOB")} <span className='font-bold '>{DOB}</span></h1>
                     )
                 }
 
 
                 <div className='flex justify-between flex-wrap mt-[16px]'>
-                    <h1 className='text-[14px] font-normal leading-[20px] text-[#FFFFFF]'>Height: <span className='font-bold '>{height}</span></h1>
-                    <h1 className='text-[14px] font-normal leading-[20px] text-[#FFFFFF] '>Weight: <span className='font-bold '>{weight}</span></h1>
+                    <h1 className='text-[14px] font-normal leading-[20px] text-[#FFFFFF]'>{t("Height")} <span className='font-bold '>{height}</span></h1>
+                    <h1 className='text-[14px] font-normal leading-[20px] text-[#FFFFFF] '>{t("Weight")} <span className='font-bold '>{weight}</span></h1>
                     {
                         !coach && (
-                            <h1 className='text-[14px] font-normal leading-[20px] text-[#FFFFFF]'>Foot: <span className='font-bold '>{foot}</span></h1>
+                            <h1 className='text-[14px] font-normal leading-[20px] text-[#FFFFFF]'>{t("Foot")} <span className='font-bold '>{foot}</span></h1>
                         )
                     }
 
@@ -58,7 +59,7 @@ const TopProfile = ({ name, position, DOB, club, coach, height, weight, foot, pr
                     }
 
                 }} className='rounded-[35px] cursor-pointer mt-[16px] w-full gap-[12px] h-[36px] bg-[#357EF8]  text-[12px] font-medium leading-[15.12px] text-[#F5F7F8] flex flex-col justify-center items-center'>
-                    Get coached by {name}
+                    {t("CoachedBy")} {name}
                 </div>
             </div>
 

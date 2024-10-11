@@ -3,10 +3,10 @@ import React from 'react'
 
 type Props = {}
 
-const page = (props: Props) => {
+const page = ({ params: { locale } }: any) => {
     return (
         <div>
-            <ChallengePage />
+            <ChallengePage language={locale} />
         </div>
     )
 }

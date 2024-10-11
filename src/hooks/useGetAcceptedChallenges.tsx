@@ -60,12 +60,15 @@ export function useGetAcceptedChallenges() {
     }, [profileId, challengeLoader, jwt, pageSize]);
 
     useEffect(() => {
-
         if (jwt && profileId && hasMore) {
             getChallenge(page);
         }
-    }, [profileId, challengeLoader, jwt, page])
+    }, [profileId, jwt, page, hasMore])
 
+    useEffect(() => {
+        setHasMore(true)
+        setPage(1);
+    }, [challengeLoader])
 
     const loadMore = () => {
         if (hasMore) {

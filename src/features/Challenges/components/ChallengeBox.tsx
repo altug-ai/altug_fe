@@ -1,6 +1,6 @@
 "use client";
-import Image from 'next/image';
-import React, { useContext, useEffect, useState } from 'react';
+import Image from 'next/image'
+import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import {
     Popover,
@@ -15,6 +15,10 @@ import { ChallengeContext } from '@/context/ChallengeContext';
 import { useTranslations } from "next-intl";
 import { FaHeart } from 'react-icons/fa';
 import { SlActionRedo } from 'react-icons/sl';
+import FirstCommentBox from './FirstCommentBox';
+import CommentsOverlay from './CommentsOverlay';
+import { useGetFirstComments } from '@/hooks/useGetFirstComment';
+import { Comment } from '@/context/types';
 
 type Props = {
     submission?: boolean;
@@ -23,23 +27,61 @@ type Props = {
     goal?: string;
     video?: string;
     id?: number;
+    submitId?: number;
     accepted?: any;
     image?: string;
+    submit?: boolean;
+    audioEnabled?: boolean;
+    setAudioEnabled?: Dispatch<SetStateAction<boolean>>;
+    clientId?: number;
+    challengeId?: number;
     liked?: any; 
 };
 
-const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, accepted, image, liked }: Props) => {
+const ChallengeBox = ({ clientId, challengeId, submission, challengeHeader, title, goal, video, id, accepted, image, liked, submit, submitId, audioEnabled, setAudioEnabled }: Props) => {
     const router = useRouter();
     const [loader, setLoader] = useState<boolean>(false);
     const [isLiked, setIsLiked] = useState<boolean>(false); // State to track if the challenge is liked
     const [likeCount, setLikeCount] = useState<number>(liked?.length || 0); // Count of likes
+    const [loading, setLoading] = useState<boolean>(false)
     const [profiles, setProfiles] = useState(new Set()); // State to track accepted profiles
     const { jwt, profileId } = useContext(AuthContext);
     const { challengeLoader, setChallengeLoader, handleShare } = useContext(ChallengeContext);
     const { toast } = useToast();
+    const [data, setData] = useState<Comment[]>([]);
+    const [showOverlay, setShowOverlay] = useState(false);
+    const [reload, setReload] = useState<boolean>(false)
     const t = useTranslations('Home.Challenge');
 
-    // Check if the user has accepted the challenge and update the profiles set
+
+    useEffect(() => {
+        async function getComments() {
+            setLoading(true);
+            let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/comments?sort=id:ASC&filters[submitted_challenge][id][$eq]=${submitId}&filters[$or][0][coach][id][$notNull][$eq]=true&filters[$or][1][player][id][$notNull][$eq]=true&populate[0]=client_profile.profile_pic&populate[1]=likes&populate[2]=coach.profile&populate[3]=player.profile&pagination[pageSize]=${1}`
+
+            const personal = await fetcher(
+                url,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                }
+            );
+
+            if (personal?.data) {
+                await setData(personal?.data);
+
+            }
+
+            setLoading(false);
+        }
+
+        if (submitId) {
+            getComments();
+        }
+    }, [submitId, reload])
+
     useEffect(() => {
         if (accepted?.length > 0) {
             const updatedSet = new Set(profiles);
@@ -61,8 +103,12 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
         try {
             const response = await acceptChallenge(id, profileId, jwt);
             if (response?.data?.data?.id) {
-                setLoader(false);
-                setChallengeLoader(!challengeLoader);
+                setLoader(false)
+                setChallengeLoader(!challengeLoader)
+                const updatedSet = new Set(profiles);
+                updatedSet?.add(profileId);
+                setProfiles(updatedSet);
+                router.push(`/challenge/${id}`)
                 toast({
                     description: t("ChallengeAccepted"),
                 });
@@ -169,6 +215,40 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                     </div>
                 </div>
 
+                {/* this is for the comments */}
+                {
+                    (submit) && (
+                        <div className='px-[8px]'>
+                            {
+                                loading && (
+                                    <div className='flex justify-center my-4'>
+                                        <TbLoader3 className="text-white w-7 h-7  animate-spin" />
+                                    </div>
+                                )
+                            }
+                            {
+                                data?.map((dat) => (
+                                    <FirstCommentBox coach key={dat?.id} profile={
+                                        dat?.attributes?.coach?.data?.id ?
+                                            dat?.attributes?.coach?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.coach?.data?.attributes?.pic_url ?? "/profile/unknownp.png" :
+                                            dat?.attributes?.player?.data?.attributes?.profile?.data?.attributes?.url ?? dat?.attributes?.player?.data?.attributes?.pic_url ?? "/profile/unknownp.png"
+                                    } comment={dat?.attributes?.comment} nameHeader={dat?.attributes?.coach?.data?.id ?
+                                        dat?.attributes?.coach?.data?.attributes?.name :
+                                        dat?.attributes?.player?.data?.attributes?.name} voice={dat?.attributes?.coach?.data?.id ?
+                                            dat?.attributes?.coach?.data?.attributes?.voice :
+                                            dat?.attributes?.player?.data?.attributes?.voice
+
+                                        } audioEnabled={audioEnabled} setAudioEnabled={setAudioEnabled} />
+                                ))
+                            }
+
+                            <h1 onClick={() => {
+                                setShowOverlay(true)
+                            }} className='text-[12px] font-bold leading-[26.63px] cursor-pointer text-[#1B76FF]'>{t("AllComments")}</h1>
+                        </div>
+                    )
+                }
+
                 {/* challenge and accept */}
                 {!submission && (
                     <div className='flex items-center space-x-2 px-[8px] pb-[12px]'>
@@ -200,6 +280,12 @@ const ChallengeBox = ({ submission, challengeHeader, title, goal, video, id, acc
                     </div>
                 )}
             </div>
+            {
+                showOverlay && (
+                    <CommentsOverlay challengeId={challengeId} clientId={clientId} dLength={data?.length} reloadd={reload} setReloadd={setReload} id={submitId} setShowOverlay={setShowOverlay} />
+                )
+            }
+
         </div>
     );
 };

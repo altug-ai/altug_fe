@@ -20,26 +20,31 @@ import ChallengeBox from './components/ChallengeBox';
 import { acceptChallenge, sendNotification } from './functions/function';
 import { useGetSubmitted } from '@/hooks/useGetSubmitted';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import CommentsOverlay from './components/CommentsOverlay';
 
-type Props = {}
+type Props = {
+    language: string;
+}
 
-const ChallengePage = (props: Props) => {
+const ChallengePage = ({ language }: Props) => {
 
     const { loading, profileId, jwt } = useContext(AuthContext)
     const params = useParams();
+    const [showOverlay, setShowOverlay] = useState(false);
     const { slug }: any = params;
-    const { handleStartCaptureClick, route, setRoute, setVideoUrl, setVideoBlob, point, challengeLoader, setChallengeLoader, chal, setChal } = useContext(ChallengeContext)
+    const { handleStartCaptureClick, route, setRoute, setVideoUrl, setVideoBlob, point, challengeLoader, setChallengeLoader, chal, setChal, setLang, lang } = useContext(ChallengeContext)
     const [profiles, setProfiles] = useState(new Set());
     const [profiless, setProfiless] = useState(new Set());
     const t = useTranslations('Home.ChallengePage');
     const { toast } = useToast();
     const [openn, setOpenn] = useState<boolean>(false)
     const [loader, setLoader] = useState<boolean>(false)
-    const { data, loading: challengeLoaderr } = useGetChallenges(slug)
+    const { data, loading: challengeLoaderr, coach } = useGetChallenges(slug)
     const { data: submitted, hasMore, loadMore } = useGetSubmitted(data?.id)
     let [isOpen, setIsOpen] = useState(false)
     const searchParams = useSearchParams()
     const search = searchParams.get('id')
+    const [audioEnabled, setAudioEnabled] = useState<boolean>(false)
 
     function open() {
         setIsOpen(true)
@@ -48,6 +53,29 @@ const ChallengePage = (props: Props) => {
     function close() {
         setIsOpen(false)
     }
+
+
+    useEffect(() => {
+        setLang(language)
+    }, [language])
+
+
+    console.log("this is the current lang", lang)
+
+    // const handleWheel = (event : any) => {
+    //     if (event.deltaY > 0) {
+    //         // Swipe down detected
+    //         console.log('Swiped down!');
+    //         yourFunction(); // Call your function here
+    //     }
+    // };
+
+    // const yourFunction = () => {
+    //     alert('Swipe down action triggered!');
+    //     // Add your desired functionality here
+    // };
+
+
     useEffect(() => {
         if (data?.attributes?.accepted?.data?.length > 0) {
             const updatedSet = new Set(profiless);
@@ -153,6 +181,9 @@ const ChallengePage = (props: Props) => {
                 toast({
                     description: t("ChallengeAccepted"),
                 });
+                const updatedSet = new Set(profiless);
+                updatedSet?.add(profileId);
+                setProfiless(updatedSet);
             } else {
                 setLoader(false)
                 toast({
@@ -220,7 +251,7 @@ const ChallengePage = (props: Props) => {
                                 >
                                     {
                                         submitted?.map((submit: any) => (
-                                            <ChallengeBox image={submit?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} goal={data?.attributes?.goal} key={submit?.id} title={data?.attributes?.title} video={submit?.attributes?.video?.data?.attributes?.url} submission />
+                                            <ChallengeBox audioEnabled={audioEnabled} setAudioEnabled={setAudioEnabled} challengeId={submit?.attributes?.challenge?.data?.id} clientId={submit?.attributes?.client_profile?.data?.id} submitId={submit?.id} submit={true} image={submit?.attributes?.client_profile?.data?.attributes?.profile_pic?.data?.attributes?.url} goal={data?.attributes?.goal} key={submit?.id} title={data?.attributes?.title} video={submit?.attributes?.video?.data?.attributes?.url} submission />
                                         ))
                                     }
                                 </InfiniteScroll>
@@ -228,8 +259,6 @@ const ChallengePage = (props: Props) => {
                         </div>
 
                         <div className='w-full max-w-[388px]'>
-
-
                             {
                                 profiless?.has(profileId) ? (
                                     <div className='w-full max-w-[388px] '>
@@ -244,16 +273,13 @@ const ChallengePage = (props: Props) => {
                                                         onChange={handleVideoChange}
                                                     />
                                                     <Label htmlFor="video" >
-                                                        <div className='rounded-[35px]  cursor-pointer mt-3 w-full gap-[12px] h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
+                                                        <div className='rounded-[35px]  cursor-pointer mt-3  w-full  h-[48px] bg-[#357EF8]  text-[13px] font-semibold leading-[16.38px] text-white flex flex-col justify-center items-center'>
                                                             {t("Testing")}
                                                         </div>
                                                     </Label>
                                                 </div>
                                             )
                                         }
-
-
-
 
                                         {/* Start Recording */}
                                         {
@@ -319,13 +345,13 @@ const ChallengePage = (props: Props) => {
 
             {
                 route === 1 && (
-                    <Submissionupload setRoute={setRoute} />
+                    <Submissionupload coach={coach} setRoute={setRoute} />
                 )
             }
 
             {
                 route === 2 && (
-                    <SubmissionLoad image={data?.attributes?.banner?.data?.attributes?.url} accepted={data?.attributes?.accepted?.data} description={data?.attributes?.description} goal={data?.attributes?.goal} title={data?.attributes?.title} setRoute={setRoute} />
+                    <SubmissionLoad coach={coach} image={data?.attributes?.banner?.data?.attributes?.url} accepted={data?.attributes?.accepted?.data} description={data?.attributes?.description} goal={data?.attributes?.goal} title={data?.attributes?.title} setRoute={setRoute} />
                 )
             }
 
@@ -367,6 +393,10 @@ const ChallengePage = (props: Props) => {
                     </div>
                 </div>
             </Dialog>
+
+
+            {/* the comments overlay */}
+
 
         </div >
     )

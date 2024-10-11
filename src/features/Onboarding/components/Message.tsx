@@ -5,6 +5,7 @@ import { HiMiniSpeakerWave } from "react-icons/hi2";
 import { getTimeData } from '../functions/functions';
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { CoachContext } from '@/context/CoachContext';
+import { TbLoader3 } from 'react-icons/tb';
 
 type Props = {
     system?: boolean;
@@ -25,14 +26,14 @@ type Props = {
 const Message = ({ system, user, message, date, image, premium, voice, audioRef, role, audioEnabled, setAudioEnabled, content }: Props) => {
 
     let [isOpen, setIsOpen] = useState(false)
+    const [loader, setLoader] = useState<boolean>(false)
 
     function removeAsterisks(str: string) {
         if (!str) {
-            return ""
+            return "";
         }
-        return str.replace(/\*/g, '');
+        return str.replace(/[\*#]/g, '');
     }
-
 
     const getElevenLabsResponse = async (text: string) => {
         const response = await fetch("/api/speech", {
@@ -78,16 +79,23 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
 
 
     const theSpeaker = async () => {
-        let mess = removeAsterisks(message)
-        const botVoiceResponse = await getElevenLabsResponse(mess);
-        const reader = new FileReader();
-        reader.readAsDataURL(botVoiceResponse);
-        reader.onload = () => {
-            if (audioRef.current) {
-                audioRef.current.src = reader.result as string;
-                audioRef.current.play();
-            }
-        };
+        try {
+            setLoader(true)
+            let mess = removeAsterisks(message)
+            const botVoiceResponse = await getElevenLabsResponse(mess);
+            const reader = new FileReader();
+            reader.readAsDataURL(botVoiceResponse);
+            reader.onload = () => {
+                if (audioRef.current) {
+                    audioRef.current.src = reader.result as string;
+                    setLoader(false)
+                    audioRef.current.play();
+                }
+            };
+        } catch (error) {
+            console.error("this is the error", error)
+            setLoader(false)
+        }
     }
 
 
@@ -135,14 +143,23 @@ const Message = ({ system, user, message, date, image, premium, voice, audioRef,
                             {
                                 premium && (
                                     <div onClick={() => {
+                                        if (loader) {
+                                            return
+                                        }
                                         if (!audioEnabled) {
                                             open()
                                         } else {
                                             theSpeaker()
                                         }
-
                                     }} className='w-full flex justify-end'>
-                                        <HiMiniSpeakerWave className='h-4 w-4 text-slate-800 cursor-pointer' />
+                                        {
+                                            loader ? (
+                                                <TbLoader3 className="text-[#1B76FF] w-4 h-4 animate-spin" />
+                                            ) : (
+                                                <HiMiniSpeakerWave className='h-4 w-4 text-[#1B76FF] cursor-pointer' />
+                                            )
+                                        }
+
                                     </div>
 
                                 )
