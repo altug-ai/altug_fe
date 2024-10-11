@@ -19,6 +19,7 @@ import FirstCommentBox from './FirstCommentBox';
 import CommentsOverlay from './CommentsOverlay';
 import { useGetFirstComments } from '@/hooks/useGetFirstComment';
 import { Comment } from '@/context/types';
+import { fetcher } from '@/lib/functions';
 
 type Props = {
     submission?: boolean;
