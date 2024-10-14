@@ -87,22 +87,43 @@ export async function decryptPrivateKey(encryptedData, password) {
 
 // Function to convert Uint8Array to Base64 string
 export function arrayBufferToBase64(buffer) {
-  let binary = "";
+  let binary = '';
   const bytes = new Uint8Array(buffer);
   const len = bytes.byteLength;
+
   for (let i = 0; i < len; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
-  return window.btoa(binary);
+
+  // Check if running in a browser environment
+  if (typeof window !== 'undefined') {
+    // Running in the browser
+    return window.btoa(binary);
+  } else {
+    // Running in Node.js (or Next.js API route)
+    return Buffer.from(binary, 'binary').toString('base64');
+  }
 }
 
 // Function to convert Base64 string back to Uint8Array
 export function base64ToArrayBuffer(base64) {
-  const binaryString = window.atob(base64);
+  let binaryString;
+
+  // Use Buffer in Node.js (server-side) and atob in the browser (client-side)
+  if (typeof window !== 'undefined') {
+    // Running in the browser
+    binaryString = window.atob(base64);
+  } else {
+    // Running in Next.js API route or Node.js
+    binaryString = Buffer.from(base64, 'base64').toString('binary');
+  }
+
   const len = binaryString.length;
   const bytes = new Uint8Array(len);
+
   for (let i = 0; i < len; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
+
   return bytes.buffer;
 }
