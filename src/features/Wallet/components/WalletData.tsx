@@ -35,7 +35,7 @@ const WalletData = ({ setTab, balance }: Props) => {
           <div className="flex flex-col text-[20px] font-extrabold text-white leading-[24px] font-plus">
             <h1>{balance?.toString().trim().slice(0, 4)} {t("Token")} </h1>
             <h1 className="text-[14px] font-normal leading-[24px]">
-              2,108.22$
+              2,108.22
             </h1>
           </div>
         )}

@@ -41,7 +41,7 @@
     "Wallet": {
       "SomethingWentWrong": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
       "RewardClaimedSuccessfully": "Ödül başarıyla talep edildi.",
-      "Token": "CHZ Token",
+      "Token": "PRO Token",
       "Deposit": "Para Yatır",
       "Withdraw": "Para Çek",
       "ClaimRewards": "Ödülleri Talep Et",
@@ -61,7 +61,7 @@
       "ProSuccess": "Pro token'larınızı başarıyla transfer ettiniz.",
       "Total": "Toplam",
       "BackHome": "Ana Sayfaya Dön",
-      "AddressBelow": "Aşağıdaki adresi kopyalayın ve ağın chz olduğundan emin olun.",
+      "AddressBelow": "Aşağıdaki adresi kopyalayın ve ağın pro olduğundan emin olun.",
       "BackWallet": "Cüzdana Dön"
     },
     "Login": {

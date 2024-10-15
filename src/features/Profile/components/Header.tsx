@@ -95,7 +95,7 @@ const Header = (props: Props) => {
             height={500}
           />
           <h1 className="text-black text-[15px] font-bold leading-[12.546px]">
-            {balance} Chz
+            {balance} Pro
           </h1>
         </div>
       </div>

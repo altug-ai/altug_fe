@@ -43,8 +43,9 @@ const Transfer = ({
         />
 
         <div className="flex flex-col text-[20px] font-extrabold text-white leading-[24px] font-plus">
+          {/* Update  */}
           <h1>{balance} {t("Token")} </h1>
-          <h1 className="text-[14px] font-normal leading-[24px]">2,108.22$</h1>
+          <h1 className="text-[14px] font-normal leading-[24px]">2,108.22</h1>
         </div>
       </div>
 
