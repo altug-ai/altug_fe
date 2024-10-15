@@ -41,7 +41,7 @@
     "Wallet": {
       "SomethingWentWrong": "Something went wrong. Please try again",
       "RewardClaimedSuccessfully": "Reward Claimed Successfully",
-      "Token": "CHZ Token",
+      "Token": "PRO Token",
       "Deposit": "Deposit",
       "Withdraw": "Withdraw",
       "ClaimRewards": "Claim Rewards",
@@ -61,7 +61,7 @@
       "ProSuccess": "You have successfully transferred your Pro tokens.",
       "Total": "Total",
       "BackHome": "Back To Home",
-      "AddressBelow": "Copy the address below and make sure the network is chz.",
+      "AddressBelow": "Copy the address below and make sure the network is pro.",
       "BackWallet": "Back To Wallet"
     },
     "Login": {
