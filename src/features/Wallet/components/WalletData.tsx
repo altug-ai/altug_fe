@@ -33,9 +33,9 @@ const WalletData = ({ setTab, balance }: Props) => {
           <TbLoader3 className="rounded-[47px] bg-[#357EF8] mr-6 text-white text-[12px] w-7 h-7 animate-spin" />
         ) : (
           <div className="flex flex-col text-[20px] font-extrabold text-white leading-[24px] font-plus">
-            <h1>{balance?.toString().replace('$', '').trim().slice(0, 4)} {t("ProToken")}</h1>
+            <h1>{balance?.toString().trim().slice(0, 4)} {t("ProToken").replace('$', '')}</h1>
             <h1 className="text-[14px] font-normal leading-[24px]">
-              2,108.22
+              {/* 2,108.22 */}
             </h1>
           </div>
         )}
