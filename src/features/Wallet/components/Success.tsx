@@ -58,7 +58,7 @@ const Success = ({ receipentAddress, transferAmount }: Props) => {
               {t("Total")}
             </h1>
             <h1 className="text-[#3640F0] font-plus text-[36px] font-bold leading-[44px]">
-              {transferAmount} {t("Token")}
+              {transferAmount} {t("ProToken")}
             </h1>
             <div className="px-[12px] py-[12px] bg-[#F3F3F3] rounded-[16px] flex space-x-[16px] items-center">
               <div className="rounded-[12px]  bg-white px-[10px] py-[10px]">
