@@ -88,7 +88,7 @@ const Task = ({
             {title ?? "Defense challenge"}
           </h1>
           <h1 className="text-[#737883] text-[12px] font-normal leading-normal font-plus">
-            {number ?? "0.1"} {t("ProToken")}
+            {number ?? "0.1"} {t("ProToken").replace('$', '')}
           </h1>
         </div>
       </div>
