@@ -1,12 +1,8 @@
+import { fetcher } from '@/lib/functions';
 import { VideoToFrames, VideoToFramesMethod } from '@/lib/VideoToFrame';
 import axios from 'axios';
 import OpenAI from 'openai';
 import { Dispatch, SetStateAction } from 'react';
-
-const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || '',
-  dangerouslyAllowBrowser: true,
-});
 
 const concatenateDescriptions = (dataArray: any) => {
   // Sort the array by id
@@ -21,49 +17,6 @@ const concatenateDescriptions = (dataArray: any) => {
   });
 
   return concatenatedString;
-};
-
-export const getImageDescription = async (
-  setProgress: Dispatch<SetStateAction<number>>,
-  imageurl: any,
-  input: string
-) => {
-  // get the image description then return it
-  setProgress(50);
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    messages: [
-      {
-        role: 'system',
-        content: `
-        , this is the user prompt ${input}, use it to get a reply for the image uploaded, do not make the reply too long,
-           `,
-      },
-
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'image_url',
-            image_url: {
-              url: `${imageurl}`,
-            },
-          },
-        ],
-      },
-    ],
-    max_tokens: 1000,
-  });
-
-  const systemResponse = completion.choices.find(
-    (choice) => choice.message.role === 'assistant'
-  );
-
-  if (systemResponse) {
-    return systemResponse.message.content;
-  } else {
-    return '';
-  }
 };
 
 export const getVideoDescription = async (
@@ -163,14 +116,16 @@ Do not include labels such as "frame 1," "frame 2,", "id 0", "id 1" etc., in you
 
     // Call OpenAI API to process this batch
     try {
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: batchMessages,
-        max_tokens: 4096,
+      const completion = await fetcher('/api/get-frame-description', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ batch: batchMessages }),
       });
 
-      const systemResponse = completion.choices.find(
-        (choice) => choice.message.role === 'assistant'
+      const systemResponse = completion?.choices?.find(
+        (choice : any) => choice.message.role === 'assistant'
       );
       if (systemResponse) {
         done = done + 1;
