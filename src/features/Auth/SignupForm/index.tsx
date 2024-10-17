@@ -241,7 +241,7 @@ const SignupForm = (props: Props) => {
             <Image
               src={"/auth/arrow-left.png"}
               alt="the arrow left"
-              width={300}                                                                    
+              width={300}
               height={300}
               className="w-[24px] h-[24px] mb-[30px] cursor-pointer"
             />
@@ -335,12 +335,7 @@ const SignupForm = (props: Props) => {
                               {Object.keys(countries).map(
                                 (countryCode: any) => (
                                   // @ts-ignore
-                                  <SelectItem
-                                    key={countries[countryCode].name}
-                                    value={countries[countryCode].name}
-                                  >
-                                    {countries[countryCode].name}
-                                  </SelectItem>
+                                  <SelectItem key={countries[countryCode].name} value={countries[countryCode].name}> {countries[countryCode].name}</SelectItem>
                                 )
                               )}
                             </SelectGroup>
@@ -439,34 +434,34 @@ const SignupForm = (props: Props) => {
                 />
               </div>
 
-                                {/* the error message */}
-                                <h1 className="text-red-500 text-[14px] font-medium mt-[50px]">{error}</h1>
-                                <div className="mb-5 w-full max-w-[388px] text-[#F5F7F8] text-[14px] leading-[20px]">
-                                    By signing up, you agree to our 
-                                    <a target="_blank" href="/terms-and-conditions" className="text-[#357EF8] hover:underline ml-1">Terms of Service</a>.
-                                    Learn more about how we collect, use, and share your data in our 
-                                    <a target="_blank" href="/user-agreement" className="text-[#357EF8] hover:underline ml-1">User Agreement</a>.
-                                    Please review these documents thoroughly. Make sure you understand and agree with the terms before using Pro Legacy.
-                                </div>
-                                {/* signup */}
-                                <div className=' w-full flex justify-center mt-[5px]'>
-                                    <button type="submit" className='py-[12px] z-10  w-full max-w-[388px]  cursor-pointer  bg-[#357EF8] flex justify-center rounded-[24px] gap-[12px]'>
-                                        <div className='flex space-x-2 items-center'>
-                                            {
-                                                loader ? (
-                                                    <TbLoader3 className="text-white w-7 h-7 animate-spin" />
-                                                ) : (
-                                                    <h1 className='text-[#F5F7F8] text-[16px] leading-[24px] '>{t("Signup")}</h1>
-                                                )
-                                            }
+              {/* the error message */}
+              <h1 className="text-red-500 text-[14px] font-medium mt-[50px]">{error}</h1>
+              <div className="mb-5 w-full max-w-[388px] text-[#F5F7F8] text-[14px] leading-[20px]">
+                By signing up, you agree to our
+                <a target="_blank" href="/terms-and-conditions" className="text-[#357EF8] hover:underline ml-1">Terms of Service</a>.
+                Learn more about how we collect, use, and share your data in our
+                <a target="_blank" href="/user-agreement" className="text-[#357EF8] hover:underline ml-1">User Agreement</a>.
+                Please review these documents thoroughly. Make sure you understand and agree with the terms before using Pro Legacy.
+              </div>
+              {/* signup */}
+              <div className=' w-full flex justify-center mt-[5px]'>
+                <button type="submit" className='py-[12px] z-10  w-full max-w-[388px]  cursor-pointer  bg-[#357EF8] flex justify-center rounded-[24px] gap-[12px]'>
+                  <div className='flex space-x-2 items-center'>
+                    {
+                      loader ? (
+                        <TbLoader3 className="text-white w-7 h-7 animate-spin" />
+                      ) : (
+                        <h1 className='text-[#F5F7F8] text-[16px] leading-[24px] '>{t("Signup")}</h1>
+                      )
+                    }
 
-                                        </div>
-                                    </button>
-                                </div>
+                  </div>
+                </button>
+              </div>
 
 
-                            </form>
-                        </Form>
+            </form>
+          </Form>
 
           {/* the divider */}
           <div className="w-full max-w-[388px] my-[30px] flex space-x-3 items-center">

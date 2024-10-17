@@ -12,15 +12,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { AuthContext } from "@/context/AuthContext";
+import { fetcher } from "@/lib/functions";
 import { Message } from "ai";
 import { AssistantStatus } from "ai/react";
+import axios from "axios";
 import Image from "next/image";
-import OpenAI from 'openai';
 import { useContext, useEffect, useState } from "react";
 import { MdOutlineAttachment } from "react-icons/md";
-import { compressAndResizeBase64Image, compressAndResizeImageFile, getImageDescription, getVideoDescription } from "../functions/functions";
-import axios from "axios";
-import { AuthContext } from "@/context/AuthContext";
+import { compressAndResizeImageFile, getVideoDescription } from "../functions/functions";
 
 type Props = {
     submitMessage: (event?: React.FormEvent<HTMLFormElement>, requestOptions?: {
@@ -45,10 +45,7 @@ type Props = {
     handleChat: () => Promise<void>
 }
 
-const openai = new OpenAI({
-    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || "",
-    dangerouslyAllowBrowser: true,
-});
+
 
 const MediaModal = ({ threadId, submitMessage, messages, coach, setFileId, fileId, handleChat, handleInputChange, input, status, setInput, setMessages, setLoad, load, messagesLeft, open, paid, tier }: Props) => {
     const [imagesrc, setImagesrc] = useState<string>("");
@@ -155,10 +152,16 @@ const MediaModal = ({ threadId, submitMessage, messages, coach, setFileId, fileI
 
 
     const uploadMediaToOpenAi = async (data: any) => {
-        const createdMessage = await openai.beta.threads.messages.create(
-            threadId,
-            data
-        );
+
+        const createdMessage = await fetcher('/api/upload-media', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ data: data, threadId: threadId }),
+        });
+
+
         return createdMessage
     }
 

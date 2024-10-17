@@ -12,29 +12,29 @@ export async function encryptPrivateKey(data, password) {
 
   // Derive a key from the password using PBKDF2 with the fixed salt
   const keyMaterial = await crypto.subtle.importKey(
-    "raw",
+    'raw',
     encoder.encode(password),
-    { name: "PBKDF2" },
+    { name: 'PBKDF2' },
     false,
-    ["deriveKey"]
+    ['deriveKey']
   );
 
   const key = await crypto.subtle.deriveKey(
     {
-      name: "PBKDF2",
+      name: 'PBKDF2',
       salt: FIXED_SALT,
       iterations: 100000,
-      hash: "SHA-256",
+      hash: 'SHA-256',
     },
     keyMaterial,
-    { name: "AES-GCM", length: 256 },
+    { name: 'AES-GCM', length: 256 },
     true,
-    ["encrypt"]
+    ['encrypt']
   );
 
   const encrypted = await crypto.subtle.encrypt(
     {
-      name: "AES-GCM",
+      name: 'AES-GCM',
       iv: FIXED_IV,
     },
     key,
@@ -53,29 +53,29 @@ export async function decryptPrivateKey(encryptedData, password) {
 
   // Derive the key from the password using PBKDF2 with the fixed salt
   const keyMaterial = await crypto.subtle.importKey(
-    "raw",
+    'raw',
     encoder.encode(password),
-    { name: "PBKDF2" },
+    { name: 'PBKDF2' },
     false,
-    ["deriveKey"]
+    ['deriveKey']
   );
 
   const key = await crypto.subtle.deriveKey(
     {
-      name: "PBKDF2",
+      name: 'PBKDF2',
       salt: FIXED_SALT,
       iterations: 100000,
-      hash: "SHA-256",
+      hash: 'SHA-256',
     },
     keyMaterial,
-    { name: "AES-GCM", length: 256 },
+    { name: 'AES-GCM', length: 256 },
     true,
-    ["decrypt"]
+    ['decrypt']
   );
 
   const decrypted = await crypto.subtle.decrypt(
     {
-      name: "AES-GCM",
+      name: 'AES-GCM',
       iv: FIXED_IV,
     },
     key,
