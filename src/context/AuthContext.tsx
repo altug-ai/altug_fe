@@ -31,7 +31,7 @@ function AuthContextProvider({ children }: Props) {
     const [userId, setUserId] = useState<number>();
     const [profile, setProfile] = useState<Profile>();
     const [tier, setTier] = useState<Tier>()
-    const [messagesLeft, setMessagesLeft] = useState<number>(3)
+    const [messagesLeft, setMessagesLeft] = useState<number>(5)
     const [user, setUser] = useState<UserData>();
     const [coachIds, setCoachIds] = useState(new Set());
     const [playerIds, setPlayerIds] = useState(new Set());
