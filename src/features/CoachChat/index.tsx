@@ -37,7 +37,7 @@ const CoachChat = (props: Props) => {
     const [message, setMessage] = useState<any[]>([]);
     const [voice, setVoice] = useState<string>("Adam")
     const { toast } = useToast();
-    const [messagesLeft, setMessagesLeft] = useState<number>(3)
+    const [messagesLeft, setMessagesLeft] = useState<number>(5)
     const [tier, setTier] = useState<any>()
     const [load, setLoad] = useState<boolean>(false);
     const [chatId, setChatId] = useState()

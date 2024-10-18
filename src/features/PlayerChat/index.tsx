@@ -34,7 +34,7 @@ const PlayerChat = (props: Props) => {
     const [response, setResponse] = useState("")
     const [voice, setVoice] = useState<string>("Adam")
     const [message, setMessage] = useState<any[]>([]);
-    const [messagesLeft, setMessagesLeft] = useState<number>(3)
+    const [messagesLeft, setMessagesLeft] = useState<number>(5)
     const [tier, setTier] = useState<any>()
     const [chatId, setChatId] = useState()
     const [previous, setPrevious] = useState([])
