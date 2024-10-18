@@ -235,8 +235,8 @@ function AuthContextProvider({ children }: Props) {
         try {
             const { data } = await axios.post("/api/stripe-subscription", {
                 profileId: chatId,
-                amount: (parseInt("500") * 100).toFixed(2),
-                productName: "Zballer",
+                amount: (parseInt("5") * 100).toFixed(2),
+                productName: "Pro Legacy",
                 customerEmail: profileEmail,
                 planId: "prod_QMLxK4VVI8U3Kp",
                 callbackURL: url ?? `/profile`
